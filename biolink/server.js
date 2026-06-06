@@ -61,7 +61,8 @@ const ALLOWED = {
   avatar:       ['image/png', 'image/jpeg', 'image/gif', 'image/webp'],
   background:   ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'],
   song:         ['audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/wav', 'audio/x-m4a', 'audio/mp4'],
-  cursor_image: ['image/png', 'image/gif', 'image/webp']
+  cursor_image: ['image/png', 'image/gif', 'image/webp'],
+  banner:       ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
 };
 const upload = multer({
   storage,
@@ -74,7 +75,8 @@ const upload = multer({
   { name: 'avatar', maxCount: 1 },
   { name: 'background', maxCount: 1 },
   { name: 'song', maxCount: 1 },
-  { name: 'cursor_image', maxCount: 1 }
+  { name: 'cursor_image', maxCount: 1 },
+  { name: 'banner', maxCount: 1 }
 ]);
 
 // ===========================================================================
@@ -105,9 +107,11 @@ const ALLOWED_CURSORS = ['none', 'magnet', 'glow', 'ring', 'dot', 'trail', 'spar
 const ALLOWED_AVATAR_SIZE = ['sm', 'md', 'lg', 'xl'];
 const ALLOWED_BADGE_STYLE = ['multi', 'accent', 'custom'];
 const ALLOWED_BG_BLUR = ['none', 'light', 'strong'];
+const ALLOWED_ENTER_ANIM = ['fade', 'zoom', 'slide', 'blur', 'flip'];
 const ALLOWED_CARD_STYLE = ['glass', 'solid', 'none'];
 const ALLOWED_CARD_SHAPE = ['rounded', 'square', 'round'];
-const ALLOWED_AVATAR_SHAPE = ['circle', 'rounded', 'square'];
+const ALLOWED_CARD_BLUR = ['none', 'light', 'medium', 'strong'];
+const ALLOWED_AVATAR_SHAPE = ['circle', 'rounded', 'square', 'none'];
 const ALLOWED_USERNAME_EFFECT = ['none', 'gradient', 'glow', 'shine'];
 
 // Catalogue de badges (cle -> libelle). Attribues depuis le panneau admin.
@@ -395,6 +399,7 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const discordUser = /^[0-9]{5,25}$/.test((b.discord_user || '').trim()) ? b.discord_user.trim() : '';
     const cardStyle = ALLOWED_CARD_STYLE.includes(b.card_style) ? b.card_style : 'glass';
     const cardShape = ALLOWED_CARD_SHAPE.includes(b.card_shape) ? b.card_shape : 'rounded';
+    const cardBlur = ALLOWED_CARD_BLUR.includes(b.card_blur) ? b.card_blur : 'strong';
     const avatarShape = ALLOWED_AVATAR_SHAPE.includes(b.avatar_shape) ? b.avatar_shape : 'circle';
     const enterText = (b.enter_text || '').slice(0, 40);
     const usernameEffect = ALLOWED_USERNAME_EFFECT.includes(b.username_effect) ? b.username_effect : 'none';
@@ -404,6 +409,10 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const badgeColor = safeHex(b.badge_color, '#8b5cf6');
     const bgBlur = ALLOWED_BG_BLUR.includes(b.bg_blur) ? b.bg_blur : 'none';
     const avatarGlow = b.avatar_glow ? 1 : 0;
+    const enterAnim = ALLOWED_ENTER_ANIM.includes(b.enter_anim) ? b.enter_anim : 'fade';
+    let banner = u.banner || '';
+    if (files.banner) banner = '/uploads/' + files.banner[0].filename;
+    else if (b.banner_clear === '1') banner = '';
 
     // Liens sociaux + boutons (champs repetes)
     const sTypes = toArray(b.social_type), sUrls = toArray(b.social_url);
@@ -444,14 +453,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -533,6 +542,7 @@ app.get('/:username', (req, res, next) => {
     cursorImage:  u.cursor_image || '',
     cardStyle:    u.card_style || 'glass',
     cardShape:    u.card_shape || 'rounded',
+    cardBlur:     u.card_blur || 'strong',
     avatarShape:  u.avatar_shape || 'circle',
     verified:     !!u.verified,
     staff:        !!u.staff,
@@ -546,6 +556,8 @@ app.get('/:username', (req, res, next) => {
     badgeColor:   u.badge_color || '#8b5cf6',
     bgBlur:       u.bg_blur || 'none',
     avatarGlow:   !!u.avatar_glow,
+    banner:       u.banner || '',
+    enterAnim:    u.enter_anim || 'fade',
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)

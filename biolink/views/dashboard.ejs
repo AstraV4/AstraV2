@@ -78,8 +78,14 @@
     <div class="section" data-tab="apparence">
       <h3>Apparence</h3>
       <div class="row2">
-        <div><label>Couleur principale</label><input type="color" name="accent" value="<%= u.accent %>" /></div>
-        <div><label>Couleur secondaire</label><input type="color" name="accent2" value="<%= u.accent2 %>" /></div>
+        <div><label>Couleur principale</label><input type="color" name="accent" id="acc1" value="<%= u.accent %>" /></div>
+        <div><label>Couleur secondaire</label><input type="color" name="accent2" id="acc2" value="<%= u.accent2 %>" /></div>
+      </div>
+      <label>🌈 Thèmes rapides (1 clic)</label>
+      <div id="themes" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <% [['Violet/Cyan','#8b5cf6','#22d3ee'],['Rose/Orange','#ec4899','#f59e0b'],['Vert/Bleu','#22c55e','#3b82f6'],['Rouge/Noir','#ef4444','#1f2937'],['Or/Ambre','#fbbf24','#f59e0b'],['Cyan/Violet','#06b6d4','#a855f7'],['Rose/Violet','#f472b6','#8b5cf6'],['Lime/Teal','#84cc16','#14b8a6'],['Bleu glace','#60a5fa','#bae6fd']].forEach(function(t){ %>
+          <button type="button" class="theme-swatch" data-c1="<%= t[1] %>" data-c2="<%= t[2] %>" title="<%= t[0] %>" style="background:linear-gradient(135deg,<%= t[1] %>,<%= t[2] %>)"></button>
+        <% }) %>
       </div>
       <div class="row2">
         <div>
@@ -117,11 +123,17 @@
           </select>
         </div>
       </div>
+      <label>🌫️ Intensité du flou de la carte (verre dépoli)</label>
+      <select name="card_blur">
+        <% [['none','Aucun (net)'],['light','Léger'],['medium','Moyen'],['strong','Fort']].forEach(function(c){ %>
+          <option value="<%= c[0] %>" <%= (u.card_blur||'strong')===c[0]?'selected':'' %>><%= c[1] %></option>
+        <% }) %>
+      </select>
       <div class="row2">
         <div>
           <label>Forme de l'avatar</label>
           <select name="avatar_shape">
-            <% [['circle','Rond'],['rounded','Arrondi'],['square','Carré']].forEach(function(c){ %>
+            <% [['circle','Rond'],['rounded','Arrondi'],['square','Carré'],['none','Aucun (pas de photo)']].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.avatar_shape||'circle')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
@@ -185,6 +197,12 @@
           <input type="text" name="enter_text" value="<%= u.enter_text %>" maxlength="40" placeholder="click to enter" />
         </div>
       </div>
+      <label style="margin-top:8px">🎬 Animation d'entrée</label>
+      <select name="enter_anim">
+        <% [['fade','Fondu'],['zoom','Zoom'],['slide','Glissé'],['blur','Flou'],['flip','Flip 3D']].forEach(function(o){ %>
+          <option value="<%= o[0] %>" <%= (u.enter_anim||'fade')===o[0]?'selected':'' %>><%= o[1] %></option>
+        <% }) %>
+      </select>
     </div>
 
     <div class="section" data-tab="media">
@@ -193,6 +211,15 @@
       <label>Fond (image ou vidéo)</label>
       <input type="file" name="background" accept="image/*,video/mp4,video/webm" />
       <% if (u.background) { %><div class="current">Actuel : <a href="<%= u.background %>" target="_blank">voir</a></div><% } %>
+
+      <label style="margin-top:14px">🖼️ Bannière (couverture en haut du profil)</label>
+      <input type="file" name="banner" accept="image/*" />
+      <div class="hint">Image large recommandée (ex: 1200×400). Elle s'affiche en haut de ta carte, avec l'avatar par-dessus.</div>
+      <% if (u.banner) { %>
+        <div class="current">Actuelle : <a href="<%= u.banner %>" target="_blank">voir</a>
+          <label style="display:inline-flex;align-items:center;gap:6px;margin-left:10px;font-weight:400"><input type="checkbox" name="banner_clear" value="1" style="width:auto" /> retirer la bannière</label>
+        </div>
+      <% } %>
     </div>
 
     <div class="section" data-tab="media">
@@ -335,6 +362,18 @@
   }
   btns.forEach(b => b.addEventListener('click', () => show(b.dataset.go)));
   show('profil');
+})();
+// Thèmes de couleurs rapides
+(function(){
+  const themes = document.getElementById('themes');
+  if (!themes) return;
+  themes.querySelectorAll('.theme-swatch').forEach(b => {
+    b.addEventListener('click', () => {
+      const a1 = document.getElementById('acc1'), a2 = document.getElementById('acc2');
+      if (a1) a1.value = b.dataset.c1;
+      if (a2) a2.value = b.dataset.c2;
+    });
+  });
 })();
 const SOCIAL_TYPES = ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','email','globe'];
 function addSocial(){

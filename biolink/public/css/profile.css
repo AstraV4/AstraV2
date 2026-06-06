@@ -230,3 +230,23 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 /* suiveurs (trail / comet) : couleur par defaut */
 .cursor-follow{background:var(--accent);box-shadow:0 0 10px var(--accent)}
 @media(max-width:480px){.card{padding:28px 22px 22px}#player{bottom:14px}}
+
+/* ===== Banniere ===== */
+.banner{height:120px;margin:-34px -28px 0;background-size:cover;background-position:center;position:relative;z-index:1}
+.card.has-banner .avatar-wrap{margin-top:-52px;position:relative;z-index:2}
+
+/* ===== Animations d'entree ===== */
+#stage.show.anim-zoom .card{animation:enZoom .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes enZoom{from{transform:scale(.82);opacity:0}to{transform:none;opacity:1}}
+#stage.show.anim-slide .card{animation:enSlide .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes enSlide{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+#stage.show.anim-blur .card{animation:enBlur .8s ease}
+@keyframes enBlur{from{filter:blur(20px);opacity:0}to{filter:blur(0);opacity:1}}
+#stage.show.anim-flip .card{animation:enFlip .8s cubic-bezier(.2,.8,.2,1)}
+@keyframes enFlip{from{transform:perspective(1000px) rotateX(40deg);opacity:0}to{transform:none;opacity:1}}
+
+/* Intensite du flou de la carte */
+.card.cb-none{backdrop-filter:saturate(140%)}
+.card.cb-light{backdrop-filter:blur(8px) saturate(150%)}
+.card.cb-medium{backdrop-filter:blur(16px) saturate(150%)}
+.card.cb-strong{backdrop-filter:blur(26px) saturate(150%)}

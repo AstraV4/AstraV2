@@ -28,7 +28,7 @@ root.setProperty('--accent-2', CONFIG.accent2 || '#22d3ee');
 
 // --- Forme de la carte et de l'avatar ---
 const cardEl = $('card');
-cardEl.classList.add('cs-' + (CONFIG.cardStyle || 'glass'), 'csh-' + (CONFIG.cardShape || 'rounded'));
+cardEl.classList.add('cs-' + (CONFIG.cardStyle || 'glass'), 'csh-' + (CONFIG.cardShape || 'rounded'), 'cb-' + (CONFIG.cardBlur || 'strong'));
 const avWrap = document.querySelector('.avatar-wrap');
 if (avWrap){
   avWrap.classList.add('av-' + (CONFIG.avatarShape || 'circle'));
@@ -53,11 +53,20 @@ if (CONFIG.bgIsVideo && CONFIG.background){
   if (CONFIG.bgBlur && CONFIG.bgBlur !== 'none') $('bg').style.filter = 'blur(' + (CONFIG.bgBlur === 'strong' ? 14 : 6) + 'px)';
 }
 
+// --- Banniere (couverture en haut de la carte) ---
+if (CONFIG.banner){
+  const bn = $('banner');
+  if (bn){ bn.style.backgroundImage = 'url(' + JSON.stringify(CONFIG.banner) + ')'; bn.style.display = 'block'; $('card').classList.add('has-banner'); }
+}
+
 // --- Identite (textContent => sans danger) ---
 $('uname-text').textContent = CONFIG.username || '';
 $('title').textContent = CONFIG.title || '';
 const avatarEl = $('avatar');
-if (CONFIG.avatar){
+const avWrapEl = document.querySelector('.avatar-wrap');
+if (CONFIG.avatarShape === 'none'){
+  if (avWrapEl) avWrapEl.style.display = 'none';   // aucun avatar du tout
+} else if (CONFIG.avatar){
   avatarEl.src = CONFIG.avatar;
 } else {
   // Pas de photo : on affiche l'initiale du pseudo dans un cercle degrade
@@ -67,7 +76,7 @@ if (CONFIG.avatar){
   fb.textContent = (CONFIG.username || '?').trim().charAt(0).toUpperCase();
   avatarEl.parentNode.insertBefore(fb, avatarEl);
 }
-if (CONFIG.avatarGlow){ const w = document.querySelector('.avatar-wrap'); if (w) w.classList.add('av-glow'); }
+if (CONFIG.avatarGlow && CONFIG.avatarShape !== 'none'){ if (avWrapEl) avWrapEl.classList.add('av-glow'); }
 // Compteur de vues anime (compte jusqu'a la valeur)
 (function(){
   const target = CONFIG.views || 0, el = $('views');
@@ -491,6 +500,7 @@ if (CONFIG.song){
 }
 
 // --- Ecran d'entree ---
+$('stage').classList.add('anim-' + (CONFIG.enterAnim || 'fade'));
 $('enter').addEventListener('click', () => {
   $('enter').classList.add('hidden');
   $('stage').classList.add('show');

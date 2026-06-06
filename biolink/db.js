@@ -57,6 +57,7 @@ addCol('cursor_style',  "TEXT DEFAULT 'glow'");
 addCol('recovery_hash', "TEXT DEFAULT ''");
 addCol('card_style',    "TEXT DEFAULT 'glass'");
 addCol('card_shape',    "TEXT DEFAULT 'rounded'");
+addCol('card_blur',     "TEXT DEFAULT 'strong'");
 addCol('avatar_shape',  "TEXT DEFAULT 'circle'");
 addCol('cursor_image',  "TEXT DEFAULT ''");
 addCol('badges',        "TEXT DEFAULT '[]'");
@@ -68,6 +69,8 @@ addCol('badge_style',   "TEXT DEFAULT 'multi'");
 addCol('badge_color',   "TEXT DEFAULT '#8b5cf6'");
 addCol('bg_blur',       "TEXT DEFAULT 'none'");
 addCol('avatar_glow',   "INTEGER DEFAULT 0");
+addCol('banner',        "TEXT DEFAULT ''");
+addCol('enter_anim',    "TEXT DEFAULT 'fade'");
 
 module.exports = db;
 
