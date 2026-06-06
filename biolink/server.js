@@ -65,7 +65,7 @@ const ALLOWED = {
 };
 const upload = multer({
   storage,
-  limits: { fileSize: 25 * 1024 * 1024 }, // 25 Mo max par fichier
+  limits: { fileSize: 50 * 1024 * 1024 }, // 25 Mo max par fichier
   fileFilter: (req, file, cb) => {
     const list = ALLOWED[file.fieldname] || [];
     cb(null, list.includes(file.mimetype));
