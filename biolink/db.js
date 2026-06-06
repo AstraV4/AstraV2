@@ -68,6 +68,7 @@ addCol('show_uid',      "INTEGER DEFAULT 0");
 addCol('badge_style',   "TEXT DEFAULT 'multi'");
 addCol('badge_color',   "TEXT DEFAULT '#8b5cf6'");
 addCol('bg_blur',       "TEXT DEFAULT 'none'");
+addCol('bg_overlay',    "TEXT DEFAULT 'normal'");
 addCol('avatar_glow',   "INTEGER DEFAULT 0");
 addCol('banner',        "TEXT DEFAULT ''");
 addCol('enter_anim',    "TEXT DEFAULT 'fade'");

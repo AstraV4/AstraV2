@@ -107,6 +107,7 @@ const ALLOWED_CURSORS = ['none', 'magnet', 'glow', 'ring', 'dot', 'trail', 'spar
 const ALLOWED_AVATAR_SIZE = ['sm', 'md', 'lg', 'xl'];
 const ALLOWED_BADGE_STYLE = ['multi', 'accent', 'custom'];
 const ALLOWED_BG_BLUR = ['none', 'light', 'strong'];
+const ALLOWED_BG_OVERLAY = ['none', 'light', 'normal', 'strong'];
 const ALLOWED_ENTER_ANIM = ['fade', 'zoom', 'slide', 'blur', 'flip'];
 const ALLOWED_CARD_STYLE = ['glass', 'solid', 'none'];
 const ALLOWED_CARD_SHAPE = ['rounded', 'square', 'round'];
@@ -408,6 +409,7 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const badgeStyle = ALLOWED_BADGE_STYLE.includes(b.badge_style) ? b.badge_style : 'multi';
     const badgeColor = safeHex(b.badge_color, '#8b5cf6');
     const bgBlur = ALLOWED_BG_BLUR.includes(b.bg_blur) ? b.bg_blur : 'none';
+    const bgOverlay = ALLOWED_BG_OVERLAY.includes(b.bg_overlay) ? b.bg_overlay : 'normal';
     const avatarGlow = b.avatar_glow ? 1 : 0;
     const enterAnim = ALLOWED_ENTER_ANIM.includes(b.enter_anim) ? b.enter_anim : 'fade';
     let banner = u.banner || '';
@@ -453,14 +455,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -555,6 +557,7 @@ app.get('/:username', (req, res, next) => {
     badgeStyle:   u.badge_style || 'multi',
     badgeColor:   u.badge_color || '#8b5cf6',
     bgBlur:       u.bg_blur || 'none',
+    bgOverlay:    u.bg_overlay || 'normal',
     avatarGlow:   !!u.avatar_glow,
     banner:       u.banner || '',
     enterAnim:    u.enter_anim || 'fade',

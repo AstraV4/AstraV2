@@ -45,6 +45,10 @@ if (CONFIG.showUid && CONFIG.uid){
 }
 
 // --- Fond ---
+(function(){
+  const OV = { none:'rgba(5,4,11,0)', light:'rgba(5,4,11,.28)', normal:'rgba(5,4,11,.55)', strong:'rgba(5,4,11,.78)' };
+  document.documentElement.style.setProperty('--bg-overlay', OV[CONFIG.bgOverlay] || OV.normal);
+})();
 if (CONFIG.bgIsVideo && CONFIG.background){
   const v = $('bg-video'); v.src = CONFIG.background; v.style.display = 'block'; $('bg').style.display = 'none';
   if (CONFIG.bgBlur && CONFIG.bgBlur !== 'none') v.style.filter = 'blur(' + (CONFIG.bgBlur === 'strong' ? 14 : 6) + 'px)';
