@@ -63,7 +63,18 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 .card.csh-square{--radius:8px}
 .card.csh-round{--radius:40px}
 
-/* Variantes d'avatar : forme */
+/* Avatar : initiale quand pas de photo */
+.avatar-fallback{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;
+  font-family:'Sora',sans-serif;font-weight:800;font-size:2.6rem;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));user-select:none}
+.avatar-wrap.av-rounded .avatar-fallback{border-radius:26px}
+.avatar-wrap.av-square .avatar-fallback{border-radius:14px}
+.avatar-wrap.avsz-sm .avatar-fallback{font-size:2rem}
+.avatar-wrap.avsz-xl .avatar-fallback{font-size:3.4rem}
+/* Halo anime autour de l'avatar */
+.avatar-wrap.av-glow{animation:avglow 2.4s ease-in-out infinite}
+@keyframes avglow{0%,100%{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--accent) 70%,transparent))}
+  50%{filter:drop-shadow(0 0 22px var(--accent))}}
 .avatar-wrap.av-rounded .avatar,.avatar-wrap.av-rounded::before{border-radius:26px}
 .avatar-wrap.av-square .avatar,.avatar-wrap.av-square::before{border-radius:14px}
 .avatar-wrap.av-rounded .status,.avatar-wrap.av-square .status{right:-2px;bottom:-2px}

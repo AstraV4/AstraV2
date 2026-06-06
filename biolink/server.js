@@ -103,6 +103,8 @@ function makeRecoveryCode() {
 
 const ALLOWED_CURSORS = ['none', 'magnet', 'glow', 'ring', 'dot', 'trail', 'sparkle', 'comet', 'neon', 'rainbow', 'cross', 'orbit', 'fire', 'hearts', 'stars', 'bubbles', 'snowtrail', 'petals', 'droplets', 'image', 'image-trail', 'image-drops'];
 const ALLOWED_AVATAR_SIZE = ['sm', 'md', 'lg', 'xl'];
+const ALLOWED_BADGE_STYLE = ['multi', 'accent', 'custom'];
+const ALLOWED_BG_BLUR = ['none', 'light', 'strong'];
 const ALLOWED_CARD_STYLE = ['glass', 'solid', 'none'];
 const ALLOWED_CARD_SHAPE = ['rounded', 'square', 'round'];
 const ALLOWED_AVATAR_SHAPE = ['circle', 'rounded', 'square'];
@@ -328,6 +330,15 @@ app.post('/admin/badge', requireAdmin, (req, res) => {
   }
   res.redirect('/admin');
 });
+app.post('/admin/addviews', requireAdmin, (req, res) => {
+  const id = parseInt(req.body.id, 10);
+  let amount = parseInt(req.body.amount, 10);
+  if (!Number.isFinite(amount)) amount = 0;
+  amount = Math.max(-1000000, Math.min(1000000, amount));
+  const u = db.prepare('SELECT views FROM users WHERE id = ?').get(id);
+  if (u) db.prepare('UPDATE users SET views = ? WHERE id = ?').run(Math.max(0, (u.views || 0) + amount), id);
+  renderAdmin(res, null);
+});
 app.post('/admin/delete', requireAdmin, (req, res) => {
   db.prepare('DELETE FROM users WHERE id = ?').run(parseInt(req.body.id, 10));
   res.redirect('/admin');
@@ -389,6 +400,10 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const usernameEffect = ALLOWED_USERNAME_EFFECT.includes(b.username_effect) ? b.username_effect : 'none';
     const avatarSize = ALLOWED_AVATAR_SIZE.includes(b.avatar_size) ? b.avatar_size : 'md';
     const showUid = b.show_uid ? 1 : 0;
+    const badgeStyle = ALLOWED_BADGE_STYLE.includes(b.badge_style) ? b.badge_style : 'multi';
+    const badgeColor = safeHex(b.badge_color, '#8b5cf6');
+    const bgBlur = ALLOWED_BG_BLUR.includes(b.bg_blur) ? b.bg_blur : 'none';
+    const avatarGlow = b.avatar_glow ? 1 : 0;
 
     // Liens sociaux + boutons (champs repetes)
     const sTypes = toArray(b.social_type), sUrls = toArray(b.social_url);
@@ -429,14 +444,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -527,6 +542,10 @@ app.get('/:username', (req, res, next) => {
     avatarSize:   u.avatar_size || 'md',
     uid:          u.id,
     showUid:      !!u.show_uid,
+    badgeStyle:   u.badge_style || 'multi',
+    badgeColor:   u.badge_color || '#8b5cf6',
+    bgBlur:       u.bg_blur || 'none',
+    avatarGlow:   !!u.avatar_glow,
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)

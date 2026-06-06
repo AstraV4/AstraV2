@@ -47,15 +47,38 @@ if (CONFIG.showUid && CONFIG.uid){
 // --- Fond ---
 if (CONFIG.bgIsVideo && CONFIG.background){
   const v = $('bg-video'); v.src = CONFIG.background; v.style.display = 'block'; $('bg').style.display = 'none';
+  if (CONFIG.bgBlur && CONFIG.bgBlur !== 'none') v.style.filter = 'blur(' + (CONFIG.bgBlur === 'strong' ? 14 : 6) + 'px)';
 } else if (CONFIG.background){
   $('bg').style.backgroundImage = "url(" + JSON.stringify(CONFIG.background) + ")";
+  if (CONFIG.bgBlur && CONFIG.bgBlur !== 'none') $('bg').style.filter = 'blur(' + (CONFIG.bgBlur === 'strong' ? 14 : 6) + 'px)';
 }
 
 // --- Identite (textContent => sans danger) ---
 $('uname-text').textContent = CONFIG.username || '';
 $('title').textContent = CONFIG.title || '';
-if (CONFIG.avatar) $('avatar').src = CONFIG.avatar;
-$('views').textContent = (CONFIG.views || 0).toLocaleString('fr-FR');
+const avatarEl = $('avatar');
+if (CONFIG.avatar){
+  avatarEl.src = CONFIG.avatar;
+} else {
+  // Pas de photo : on affiche l'initiale du pseudo dans un cercle degrade
+  avatarEl.style.display = 'none';
+  const fb = document.createElement('div');
+  fb.className = 'avatar-fallback';
+  fb.textContent = (CONFIG.username || '?').trim().charAt(0).toUpperCase();
+  avatarEl.parentNode.insertBefore(fb, avatarEl);
+}
+if (CONFIG.avatarGlow){ const w = document.querySelector('.avatar-wrap'); if (w) w.classList.add('av-glow'); }
+// Compteur de vues anime (compte jusqu'a la valeur)
+(function(){
+  const target = CONFIG.views || 0, el = $('views');
+  if (target <= 0){ el.textContent = '0'; return; }
+  const dur = 900, t0 = performance.now();
+  (function step(t){
+    const k = Math.min(1, (t - t0) / dur);
+    el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))).toLocaleString('fr-FR');
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+})();
 // Effet de pseudo
 const unameEl = document.querySelector('.username');
 if (unameEl && CONFIG.usernameEffect && CONFIG.usernameEffect !== 'none') unameEl.classList.add('ue-' + CONFIG.usernameEffect);
@@ -123,7 +146,11 @@ BADGE_ORDER.forEach(key => {
   const d = BADGE_DEFS[key]; if (!d) return;
   const b = document.createElement('span');
   b.className = 'badge'; b.dataset.tip = d.label;
-  b.style.background = 'linear-gradient(135deg,' + d.c1 + ',' + d.c2 + ')';
+  // Couleur : multicolore (defaut) / couleur d'accent / couleur perso
+  let c1 = d.c1, c2 = d.c2;
+  if (CONFIG.badgeStyle === 'accent'){ c1 = CONFIG.accent || '#8b5cf6'; c2 = CONFIG.accent2 || '#22d3ee'; }
+  else if (CONFIG.badgeStyle === 'custom'){ c1 = CONFIG.badgeColor || '#8b5cf6'; c2 = CONFIG.badgeColor || '#8b5cf6'; }
+  b.style.background = 'linear-gradient(135deg,' + c1 + ',' + c2 + ')';
   const img = document.createElement('img');
   img.src = LU + d.icon + '.svg'; img.alt = d.label; img.className = 'badge-glyph'; img.loading = 'lazy';
   b.appendChild(img);

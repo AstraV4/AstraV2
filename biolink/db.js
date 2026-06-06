@@ -64,6 +64,10 @@ addCol('enter_text',    "TEXT DEFAULT ''");
 addCol('username_effect',"TEXT DEFAULT 'none'");
 addCol('avatar_size',   "TEXT DEFAULT 'md'");
 addCol('show_uid',      "INTEGER DEFAULT 0");
+addCol('badge_style',   "TEXT DEFAULT 'multi'");
+addCol('badge_color',   "TEXT DEFAULT '#8b5cf6'");
+addCol('bg_blur',       "TEXT DEFAULT 'none'");
+addCol('avatar_glow',   "INTEGER DEFAULT 0");
 
 module.exports = db;
 

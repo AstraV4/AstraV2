@@ -139,6 +139,31 @@
         <input type="checkbox" name="show_uid" id="show_uid" style="width:auto" <%= u.show_uid?'checked':'' %> />
         <label for="show_uid" style="margin:0">Afficher mon UID (numéro de membre) sur le profil</label>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <input type="checkbox" name="avatar_glow" id="avatar_glow" style="width:auto" <%= u.avatar_glow?'checked':'' %> />
+        <label for="avatar_glow" style="margin:0">✨ Halo animé autour de l'avatar</label>
+      </div>
+
+      <div class="row2" style="margin-top:14px">
+        <div>
+          <label>🎨 Couleur des badges</label>
+          <select name="badge_style">
+            <% [['multi','Multicolore (défaut)'],['accent','Mes couleurs d\u2019accent'],['custom','Couleur personnalisée']].forEach(function(o){ %>
+              <option value="<%= o[0] %>" <%= (u.badge_style||'multi')===o[0]?'selected':'' %>><%= o[1] %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label>Couleur perso des badges</label>
+          <input type="color" name="badge_color" value="<%= u.badge_color || '#8b5cf6' %>" style="height:46px;padding:4px" />
+        </div>
+      </div>
+      <label style="margin-top:8px">🌫️ Flou du fond</label>
+      <select name="bg_blur">
+        <% [['none','Aucun'],['light','Léger'],['strong','Fort']].forEach(function(o){ %>
+          <option value="<%= o[0] %>" <%= (u.bg_blur||'none')===o[0]?'selected':'' %>><%= o[1] %></option>
+        <% }) %>
+      </select>
 
       <label style="margin-top:14px">🖼️ Image de curseur personnalisé (PNG/GIF/WebP)</label>
       <input type="file" name="cursor_image" accept="image/*" />

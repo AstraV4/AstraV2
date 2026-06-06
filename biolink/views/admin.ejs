@@ -57,6 +57,12 @@
           </form>
         <% }) %>
       </div>
+      <form method="POST" action="/admin/addviews" style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
+        <input type="hidden" name="id" value="<%= u.id %>"/>
+        <span class="current">👁️ Ajouter des vues :</span>
+        <input type="number" name="amount" value="100" style="width:110px;padding:7px 10px" />
+        <button class="btn" type="submit" style="padding:7px 12px;font-size:.8rem">Ajouter</button>
+      </form>
     </div>
   <% }) %>
 </div>
