@@ -22,6 +22,14 @@
     <nav style="display:flex;gap:10px"><a class="btn" href="/dashboard">Mon profil</a></nav>
   </div>
 
+  <% if (resetInfo) { %>
+    <div class="panel" style="border-color:var(--accent);margin-bottom:14px">
+      <h3 style="margin-bottom:6px">🔑 Mot de passe réinitialisé pour @<%= resetInfo.username %></h3>
+      <p class="hint" style="margin-bottom:10px">Donne-lui ce mot de passe temporaire (il pourra le changer ensuite dans son profil) :</p>
+      <div style="font-family:monospace;font-size:1.3rem;letter-spacing:2px;background:rgba(139,92,246,.12);border:1px solid var(--accent);border-radius:10px;padding:12px;text-align:center"><%= resetInfo.password %></div>
+    </div>
+  <% } %>
+
   <% users.forEach(function(u){ %>
     <div class="uadmin">
       <div class="uadmin-head">
@@ -29,10 +37,16 @@
           <a href="/<%= u.username %>" target="_blank" style="color:var(--accent);font-weight:700;font-size:1.05rem">@<%= u.username %></a>
           <span class="current"> · <%= u.views %> vues · <%= u.badges.length %> badge<%= u.badges.length>1?'s':'' %></span>
         </div>
-        <form method="POST" action="/admin/delete" onsubmit="return confirm('Supprimer @<%= u.username %> définitivement ?')">
-          <input type="hidden" name="id" value="<%= u.id %>"/>
-          <button class="btn btn-danger" type="submit" style="padding:7px 12px;font-size:.8rem">Supprimer</button>
-        </form>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <form method="POST" action="/admin/resetpw" onsubmit="return confirm('Générer un nouveau mot de passe temporaire pour @<%= u.username %> ?')">
+            <input type="hidden" name="id" value="<%= u.id %>"/>
+            <button class="btn" type="submit" style="padding:7px 12px;font-size:.8rem">🔑 Réinit. MDP</button>
+          </form>
+          <form method="POST" action="/admin/delete" onsubmit="return confirm('Supprimer @<%= u.username %> définitivement ?')">
+            <input type="hidden" name="id" value="<%= u.id %>"/>
+            <button class="btn btn-danger" type="submit" style="padding:7px 12px;font-size:.8rem">Supprimer</button>
+          </form>
+        </div>
       </div>
       <div class="bgrid">
         <% catalog.forEach(function(c){ %>

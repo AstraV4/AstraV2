@@ -34,10 +34,14 @@ if (avWrap){
   avWrap.classList.add('av-' + (CONFIG.avatarShape || 'circle'));
   avWrap.classList.add('avsz-' + (CONFIG.avatarSize || 'md'));
 }
-// UID (facon guns.lol)
+// UID (facon guns.lol) : infobulle au survol / au clic du pseudo
 if (CONFIG.showUid && CONFIG.uid){
-  const uidEl = $('uid');
-  if (uidEl){ uidEl.textContent = 'UID ' + Number(CONFIG.uid).toLocaleString('fr-FR'); uidEl.style.display = 'block'; }
+  const u = document.querySelector('.username');
+  if (u){
+    u.dataset.uid = 'UID ' + Number(CONFIG.uid).toLocaleString('fr-FR');
+    u.classList.add('has-uid');
+    u.addEventListener('click', () => u.classList.toggle('uid-open'));
+  }
 }
 
 // --- Fond ---

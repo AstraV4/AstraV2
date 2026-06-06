@@ -65,7 +65,7 @@ const ALLOWED = {
 };
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 25 Mo max par fichier
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 Mo max par fichier
   fileFilter: (req, file, cb) => {
     const list = ALLOWED[file.fieldname] || [];
     cb(null, list.includes(file.mimetype));
@@ -285,6 +285,16 @@ app.post('/logout', (req, res) => {
   req.session.destroy(() => res.redirect('/'));
 });
 
+// ---- Changer son propre mot de passe ----
+app.post('/account/password', requireAuth, (req, res) => {
+  const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
+  const cur = req.body.current || '', nw = req.body.new || '';
+  if (!u || !bcrypt.compareSync(cur, u.password)) return res.redirect('/dashboard?pwerr=1');
+  if (nw.length < 6) return res.redirect('/dashboard?pwerr=2');
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(bcrypt.hashSync(nw, 10), u.id);
+  res.redirect('/dashboard?pwok=1');
+});
+
 // ---- Suppression de son propre compte ----
 app.post('/account/delete', requireAuth, (req, res) => {
   db.prepare('DELETE FROM users WHERE id = ?').run(req.session.userId);
@@ -292,10 +302,19 @@ app.post('/account/delete', requireAuth, (req, res) => {
 });
 
 // ---- Panneau admin ----
-app.get('/admin', requireAdmin, (req, res) => {
+function renderAdmin(res, resetInfo){
   const rows = db.prepare('SELECT id, username, created_at, views, badges, verified, staff FROM users ORDER BY created_at DESC').all();
   const users = rows.map(u => ({ id: u.id, username: u.username, views: u.views, badges: userBadges(u) }));
-  res.render('admin', { users, catalog: BADGE_CATALOG });
+  res.render('admin', { users, catalog: BADGE_CATALOG, resetInfo: resetInfo || null });
+}
+app.get('/admin', requireAdmin, (req, res) => renderAdmin(res, null));
+app.post('/admin/resetpw', requireAdmin, (req, res) => {
+  const id = parseInt(req.body.id, 10);
+  const u = db.prepare('SELECT username FROM users WHERE id = ?').get(id);
+  if (!u) return renderAdmin(res, null);
+  const tempPw = crypto.randomBytes(4).toString('hex'); // mot de passe temporaire (8 caracteres)
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(bcrypt.hashSync(tempPw, 10), id);
+  renderAdmin(res, { username: u.username, password: tempPw });
 });
 app.post('/admin/badge', requireAdmin, (req, res) => {
   const key = req.body.key;
@@ -331,7 +350,9 @@ app.get('/dashboard', requireAuth, (req, res) => {
     allowedCardStyle: ALLOWED_CARD_STYLE,
     allowedCardShape: ALLOWED_CARD_SHAPE,
     allowedAvatarShape: ALLOWED_AVATAR_SHAPE,
-    saved: req.query.saved === '1'
+    saved: req.query.saved === '1',
+    pwok: req.query.pwok === '1',
+    pwerr: req.query.pwerr || ''
   });
 });
 
