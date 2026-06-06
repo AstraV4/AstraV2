@@ -46,7 +46,9 @@ if (CONFIG.showUid && CONFIG.uid){
 
 // --- Fond ---
 (function(){
-  const OV = { none:'rgba(5,4,11,0)', light:'rgba(5,4,11,.28)', normal:'rgba(5,4,11,.55)', strong:'rgba(5,4,11,.78)' };
+  const ov = $('bg-overlay');
+  if (CONFIG.bgOverlay === 'none'){ if (ov) ov.style.display = 'none'; return; } // fond 100% pur
+  const OV = { light:'rgba(5,4,11,.28)', normal:'rgba(5,4,11,.55)', strong:'rgba(5,4,11,.78)' };
   document.documentElement.style.setProperty('--bg-overlay', OV[CONFIG.bgOverlay] || OV.normal);
 })();
 if (CONFIG.bgIsVideo && CONFIG.background){
