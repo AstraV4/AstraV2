@@ -129,3 +129,18 @@ input[type=color]{height:44px;padding:4px;cursor:pointer}
 /* Pastilles de themes */
 .theme-swatch{width:34px;height:34px;border-radius:9px;border:2px solid rgba(255,255,255,.15);cursor:pointer;transition:.15s;padding:0}
 .theme-swatch:hover{transform:scale(1.12);border-color:#fff}
+
+/* Graphique de stats (barres) */
+.stats-chart{display:flex;align-items:flex-end;gap:6px;height:140px;margin-top:10px}
+.stat-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.stat-fill{width:70%;min-height:3px;border-radius:6px 6px 0 0;background:linear-gradient(var(--accent),var(--accent-2));transition:height .4s}
+.stat-day{font-size:.62rem;color:var(--dim);white-space:nowrap}
+/* Classement */
+.lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--border);margin-bottom:10px;text-decoration:none;color:var(--text);transition:.18s}
+.lb-row:hover{border-color:var(--accent);transform:translateX(4px)}
+.lb-rank{font-size:1.2rem;font-weight:800;width:34px;text-align:center;color:var(--accent)}
+.lb-av{width:46px;height:46px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+.lb-info{flex:1;min-width:0}
+.lb-info b{display:block}
+.lb-info small{color:var(--dim)}
+.lb-stats{text-align:right;font-size:.85rem;color:var(--dim);white-space:nowrap}

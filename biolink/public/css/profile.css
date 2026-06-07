@@ -250,3 +250,11 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 .card.cb-light{backdrop-filter:blur(8px) saturate(150%)}
 .card.cb-medium{backdrop-filter:blur(16px) saturate(150%)}
 .card.cb-strong{backdrop-filter:blur(26px) saturate(150%)}
+
+/* Bouton Like */
+.like-btn{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:8px 16px;border-radius:30px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--text);cursor:pointer;
+  font-family:inherit;font-size:.9rem;font-weight:600;transition:.2s}
+.like-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+.like-btn.liked{background:color-mix(in srgb,var(--accent) 20%,transparent);border-color:var(--accent)}
+.like-btn:active{transform:scale(.94)}

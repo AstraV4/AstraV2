@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Classement · <%= siteName %></title>
+<link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+<div class="hero-glow"></div>
+<div class="container">
+  <header>
+    <a href="/" class="logo"><%= siteName %></a>
+    <nav>
+      <% if (me) { %>
+        <a class="btn btn-primary" href="/dashboard">Mon profil</a>
+      <% } else { %>
+        <a class="btn btn-ghost" href="/login">Connexion</a>
+        <a class="btn btn-primary" href="/register">S'inscrire</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <h2 class="sec-title" style="margin-top:10px">🏆 Classement — profils les plus vus</h2>
+  <% if (!top.length) { %>
+    <p class="muted">Aucun profil pour le moment.</p>
+  <% } %>
+  <% top.forEach(function(u, i){ %>
+    <a class="lb-row" href="/<%= u.username %>">
+      <div class="lb-rank"><%= i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ('#' + (i+1)) %></div>
+      <% if (u.avatar) { %><img class="lb-av" src="<%= u.avatar %>" alt="" /><% } else { %><div class="lb-av"></div><% } %>
+      <div class="lb-info">
+        <b>@<%= u.username %></b>
+        <% if (u.title) { %><small><%= u.title %></small><% } %>
+      </div>
+      <div class="lb-stats"><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %> vues<br/><%= (u.likes||0) %> ❤️</div>
+    </a>
+  <% }) %>
+
+  <div class="foot">© <%= new Date().getFullYear() %> <%= siteName %></div>
+</div>
+</body>
+</html>

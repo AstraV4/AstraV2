@@ -14,9 +14,11 @@
     <nav>
       <% if (me) { %>
         <% if (isAdmin) { %><a class="btn btn-ghost" href="/admin">Admin</a><% } %>
+        <a class="btn btn-ghost" href="/leaderboard">🏆 Classement</a>
         <a class="btn btn-ghost" href="/<%= me.username %>">Ma page</a>
         <a class="btn btn-primary" href="/dashboard">Mon profil</a>
       <% } else { %>
+        <a class="btn btn-ghost" href="/leaderboard">🏆 Classement</a>
         <a class="btn btn-ghost" href="/login">Connexion</a>
         <a class="btn btn-primary" href="/register">S'inscrire</a>
       <% } %>

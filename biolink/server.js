@@ -13,6 +13,12 @@ const crypto = require('crypto');
 const db = require('./db');
 
 const app = express();
+app.set('trust proxy', true); // pour lire la vraie IP derriere Railway/Cloudflare
+function clientIp(req) {
+  return (req.headers['cf-connecting-ip']
+    || (req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+    || req.ip || '').replace('::ffff:', '').slice(0, 45);
+}
 const PORT = process.env.PORT || 3000;
 
 // --- Dossiers ---
@@ -25,6 +31,7 @@ if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d' }));
 
@@ -85,7 +92,7 @@ const upload = multer({
 const RESERVED = new Set([
   'login', 'register', 'logout', 'dashboard', 'static', 'uploads', 'api',
   'admin', 'about', 'terms', 'privacy', 'settings', 'account', 'home', 'forgot',
-  'explore', 'discover', 'index', 'favicon.ico', 'robots.txt'
+  'explore', 'discover', 'index', 'favicon.ico', 'robots.txt', 'leaderboard', 'top'
 ]);
 
 // Compte admin : defini par la variable d'environnement ADMIN_USERNAME
@@ -109,6 +116,7 @@ const ALLOWED_BADGE_STYLE = ['multi', 'accent', 'custom'];
 const ALLOWED_BG_BLUR = ['none', 'light', 'strong'];
 const ALLOWED_BG_OVERLAY = ['none', 'light', 'normal', 'strong'];
 const ALLOWED_ENTER_ANIM = ['fade', 'zoom', 'slide', 'blur', 'flip'];
+const ALLOWED_SOCIAL_COLOR = ['white', 'accent', 'brand', 'custom'];
 const ALLOWED_CARD_STYLE = ['glass', 'solid', 'none'];
 const ALLOWED_CARD_SHAPE = ['rounded', 'square', 'round'];
 const ALLOWED_CARD_BLUR = ['none', 'light', 'medium', 'strong'];
@@ -142,6 +150,7 @@ function userBadges(u) {
 
 // Nom du site (rebrandable) — defini par SITE_NAME, sinon "shrxk.lol"
 const SITE_NAME = process.env.SITE_NAME || 'shrxk.lol';
+const MAX_ACCOUNTS_PER_IP = parseInt(process.env.MAX_ACCOUNTS_PER_IP, 10) || 2;
 
 // Logos des competences (CDN Devicon, charge cote navigateur)
 const DEVICON = {
@@ -242,12 +251,21 @@ app.post('/register', (req, res) => {
   const exists = db.prepare('SELECT 1 FROM users WHERE username_lower = ?').get(username.toLowerCase());
   if (exists) return render('Ce pseudo est deja pris.');
 
+  // Anti multi-comptes : max 2 comptes par adresse IP
+  const signupIp = clientIp(req);
+  if (signupIp) {
+    const n = db.prepare('SELECT COUNT(*) c FROM users WHERE signup_ip = ?').get(signupIp).c;
+    if (n >= MAX_ACCOUNTS_PER_IP)
+      return render("Trop de comptes ont déjà été créés depuis cette connexion. Limite atteinte.");
+  }
+
   const hash = bcrypt.hashSync(password, 10);
   const recoveryCode = makeRecoveryCode();
   const recoveryHash = bcrypt.hashSync(recoveryCode, 10);
+  const ip = clientIp(req);
   const info = db.prepare(
-    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash) VALUES (?,?,?,?,?)'
-  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash);
+    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash, signup_ip, last_ip, last_login) VALUES (?,?,?,?,?,?,?,?)'
+  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash, ip, ip, Date.now());
   req.session.userId = info.lastInsertRowid;
   // On montre le code de recuperation UNE SEULE FOIS
   res.render('recovery', { username, recoveryCode });
@@ -285,6 +303,7 @@ app.post('/login', (req, res) => {
     return res.status(401).render('login', { error: 'Pseudo ou mot de passe incorrect.', username });
   }
   req.session.userId = user.id;
+  db.prepare('UPDATE users SET last_ip = ?, last_login = ? WHERE id = ?').run(clientIp(req), Date.now(), user.id);
   res.redirect('/dashboard');
 });
 
@@ -310,8 +329,11 @@ app.post('/account/delete', requireAuth, (req, res) => {
 
 // ---- Panneau admin ----
 function renderAdmin(res, resetInfo){
-  const rows = db.prepare('SELECT id, username, created_at, views, badges, verified, staff FROM users ORDER BY created_at DESC').all();
-  const users = rows.map(u => ({ id: u.id, username: u.username, views: u.views, badges: userBadges(u) }));
+  const rows = db.prepare('SELECT id, username, created_at, views, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
+  const users = rows.map(u => ({
+    id: u.id, username: u.username, views: u.views, badges: userBadges(u),
+    createdAt: u.created_at, signupIp: u.signup_ip || '', lastIp: u.last_ip || '', lastLogin: u.last_login || 0
+  }));
   res.render('admin', { users, catalog: BADGE_CATALOG, resetInfo: resetInfo || null });
 }
 app.get('/admin', requireAdmin, (req, res) => renderAdmin(res, null));
@@ -354,6 +376,14 @@ app.post('/admin/delete', requireAdmin, (req, res) => {
 // ===========================================================================
 app.get('/dashboard', requireAuth, (req, res) => {
   const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
+  // Statistiques : vues des 14 derniers jours
+  const stats = [];
+  const dayRow = db.prepare('SELECT count FROM views_daily WHERE user_id = ? AND day = ?');
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const r = dayRow.get(u.id, d);
+    stats.push({ day: d.slice(5), count: r ? r.count : 0 });
+  }
   res.render('dashboard', {
     u,
     bio: JSON.parse(u.bio || '[]').join('\n'),
@@ -366,6 +396,7 @@ app.get('/dashboard', requireAuth, (req, res) => {
     allowedCardStyle: ALLOWED_CARD_STYLE,
     allowedCardShape: ALLOWED_CARD_SHAPE,
     allowedAvatarShape: ALLOWED_AVATAR_SHAPE,
+    stats,
     saved: req.query.saved === '1',
     pwok: req.query.pwok === '1',
     pwerr: req.query.pwerr || ''
@@ -375,7 +406,7 @@ app.get('/dashboard', requireAuth, (req, res) => {
 app.post('/dashboard', requireAuth, (req, res) => {
   upload(req, res, (err) => {
     if (err) {
-      return res.status(400).send('Erreur d\'upload : ' + err.message + ' (taille max 25 Mo, formats image/video/audio).');
+      return res.status(400).send('Erreur d\'upload : ' + err.message + ' (taille max 50 Mo, formats image/video/audio).');
     }
     const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
     const b = req.body;
@@ -412,6 +443,11 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const bgOverlay = ALLOWED_BG_OVERLAY.includes(b.bg_overlay) ? b.bg_overlay : 'normal';
     const avatarGlow = b.avatar_glow ? 1 : 0;
     const enterAnim = ALLOWED_ENTER_ANIM.includes(b.enter_anim) ? b.enter_anim : 'fade';
+    const hexOrEmpty = (v) => /^#[0-9a-fA-F]{6}$/.test(v || '') ? v : '';
+    const textColor = b.text_color_on ? hexOrEmpty(b.text_color) : '';
+    const bioColor = b.bio_color_on ? hexOrEmpty(b.bio_color) : '';
+    const socialColor = ALLOWED_SOCIAL_COLOR.includes(b.social_color) ? b.social_color : 'white';
+    const socialColorHex = /^#[0-9a-fA-F]{6}$/.test(b.social_color_hex || '') ? b.social_color_hex : '#ffffff';
     let banner = u.banner || '';
     if (files.banner) banner = '/uploads/' + files.banner[0].filename;
     else if (b.banner_clear === '1') banner = '';
@@ -455,14 +491,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -496,6 +532,25 @@ app.get('/api/music/search', async (req, res) => {
 // ===========================================================================
 //  ROUTE — PROFIL PUBLIC  (tonsite.com/pseudo)  -> doit rester EN DERNIER
 // ===========================================================================
+// ---- Likes (toggle, 1 par visiteur via session) ----
+app.post('/api/like', (req, res) => {
+  const name = (req.body.username || '').toLowerCase();
+  const u = db.prepare('SELECT id, likes FROM users WHERE username_lower = ?').get(name);
+  if (!u) return res.status(404).json({ ok: false });
+  if (!req.session.liked) req.session.liked = {};
+  const already = !!req.session.liked[name];
+  const newLikes = Math.max(0, (u.likes || 0) + (already ? -1 : 1));
+  db.prepare('UPDATE users SET likes = ? WHERE id = ?').run(newLikes, u.id);
+  req.session.liked[name] = !already;
+  res.json({ ok: true, likes: newLikes, liked: !already });
+});
+
+// ---- Classement des profils les plus vus ----
+app.get('/leaderboard', (req, res) => {
+  const top = db.prepare('SELECT username, avatar, title, views, likes FROM users ORDER BY views DESC, likes DESC LIMIT 50').all();
+  res.render('leaderboard', { top });
+});
+
 app.get('/:username', (req, res, next) => {
   const name = req.params.username;
   if (RESERVED.has(name.toLowerCase())) return next();
@@ -512,6 +567,8 @@ app.get('/:username', (req, res, next) => {
     const last = req.session.viewed[u.username_lower] || 0;
     if (Date.now() - last > 6 * 3600 * 1000) {
       db.prepare('UPDATE users SET views = views + 1 WHERE id = ?').run(u.id);
+      const today = new Date().toISOString().slice(0, 10);
+      db.prepare('INSERT INTO views_daily (user_id, day, count) VALUES (?,?,1) ON CONFLICT(user_id,day) DO UPDATE SET count = count + 1').run(u.id, today);
       req.session.viewed[u.username_lower] = Date.now();
       viewsCount = u.views + 1;
     }
@@ -561,6 +618,12 @@ app.get('/:username', (req, res, next) => {
     avatarGlow:   !!u.avatar_glow,
     banner:       u.banner || '',
     enterAnim:    u.enter_anim || 'fade',
+    textColor:    u.text_color || '',
+    bioColor:     u.bio_color || '',
+    socialColor:  u.social_color || 'white',
+    socialColorHex: u.social_color_hex || '#ffffff',
+    likes:        u.likes || 0,
+    liked:        !!(req.session.liked && req.session.liked[u.username_lower]),
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)

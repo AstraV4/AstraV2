@@ -72,6 +72,24 @@ addCol('bg_overlay',    "TEXT DEFAULT 'normal'");
 addCol('avatar_glow',   "INTEGER DEFAULT 0");
 addCol('banner',        "TEXT DEFAULT ''");
 addCol('enter_anim',    "TEXT DEFAULT 'fade'");
+addCol('text_color',    "TEXT DEFAULT ''");
+addCol('bio_color',     "TEXT DEFAULT ''");
+addCol('signup_ip',     "TEXT DEFAULT ''");
+addCol('last_ip',       "TEXT DEFAULT ''");
+addCol('last_login',    "INTEGER DEFAULT 0");
+addCol('likes',         "INTEGER DEFAULT 0");
+addCol('social_color',  "TEXT DEFAULT 'white'");
+addCol('social_color_hex',"TEXT DEFAULT '#ffffff'");
+
+// Table des vues par jour (pour les statistiques)
+db.exec(`
+CREATE TABLE IF NOT EXISTS views_daily (
+  user_id INTEGER NOT NULL,
+  day     TEXT    NOT NULL,
+  count   INTEGER DEFAULT 0,
+  PRIMARY KEY (user_id, day)
+);
+`);
 
 module.exports = db;
 

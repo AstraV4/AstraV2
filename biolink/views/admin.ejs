@@ -36,6 +36,12 @@
         <div>
           <a href="/<%= u.username %>" target="_blank" style="color:var(--accent);font-weight:700;font-size:1.05rem">@<%= u.username %></a>
           <span class="current"> · <%= u.views %> vues · <%= u.badges.length %> badge<%= u.badges.length>1?'s':'' %></span>
+          <div class="current" style="margin-top:6px;line-height:1.6">
+            🕓 Inscrit le <%= new Date(u.createdAt).toLocaleString('fr-FR') %><br/>
+            🔌 Dernière connexion : <%= u.lastLogin ? new Date(u.lastLogin).toLocaleString('fr-FR') : '—' %><br/>
+            🌐 IP inscription : <%= u.signupIp || '—' %><% if (u.signupIp) { %> <a href="https://ipinfo.io/<%= u.signupIp %>" target="_blank" style="color:var(--accent)">(localiser)</a><% } %><br/>
+            🌐 IP dernière connexion : <%= u.lastIp || '—' %><% if (u.lastIp && u.lastIp !== u.signupIp) { %> <a href="https://ipinfo.io/<%= u.lastIp %>" target="_blank" style="color:var(--accent)">(localiser)</a><% } %>
+          </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <form method="POST" action="/admin/resetpw" onsubmit="return confirm('Générer un nouveau mot de passe temporaire pour @<%= u.username %> ?')">

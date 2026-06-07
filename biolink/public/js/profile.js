@@ -25,6 +25,7 @@ const STATUS_COLORS = { online:'#22c55e', idle:'#f59e0b', dnd:'#ef4444', offline
 const root = document.documentElement.style;
 root.setProperty('--accent', CONFIG.accent || '#8b5cf6');
 root.setProperty('--accent-2', CONFIG.accent2 || '#22d3ee');
+if (CONFIG.textColor) root.setProperty('--text', CONFIG.textColor);
 
 // --- Forme de la carte et de l'avatar ---
 const cardEl = $('card');
@@ -83,14 +84,15 @@ if (CONFIG.avatarShape === 'none'){
   avatarEl.parentNode.insertBefore(fb, avatarEl);
 }
 if (CONFIG.avatarGlow && CONFIG.avatarShape !== 'none'){ if (avWrapEl) avWrapEl.classList.add('av-glow'); }
-// Compteur de vues anime (compte jusqu'a la valeur)
+// Compteur de vues anime (compte jusqu'a la valeur, avec separateur de milliers)
+function fmtNum(n){ return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 (function(){
   const target = CONFIG.views || 0, el = $('views');
   if (target <= 0){ el.textContent = '0'; return; }
   const dur = 900, t0 = performance.now();
   (function step(t){
     const k = Math.min(1, (t - t0) / dur);
-    el.textContent = Math.round(target * (1 - Math.pow(1 - k, 3))).toLocaleString('fr-FR');
+    el.textContent = fmtNum(target * (1 - Math.pow(1 - k, 3)));
     if (k < 1) requestAnimationFrame(step);
   })(t0);
 })();
@@ -108,6 +110,12 @@ if (CONFIG.status && STATUS_COLORS[CONFIG.status]){
 // --- Liens sociaux (logos de marque via Simple Icons) ---
 const SI_SLUG = { discord:'discord', github:'github', instagram:'instagram', x:'x',
   youtube:'youtube', spotify:'spotify', tiktok:'tiktok', telegram:'telegram' };
+// Couleur des logos : white | accent | brand | custom
+const SC = CONFIG.socialColor || 'white';
+let iconHex = 'ffffff', linkColor = '#ffffff', brandColors = false;
+if (SC === 'accent'){ iconHex = (CONFIG.accent || '#8b5cf6').replace('#', ''); linkColor = CONFIG.accent || '#8b5cf6'; }
+else if (SC === 'custom'){ const h = CONFIG.socialColorHex || '#ffffff'; iconHex = h.replace('#', ''); linkColor = h; }
+else if (SC === 'brand'){ brandColors = true; }
 const linksBox = $('links');
 (CONFIG.socials || []).forEach(s => {
   const a = document.createElement('a');
@@ -116,9 +124,10 @@ const linksBox = $('links');
   if (s.type === 'email' && !/^mailto:/i.test(href)) href = 'mailto:' + href;
   if (!/^(https?:|mailto:)/i.test(href)) return; // securite
   a.href = href; a.target = '_blank'; a.rel = 'noopener'; a.title = s.type || '';
+  a.style.color = linkColor; // pour les SVG internes (globe/email en currentColor)
   if (SI_SLUG[s.type]){
     const img = document.createElement('img');
-    img.src = 'https://cdn.simpleicons.org/' + SI_SLUG[s.type] + '/ffffff';
+    img.src = 'https://cdn.simpleicons.org/' + SI_SLUG[s.type] + (brandColors ? '' : '/' + iconHex);
     img.alt = s.type; img.loading = 'lazy'; img.className = 'link-logo';
     a.appendChild(img);
   } else {
@@ -417,9 +426,24 @@ if (cursorStyle && cursorStyle !== 'none' && matchMedia('(pointer:fine)').matche
   })();
 }
 
+// --- Bouton Like ---
+(function(){
+  const btn = $('like-btn'); if (!btn) return;
+  const cnt = $('like-count'), emo = $('like-emoji');
+  let liked = !!CONFIG.liked;
+  function render(n){ cnt.textContent = fmtNum(n); emo.textContent = liked ? '❤️' : '🤍'; btn.classList.toggle('liked', liked); }
+  render(CONFIG.likes || 0);
+  btn.style.display = 'inline-flex';
+  btn.addEventListener('click', () => {
+    fetch('/api/like', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ username: CONFIG.username }) })
+      .then(r => r.json()).then(d => { if (d.ok){ liked = d.liked; render(d.likes); } }).catch(() => {});
+  });
+})();
+
 // --- Machine a ecrire ---
 (function typewriter(){
   const el = $('bio-text');
+  if (CONFIG.bioColor && el) el.style.color = CONFIG.bioColor;
   const lines = (CONFIG.bio && CONFIG.bio.length) ? CONFIG.bio : [''];
   let li=0, ci=0, del=false;
   (function tick(){

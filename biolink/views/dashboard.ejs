@@ -87,6 +87,48 @@
           <button type="button" class="theme-swatch" data-c1="<%= t[1] %>" data-c2="<%= t[2] %>" title="<%= t[0] %>" style="background:linear-gradient(135deg,<%= t[1] %>,<%= t[2] %>)"></button>
         <% }) %>
       </div>
+
+      <label>🎭 Templates complets (couleurs + effet + curseur + carte)</label>
+      <div id="templates" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <% [
+          ['Néon','#8b5cf6','#22d3ee','stars','magnet','glass'],
+          ['Feu','#ef4444','#f59e0b','none','fire','solid'],
+          ['Glacé','#60a5fa','#bae6fd','snow','droplets','glass'],
+          ['Nature','#22c55e','#14b8a6','none','sparkle','glass'],
+          ['Amour','#ec4899','#f472b6','none','hearts','glass'],
+          ['Sombre','#ef4444','#1f2937','none','ring','solid']
+        ].forEach(function(t){ %>
+          <button type="button" class="tpl btn" data-acc="<%= t[1] %>" data-acc2="<%= t[2] %>" data-effect="<%= t[3] %>" data-cursor="<%= t[4] %>" data-card="<%= t[5] %>" style="padding:7px 13px;font-size:.82rem"><%= t[0] %></button>
+        <% }) %>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label><input type="checkbox" name="text_color_on" style="width:auto;margin-right:6px" <%= u.text_color?'checked':'' %> />🅰️ Couleur du texte</label>
+          <input type="color" name="text_color" value="<%= u.text_color || '#f5f5fc' %>" />
+        </div>
+        <div>
+          <label><input type="checkbox" name="bio_color_on" style="width:auto;margin-right:6px" <%= u.bio_color?'checked':'' %> />📝 Couleur de la description</label>
+          <input type="color" name="bio_color" value="<%= u.bio_color || '#9fa0bd' %>" />
+        </div>
+      </div>
+      <div class="hint">Coche la case pour activer la couleur perso (sinon couleur par défaut).</div>
+
+      <div class="row2" style="margin-top:8px">
+        <div>
+          <label>🔗 Couleur des logos (TikTok, Discord…)</label>
+          <select name="social_color">
+            <% [['white','Blanc (défaut)'],['accent','Couleur d\u2019accent'],['brand','Couleurs officielles des marques'],['custom','Couleur personnalisée']].forEach(function(o){ %>
+              <option value="<%= o[0] %>" <%= (u.social_color||'white')===o[0]?'selected':'' %>><%= o[1] %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label>Couleur perso des logos</label>
+          <input type="color" name="social_color_hex" value="<%= u.social_color_hex || '#ffffff' %>" />
+        </div>
+      </div>
+
       <div class="row2">
         <div>
           <label>Effet de fond</label>
@@ -329,6 +371,31 @@
   </form>
 
   <div class="panel" style="margin-top:20px">
+    <h3 style="margin-bottom:6px">📊 Statistiques — vues des 14 derniers jours</h3>
+    <% var smax = Math.max(1, ...stats.map(function(s){return s.count;})); %>
+    <div class="stats-chart">
+      <% stats.forEach(function(s){ %>
+        <div class="stat-bar" title="<%= s.day %> : <%= s.count %> vues">
+          <div class="stat-fill" style="height:<%= Math.max(3, Math.round(s.count/smax*100)) %>%"></div>
+          <span class="stat-day"><%= s.day %></span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:20px">
+    <h3 style="margin-bottom:6px">🔗 Partager mon profil</h3>
+    <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+      <img id="qr" alt="QR code" width="150" height="150" style="background:#fff;border-radius:12px;padding:7px" />
+      <div>
+        <div id="profile-link" class="current" style="font-size:1.05rem;color:var(--accent);word-break:break-all"></div>
+        <button type="button" class="btn" id="copy-link" style="margin-top:12px">📋 Copier le lien</button>
+        <p class="hint" style="margin-top:8px">Scanne le QR code pour ouvrir ton profil sur un téléphone.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:20px">
     <h3 style="margin-bottom:6px">🔑 Changer mon mot de passe</h3>
     <p class="hint">Saisis ton mot de passe actuel (ou le mot de passe temporaire donné par un admin), puis ton nouveau mot de passe.</p>
     <form method="POST" action="/account/password">
@@ -380,6 +447,27 @@
       if (a1) a1.value = b.dataset.c1;
       if (a2) a2.value = b.dataset.c2;
     });
+  });
+})();
+// Templates complets (couleurs + effet + curseur + carte)
+(function(){
+  const set = (name, val) => { const e = document.querySelector('[name="' + name + '"]'); if (e) e.value = val; };
+  document.querySelectorAll('.tpl').forEach(b => {
+    b.addEventListener('click', () => {
+      set('accent', b.dataset.acc); set('accent2', b.dataset.acc2);
+      set('effect', b.dataset.effect); set('cursor_style', b.dataset.cursor); set('card_style', b.dataset.card);
+    });
+  });
+})();
+// Partage : lien + QR + copier
+(function(){
+  const username = <%- JSON.stringify(u.username) %>;
+  const url = location.origin + '/' + username;
+  const link = document.getElementById('profile-link'); if (link) link.textContent = url;
+  const qr = document.getElementById('qr'); if (qr) qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(url);
+  const btn = document.getElementById('copy-link');
+  if (btn) btn.addEventListener('click', () => {
+    navigator.clipboard.writeText(url).then(() => { btn.textContent = '✅ Copié !'; setTimeout(() => btn.textContent = '📋 Copier le lien', 1500); }).catch(() => {});
   });
 })();
 const SOCIAL_TYPES = ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','email','globe'];
