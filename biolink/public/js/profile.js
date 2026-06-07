@@ -69,6 +69,10 @@ if (CONFIG.banner){
 // --- Identite (textContent => sans danger) ---
 $('uname-text').textContent = CONFIG.username || '';
 $('title').textContent = CONFIG.title || '';
+// Couleurs personnalisees par element
+if (CONFIG.usernameColor) $('uname-text').style.color = CONFIG.usernameColor;
+if (CONFIG.titleColor) $('title').style.color = CONFIG.titleColor;
+if (CONFIG.widgetColor) root.setProperty('--widget-text', CONFIG.widgetColor);
 const avatarEl = $('avatar');
 const avWrapEl = document.querySelector('.avatar-wrap');
 if (CONFIG.avatarShape === 'none'){
@@ -429,6 +433,7 @@ if (cursorStyle && cursorStyle !== 'none' && matchMedia('(pointer:fine)').matche
 // --- Bouton Like ---
 (function(){
   const btn = $('like-btn'); if (!btn) return;
+  if (CONFIG.showLikes === false){ btn.style.display = 'none'; return; } // likes desactives pour ce profil
   const cnt = $('like-count'), emo = $('like-emoji');
   let liked = !!CONFIG.liked;
   function render(n){ cnt.textContent = fmtNum(n); emo.textContent = liked ? '❤️' : '🤍'; btn.classList.toggle('liked', liked); }

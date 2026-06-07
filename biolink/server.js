@@ -329,9 +329,9 @@ app.post('/account/delete', requireAuth, (req, res) => {
 
 // ---- Panneau admin ----
 function renderAdmin(res, resetInfo){
-  const rows = db.prepare('SELECT id, username, created_at, views, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
+  const rows = db.prepare('SELECT id, username, created_at, views, likes, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
   const users = rows.map(u => ({
-    id: u.id, username: u.username, views: u.views, badges: userBadges(u),
+    id: u.id, username: u.username, views: u.views, likes: u.likes || 0, badges: userBadges(u),
     createdAt: u.created_at, signupIp: u.signup_ip || '', lastIp: u.last_ip || '', lastLogin: u.last_login || 0
   }));
   res.render('admin', { users, catalog: BADGE_CATALOG, resetInfo: resetInfo || null });
@@ -364,6 +364,15 @@ app.post('/admin/addviews', requireAdmin, (req, res) => {
   amount = Math.max(-1000000, Math.min(1000000, amount));
   const u = db.prepare('SELECT views FROM users WHERE id = ?').get(id);
   if (u) db.prepare('UPDATE users SET views = ? WHERE id = ?').run(Math.max(0, (u.views || 0) + amount), id);
+  renderAdmin(res, null);
+});
+app.post('/admin/addlikes', requireAdmin, (req, res) => {
+  const id = parseInt(req.body.id, 10);
+  let amount = parseInt(req.body.amount, 10);
+  if (!Number.isFinite(amount)) amount = 0;
+  amount = Math.max(-1000000, Math.min(1000000, amount));
+  const u = db.prepare('SELECT likes FROM users WHERE id = ?').get(id);
+  if (u) db.prepare('UPDATE users SET likes = ? WHERE id = ?').run(Math.max(0, (u.likes || 0) + amount), id);
   renderAdmin(res, null);
 });
 app.post('/admin/delete', requireAdmin, (req, res) => {
@@ -448,6 +457,10 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const bioColor = b.bio_color_on ? hexOrEmpty(b.bio_color) : '';
     const socialColor = ALLOWED_SOCIAL_COLOR.includes(b.social_color) ? b.social_color : 'white';
     const socialColorHex = /^#[0-9a-fA-F]{6}$/.test(b.social_color_hex || '') ? b.social_color_hex : '#ffffff';
+    const showLikes = b.show_likes ? 1 : 0;
+    const usernameColor = b.username_color_on ? hexOrEmpty(b.username_color) : '';
+    const titleColor = b.title_color_on ? hexOrEmpty(b.title_color) : '';
+    const widgetColor = b.widget_color_on ? hexOrEmpty(b.widget_color) : '';
     let banner = u.banner || '';
     if (files.banner) banner = '/uploads/' + files.banner[0].filename;
     else if (b.banner_clear === '1') banner = '';
@@ -491,14 +504,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -623,6 +636,10 @@ app.get('/:username', (req, res, next) => {
     socialColor:  u.social_color || 'white',
     socialColorHex: u.social_color_hex || '#ffffff',
     likes:        u.likes || 0,
+    showLikes:    u.show_likes === undefined ? true : !!u.show_likes,
+    usernameColor: u.username_color || '',
+    titleColor:   u.title_color || '',
+    widgetColor:  u.widget_color || '',
     liked:        !!(req.session.liked && req.session.liked[u.username_lower]),
     views:      viewsCount
   };

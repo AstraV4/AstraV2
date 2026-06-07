@@ -80,6 +80,10 @@ addCol('last_login',    "INTEGER DEFAULT 0");
 addCol('likes',         "INTEGER DEFAULT 0");
 addCol('social_color',  "TEXT DEFAULT 'white'");
 addCol('social_color_hex',"TEXT DEFAULT '#ffffff'");
+addCol('show_likes',    "INTEGER DEFAULT 1");
+addCol('username_color',"TEXT DEFAULT ''");
+addCol('title_color',   "TEXT DEFAULT ''");
+addCol('widget_color',  "TEXT DEFAULT ''");
 
 // Table des vues par jour (pour les statistiques)
 db.exec(`

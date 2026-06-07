@@ -114,6 +114,25 @@
       </div>
       <div class="hint">Coche la case pour activer la couleur perso (sinon couleur par défaut).</div>
 
+      <div class="row2">
+        <div>
+          <label><input type="checkbox" name="username_color_on" style="width:auto;margin-right:6px" <%= u.username_color?'checked':'' %> />😎 Couleur du pseudo</label>
+          <input type="color" name="username_color" value="<%= u.username_color || '#ffffff' %>" />
+        </div>
+        <div>
+          <label><input type="checkbox" name="title_color_on" style="width:auto;margin-right:6px" <%= u.title_color?'checked':'' %> />🏷️ Couleur du titre</label>
+          <input type="color" name="title_color" value="<%= u.title_color || '#9fa0bd' %>" />
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label><input type="checkbox" name="widget_color_on" style="width:auto;margin-right:6px" <%= u.widget_color?'checked':'' %> />🕐 Couleur des widgets (heure…)</label>
+          <input type="color" name="widget_color" value="<%= u.widget_color || '#f5f5fc' %>" />
+        </div>
+        <div></div>
+      </div>
+      <div class="hint">💡 Astuce : pour colorer <b>seulement</b> la description, utilise « Couleur de la description » (pas « Couleur du texte » qui, elle, colore tout). Chaque couleur ci-dessus est indépendante.</div>
+
       <div class="row2" style="margin-top:8px">
         <div>
           <label>🔗 Couleur des logos (TikTok, Discord…)</label>
@@ -192,6 +211,10 @@
       <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
         <input type="checkbox" name="show_uid" id="show_uid" style="width:auto" <%= u.show_uid?'checked':'' %> />
         <label for="show_uid" style="margin:0">Afficher mon UID (numéro de membre) sur le profil</label>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <input type="checkbox" name="show_likes" id="show_likes" style="width:auto" <%= (u.show_likes===undefined||u.show_likes)?'checked':'' %> />
+        <label for="show_likes" style="margin:0">❤️ Afficher le bouton « J'aime » sur mon profil</label>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
         <input type="checkbox" name="avatar_glow" id="avatar_glow" style="width:auto" <%= u.avatar_glow?'checked':'' %> />
