@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>S'inscrire</title>
+<title><%= t('register_h') %> · <%= siteName %></title>
 <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
-<div class="container"><header><a href="/" class="logo"><%= siteName %></a></header></div>
+<div class="container"><header><a href="/" class="logo"><%= siteName %></a>
+  <nav><% LANGS.forEach(function(l){ %><a class="btn btn-ghost" style="padding:6px 10px<%= l===lang?';color:var(--accent)':'' %>" href="/lang/<%= l %>"><%= LANG_LABEL[l] %></a><% }) %></nav>
+</header></div>
 <div class="auth-wrap">
   <form class="auth panel" method="POST" action="/register">
-    <h2>Créer un compte</h2>
-    <p class="sub">Choisis ton pseudo, c'est l'adresse de ta page.</p>
+    <h2><%= t('register_h') %></h2>
+    <p class="sub"><%= t('register_sub') %></p>
     <% if (error) { %><div class="error"><%= error %></div><% } %>
 
-    <label>Pseudo</label>
-    <input type="text" name="username" value="<%= username %>" placeholder="tonpseudo" autocomplete="username"
+    <label><%= t('f_username') %></label>
+    <input type="text" name="username" value="<%= username %>" placeholder="<%= t('your_username') %>" autocomplete="username"
            pattern="[a-zA-Z0-9_]{3,20}" required autofocus />
 
-    <label>Mot de passe</label>
-    <input type="password" name="password" placeholder="6 caractères minimum" autocomplete="new-password" required />
+    <label><%= t('f_password') %></label>
+    <input type="password" name="password" placeholder="<%= t('pw_min') %>" autocomplete="new-password" required />
 
-    <button class="btn btn-primary full" type="submit">Créer mon profil</button>
-    <p class="muted">Déjà un compte ? <a href="/login" style="color:var(--accent)">Se connecter</a></p>
+    <button class="btn btn-primary full" type="submit"><%= t('register_btn') %></button>
+    <p class="muted"><%= t('register_have') %> <a href="/login" style="color:var(--accent)"><%= t('nav_login') %></a></p>
   </form>
 </div>
 </body>

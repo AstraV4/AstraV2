@@ -1,43 +1,81 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Classement · <%= siteName %></title>
-<link rel="stylesheet" href="/static/css/app.css" />
+<title><%= t('nav_leaderboard') %> · <%= siteName %></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#08080a;--ink:#ededf0;--dim:#83838f;--line:#1c1c22;--a1:#8b5cf6;--a2:#22d3ee}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:'JetBrains Mono',ui-monospace,monospace;min-height:100vh;position:relative;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  .grain{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.04;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .glow{position:fixed;top:-25%;right:-15%;width:60vw;height:60vw;z-index:0;pointer-events:none;
+    background:radial-gradient(circle,color-mix(in srgb,var(--a1) 20%,transparent),transparent 60%);filter:blur(40px)}
+  .bar{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;
+    padding:22px clamp(18px,5vw,60px);border-bottom:1px solid var(--line)}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:1.05rem;letter-spacing:-.02em}
+  .dot{width:11px;height:11px;background:linear-gradient(135deg,var(--a1),var(--a2));border-radius:3px;box-shadow:0 0 14px var(--a1)}
+  nav{display:flex;align-items:center;gap:clamp(10px,2vw,20px);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+  nav a{color:var(--dim);text-decoration:none;transition:.2s}
+  nav a:hover{color:var(--ink)}
+  nav a.cta{color:var(--bg);background:var(--ink);padding:9px 16px;border-radius:4px;font-weight:700}
+  .langs{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:5px;padding:2px}
+  .langs a{padding:4px 7px;border-radius:3px;font-size:.72rem}
+  .langs a.on{background:var(--ink);color:var(--bg);font-weight:700}
+  main{position:relative;z-index:5;max-width:760px;margin:0 auto;padding:clamp(36px,7vh,70px) clamp(18px,5vw,40px) 80px}
+  .head{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(2.2rem,7vw,3.8rem);letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+  .sub{color:var(--dim);font-size:.82rem;text-transform:uppercase;letter-spacing:.14em;margin-bottom:34px}
+  .row{display:flex;align-items:center;gap:16px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;
+    margin-bottom:10px;text-decoration:none;color:var(--ink);transition:.2s;background:rgba(255,255,255,.015)}
+  .row:hover{border-color:var(--a2);transform:translateX(5px)}
+  .row.top{border-color:color-mix(in srgb,var(--a1) 45%,var(--line))}
+  .rank{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.4rem;width:42px;text-align:center;flex:none}
+  .rank.n{color:transparent;-webkit-text-stroke:1px var(--dim);font-size:1.1rem}
+  .av{width:48px;height:48px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--a1),var(--a2));flex:none}
+  .info{flex:1;min-width:0}
+  .info b{font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;display:block;letter-spacing:-.01em}
+  .info small{color:var(--dim);font-size:.78rem;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .stats{text-align:right;font-size:.8rem;color:var(--dim);white-space:nowrap;flex:none}
+  .stats b{color:var(--ink);font-weight:700}
+  .foot{border-top:1px solid var(--line);margin-top:40px;padding-top:24px;color:var(--dim);font-size:.76rem;letter-spacing:.04em;text-align:center}
+</style>
 </head>
 <body>
-<div class="hero-glow"></div>
-<div class="container">
-  <header>
-    <a href="/" class="logo"><%= siteName %></a>
-    <nav>
-      <% if (me) { %>
-        <a class="btn btn-primary" href="/dashboard">Mon profil</a>
-      <% } else { %>
-        <a class="btn btn-ghost" href="/login">Connexion</a>
-        <a class="btn btn-primary" href="/register">S'inscrire</a>
-      <% } %>
-    </nav>
-  </header>
+<div class="grain"></div><div class="glow"></div>
+<header class="bar">
+  <a href="/" class="logo"><span class="dot"></span><%= siteName %></a>
+  <nav>
+    <% if (me) { %>
+      <a class="cta" href="/dashboard"><%= t('nav_dashboard') %></a>
+    <% } else { %>
+      <a href="/login"><%= t('nav_login') %></a>
+      <a class="cta" href="/register"><%= t('nav_register') %></a>
+    <% } %>
+    <span class="langs"><% LANGS.forEach(function(l){ %><a class="<%= l===lang?'on':'' %>" href="/lang/<%= l %>"><%= LANG_LABEL[l] %></a><% }) %></span>
+  </nav>
+</header>
 
-  <h2 class="sec-title" style="margin-top:10px">🏆 Classement — profils les plus vus</h2>
+<main>
+  <h1 class="head">🏆 <%= t('nav_leaderboard') %></h1>
+  <div class="sub"><%= siteName %> — top profils</div>
+
   <% if (!top.length) { %>
-    <p class="muted">Aucun profil pour le moment.</p>
+    <p style="color:var(--dim)">—</p>
   <% } %>
   <% top.forEach(function(u, i){ %>
-    <a class="lb-row" href="/<%= u.username %>">
-      <div class="lb-rank"><%= i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : ('#' + (i+1)) %></div>
-      <% if (u.avatar) { %><img class="lb-av" src="<%= u.avatar %>" alt="" /><% } else { %><div class="lb-av"></div><% } %>
-      <div class="lb-info">
-        <b>@<%= u.username %></b>
-        <% if (u.title) { %><small><%= u.title %></small><% } %>
-      </div>
-      <div class="lb-stats"><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %> vues<br/><%= (u.likes||0) %> ❤️</div>
+    <a class="row <%= i<3?'top':'' %>" href="/<%= u.username %>">
+      <div class="rank <%= i>2?'n':'' %>"><%= i===0?'🥇':i===1?'🥈':i===2?'🥉':String(i+1).padStart(2,'0') %></div>
+      <% if (u.avatar) { %><img class="av" src="<%= u.avatar %>" alt="" /><% } else { %><div class="av"></div><% } %>
+      <div class="info"><b>@<%= u.username %></b><% if (u.title) { %><small><%= u.title %></small><% } %></div>
+      <div class="stats"><b><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b> vues<br/><%= (u.likes||0) %> &#10084;</div>
     </a>
   <% }) %>
 
-  <div class="foot">© <%= new Date().getFullYear() %> <%= siteName %></div>
-</div>
+  <div class="foot">&copy; <%= new Date().getFullYear() %> <%= siteName %></div>
+</main>
 </body>
 </html>

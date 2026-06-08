@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Connexion</title>
+<title><%= t('login_h') %> · <%= siteName %></title>
 <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
-<div class="container"><header><a href="/" class="logo"><%= siteName %></a></header></div>
+<div class="container"><header><a href="/" class="logo"><%= siteName %></a>
+  <nav><% LANGS.forEach(function(l){ %><a class="btn btn-ghost" style="padding:6px 10px<%= l===lang?';color:var(--accent)':'' %>" href="/lang/<%= l %>"><%= LANG_LABEL[l] %></a><% }) %></nav>
+</header></div>
 <div class="auth-wrap">
   <form class="auth panel" method="POST" action="/login">
-    <h2>Connexion</h2>
-    <p class="sub">Content de te revoir.</p>
+    <h2><%= t('login_h') %></h2>
+    <p class="sub"><%= t('login_sub') %></p>
     <% if (error) { %><div class="error"><%= error %></div><% } %>
 
-    <label>Pseudo</label>
-    <input type="text" name="username" value="<%= username %>" placeholder="tonpseudo" autocomplete="username" required autofocus />
+    <label><%= t('f_username') %></label>
+    <input type="text" name="username" value="<%= username %>" placeholder="<%= t('your_username') %>" autocomplete="username" required autofocus />
 
-    <label>Mot de passe</label>
+    <label><%= t('f_password') %></label>
     <input type="password" name="password" autocomplete="current-password" required />
 
-    <button class="btn btn-primary full" type="submit">Se connecter</button>
-    <p class="muted"><a href="/forgot" style="color:var(--accent)">Mot de passe oublié ?</a></p>
-    <p class="muted">Pas encore de compte ? <a href="/register" style="color:var(--accent)">S'inscrire</a></p>
+    <button class="btn btn-primary full" type="submit"><%= t('login_btn') %></button>
+    <p class="muted"><a href="/forgot" style="color:var(--accent)"><%= t('login_forgot') %></a></p>
+    <p class="muted"><%= t('login_no_account') %> <a href="/register" style="color:var(--accent)"><%= t('nav_register') %></a></p>
   </form>
 </div>
 </body>

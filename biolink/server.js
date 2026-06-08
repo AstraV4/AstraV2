@@ -51,6 +51,11 @@ app.use((req, res, next) => {
     : null;
   res.locals.isAdmin = isAdmin(req);
   res.locals.siteName = SITE_NAME;
+  const lang = LANGS.includes(req.session.lang) ? req.session.lang : 'fr';
+  res.locals.lang = lang;
+  res.locals.t = translator(lang);
+  res.locals.LANGS = LANGS;
+  res.locals.LANG_LABEL = LANG_LABEL;
   next();
 });
 
@@ -92,7 +97,7 @@ const upload = multer({
 const RESERVED = new Set([
   'login', 'register', 'logout', 'dashboard', 'static', 'uploads', 'api',
   'admin', 'about', 'terms', 'privacy', 'settings', 'account', 'home', 'forgot',
-  'explore', 'discover', 'index', 'favicon.ico', 'robots.txt', 'leaderboard', 'top'
+  'explore', 'discover', 'index', 'favicon.ico', 'robots.txt', 'leaderboard', 'top', 'lang'
 ]);
 
 // Compte admin : defini par la variable d'environnement ADMIN_USERNAME
@@ -148,8 +153,9 @@ function userBadges(u) {
   return list.filter(k => BADGE_KEYS.includes(k));
 }
 
-// Nom du site (rebrandable) — defini par SITE_NAME, sinon "shrxk.lol"
-const SITE_NAME = process.env.SITE_NAME || 'shrxk.lol';
+// Nom du site (rebrandable) — defini par SITE_NAME, sinon "lvtm.lol"
+const SITE_NAME = process.env.SITE_NAME || 'lvtm.lol';
+const { LANGS, LANG_LABEL, translator } = require('./i18n');
 const MAX_ACCOUNTS_PER_IP = parseInt(process.env.MAX_ACCOUNTS_PER_IP, 10) || 2;
 
 // Logos des competences (CDN Devicon, charge cote navigateur)
@@ -229,7 +235,10 @@ app.get('/', (req, res) => {
   const recent = db.prepare(
     'SELECT username, avatar, title FROM users ORDER BY created_at DESC LIMIT 12'
   ).all();
-  res.render('index', { count, recent });
+  const showcase = db.prepare(
+    'SELECT username, avatar, background, bg_is_video, title, views, likes, socials, accent, accent2 FROM users ORDER BY views DESC, likes DESC LIMIT 3'
+  ).all();
+  res.render('index', { count, recent, showcase });
 });
 
 // ---- Inscription ----
@@ -556,6 +565,13 @@ app.post('/api/like', (req, res) => {
   db.prepare('UPDATE users SET likes = ? WHERE id = ?').run(newLikes, u.id);
   req.session.liked[name] = !already;
   res.json({ ok: true, likes: newLikes, liked: !already });
+});
+
+// ---- Changer la langue ----
+app.get('/lang/:code', (req, res) => {
+  if (LANGS.includes(req.params.code)) req.session.lang = req.params.code;
+  const ref = req.get('referer');
+  res.redirect(ref && ref.startsWith('http') ? ref : '/');
 });
 
 // ---- Classement des profils les plus vus ----

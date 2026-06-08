@@ -1,67 +1,172 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= siteName %> — ta page, ton style</title>
-<link rel="stylesheet" href="/static/css/app.css" />
-</head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title><%= siteName %> — link in bio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0}
+  body{font-family:'Sora',sans-serif;background:#0a0a0f;color:#f3f3f7;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+  a{color:inherit}
+  .glow{position:fixed;top:-340px;left:50%;transform:translateX(-50%);width:1200px;height:760px;z-index:0;pointer-events:none;
+    background:radial-gradient(50% 50% at 50% 50%,rgba(124,108,255,.22),rgba(34,211,238,.07) 50%,transparent 72%)}
+  .nav{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:0 auto;padding:22px clamp(18px,4vw,34px)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.06rem;letter-spacing:-.02em;text-decoration:none}
+  .brand .m{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#818cf8,#22d3ee)}
+  .links{display:flex;align-items:center;gap:20px;font-size:.9rem;color:#a7a7b4}
+  .links a{color:#a7a7b4;text-decoration:none}.links .pill{background:#f3f3f7;color:#0a0a0f;padding:9px 17px;border-radius:9px;font-weight:600}
+  .langs{display:inline-flex;gap:2px;border:1px solid #23232e;border-radius:6px;padding:2px}
+  .langs a{padding:4px 7px;border-radius:4px;font-size:.72rem;color:#9a9aa6;text-decoration:none}
+  .langs a.on{background:#f3f3f7;color:#0a0a0f;font-weight:700}
+  .hero{position:relative;z-index:5;text-align:center;max-width:760px;margin:0 auto;padding:clamp(34px,6vw,70px) 22px 26px}
+  .tagb{display:inline-flex;align-items:center;gap:8px;border:1px solid #23232e;background:#121219;border-radius:30px;padding:6px 14px;font-size:.78rem;color:#b9b9c6;margin-bottom:24px}
+  .tagb .d{width:7px;height:7px;border-radius:50%;background:#34d399}
+  h1{font-size:clamp(2.4rem,5.4vw,4.1rem);line-height:1.04;letter-spacing:-.035em;font-weight:700}
+  h1 .g{background:linear-gradient(100deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  p.sub{color:#9a9aa8;font-size:1.12rem;line-height:1.6;margin:20px auto 28px;max-width:34em;font-weight:300}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .b1{background:#f3f3f7;color:#0a0a0f;padding:14px 24px;border-radius:11px;font-weight:600;text-decoration:none;transition:.2s}
+  .b1:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(129,140,248,.3)}
+  .b2{color:#dcdce4;padding:14px 22px;border:1px solid #2a2a36;border-radius:11px;text-decoration:none;font-weight:500}
+  .stat{margin-top:18px;color:#74747f;font-size:.85rem}
+
+  .showcase{position:relative;z-index:5;perspective:1800px;overflow:hidden;padding:26px 0 60px;margin-top:6px}
+  .stage{position:relative;width:1140px;height:600px;margin:0 auto;transform-style:preserve-3d;
+    transform:rotateX(7deg) rotateY(-17deg) rotateZ(1.5deg);animation:floaty 7s ease-in-out infinite}
+  @keyframes floaty{50%{transform:rotateX(6deg) rotateY(-15deg) rotateZ(1deg) translateY(-10px)}}
+  .panel{position:absolute;border:1px solid #26263340;border-radius:22px;box-shadow:0 50px 100px rgba(0,0,0,.6);overflow:hidden}
+  .dash{left:0;top:24px;width:690px;height:520px;background:linear-gradient(180deg,#121219,#0c0c12);display:flex}
+  .dside{width:188px;border-right:1px solid #20202b;padding:18px 14px;display:flex;flex-direction:column;gap:6px}
+  .dside .me{display:flex;align-items:center;gap:9px;padding:8px;border-radius:10px;background:#181820;margin-bottom:12px}
+  .dside .me .a{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#22d3ee)}
+  .dside .me b{font-size:.78rem}.dside .me span{font-size:.64rem;color:#83838f;display:block}
+  .di{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;font-size:.78rem;color:#9a9aa6}
+  .di.on{background:#1c1c26;color:#f3f3f7}.di .dot{width:13px;height:13px;border-radius:4px;background:#2c2c3a}.di.on .dot{background:linear-gradient(135deg,#818cf8,#22d3ee)}
+  .dmain{flex:1;padding:18px}
+  .dmain .h{font-size:.7rem;color:#83838f;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+  .tile{background:#16161e;border:1px solid #21212b;border-radius:11px;padding:10px}
+  .tile span{font-size:.6rem;color:#83838f;display:block}.tile b{font-size:.84rem}
+  .chart{background:#16161e;border:1px solid #21212b;border-radius:13px;padding:12px;height:196px}
+  .chart .t{font-size:.66rem;color:#9a9aa6;margin-bottom:6px}
+  .manage{margin-top:14px;display:grid;gap:6px}
+  .mbtn{background:#16161e;border:1px solid #21212b;border-radius:9px;padding:9px 11px;font-size:.7rem;color:#b9b9c6}
+  .pcard{width:288px;background:#0e0e15;text-decoration:none;color:#fff}
+  .pcard .cover{height:118px;background-size:cover;background-position:center;position:relative;overflow:hidden}
+  .pcard .coverv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+  .pcard .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,#0e0e15)}
+  .pcard .pa{width:74px;height:74px;border-radius:50%;border:3px solid #0e0e15;background-size:cover;background-position:center;position:absolute;left:50%;bottom:-37px;transform:translateX(-50%);z-index:2}
+  .pcard .pb{padding:48px 20px 22px;text-align:center}
+  .pcard .pb h3{font-size:1.3rem;font-weight:700}
+  .pcard .role{color:#9a9aa6;font-size:.8rem;margin:5px 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pcard .metarow{display:flex;justify-content:center;gap:14px;font-size:.78rem;color:#c7c7d2;margin-bottom:13px}
+  .pcard .metarow b{color:#fff}
+  .pcard .soc{display:flex;justify-content:center;gap:9px}
+  .pcard .soc i{width:30px;height:30px;border-radius:8px;background:#1b1b25;display:block}
+  .c1{left:600px;top:46px;height:476px;transform:translateZ(40px)}
+  .c2{left:744px;top:96px;height:430px;transform:translateZ(95px)}
+  .c3{left:884px;top:150px;height:392px;transform:translateZ(150px)}
+  .feats{position:relative;z-index:5;max-width:1000px;margin:0 auto;padding:10px clamp(18px,4vw,34px) 70px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid #1a1a23;padding-top:46px}
+  .feat .ic{width:38px;height:38px;border-radius:11px;background:#15151d;border:1px solid #23232e;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .feat .ic span{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#818cf8,#22d3ee)}
+  .feat b{font-size:1.05rem;font-weight:600;display:block;margin-bottom:6px}
+  .feat p{color:#8e8e9c;font-size:.9rem;line-height:1.6;font-weight:300}
+  .foot{position:relative;z-index:5;border-top:1px solid #1a1a23;max-width:1180px;margin:0 auto;padding:26px clamp(18px,4vw,34px) 50px;color:#74747f;font-size:.8rem}
+  body>*{animation:fu .7s both}.showcase{animation-delay:.12s}.feats{animation-delay:.18s}
+  @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @media(max-width:1180px){.stage{transform:scale(.78) rotateX(7deg) rotateY(-17deg) rotateZ(1.5deg)}}
+  @media(max-width:760px){.links a:not(.pill):not(.langs a){display:none}.showcase{perspective:1100px;height:380px}.stage{transform:scale(.5) rotateX(6deg) rotateY(-15deg);transform-origin:top center}.feats{grid-template-columns:1fr}}
+</style></head>
 <body>
-<div class="hero-glow"></div>
-<div class="container">
-  <header>
-    <a href="/" class="logo"><%= siteName %></a>
-    <nav>
-      <% if (me) { %>
-        <% if (isAdmin) { %><a class="btn btn-ghost" href="/admin">Admin</a><% } %>
-        <a class="btn btn-ghost" href="/leaderboard">🏆 Classement</a>
-        <a class="btn btn-ghost" href="/<%= me.username %>">Ma page</a>
-        <a class="btn btn-primary" href="/dashboard">Mon profil</a>
-      <% } else { %>
-        <a class="btn btn-ghost" href="/leaderboard">🏆 Classement</a>
-        <a class="btn btn-ghost" href="/login">Connexion</a>
-        <a class="btn btn-primary" href="/register">S'inscrire</a>
-      <% } %>
-    </nav>
-  </header>
+<div class="glow"></div>
+<nav class="nav">
+  <a href="/" class="brand"><span class="m"></span><%= siteName %></a>
+  <div class="links">
+    <a href="/leaderboard"><%= t('nav_leaderboard') %></a>
+    <% if (me) { %>
+      <% if (isAdmin) { %><a href="/admin"><%= t('nav_admin') %></a><% } %>
+      <a href="/<%= me.username %>"><%= t('nav_mypage') %></a>
+      <a class="pill" href="/dashboard"><%= t('nav_dashboard') %></a>
+    <% } else { %>
+      <a href="/login"><%= t('nav_login') %></a>
+      <a class="pill" href="/register"><%= t('nav_register') %></a>
+    <% } %>
+    <span class="langs"><% LANGS.forEach(function(l){ %><a class="<%= l===lang?'on':'' %>" href="/lang/<%= l %>"><%= LANG_LABEL[l] %></a><% }) %></span>
+  </div>
+</nav>
 
-  <section class="hero">
-    <div class="pill">✦ ton lien-en-bio, en mieux</div>
-    <h1>Une page.<br><span>Tout ton univers.</span></h1>
-    <p>Avatar, musique, effets, présence Discord en direct, badges… Crée ton profil
-       en quelques secondes et partage un seul lien : <b><%= siteName %>/tonpseudo</b></p>
-    <div class="cta">
-      <% if (me) { %>
-        <a class="btn btn-primary btn-lg" href="/dashboard">Modifier mon profil</a>
-        <a class="btn btn-lg" href="/<%= me.username %>">Voir ma page</a>
-      <% } else { %>
-        <a class="btn btn-primary btn-lg" href="/register">Créer ma page — gratuit</a>
-        <a class="btn btn-lg" href="/login">J'ai déjà un compte</a>
-      <% } %>
+<section class="hero">
+  <div class="tagb"><span class="d"></span><%= t('hero_eyebrow') %></div>
+  <h1><%= t('hero_title_1') %> <span class="g"><%= t('hero_title_2') %></span></h1>
+  <p class="sub"><%= t('hero_desc') %></p>
+  <div class="cta">
+    <% if (me) { %>
+      <a class="b1" href="/dashboard"><%= t('cta_edit') %></a><a class="b2" href="/<%= me.username %>"><%= t('cta_view') %></a>
+    <% } else { %>
+      <a class="b1" href="/register"><%= t('cta_create') %></a><a class="b2" href="/login"><%= t('cta_have_account') %></a>
+    <% } %>
+  </div>
+  <div class="stat"><%= count %> <%= t('stat_profiles') %></div>
+</section>
+
+<section class="showcase"><div class="stage">
+  <div class="panel dash">
+    <div class="dside">
+      <div class="me"><span class="a"></span><div><b>Welcome back</b><span><%= siteName %></span></div></div>
+      <div class="di on"><span class="dot"></span>account</div>
+      <div class="di"><span class="dot"></span>customize</div>
+      <div class="di"><span class="dot"></span>links</div>
+      <div class="di"><span class="dot"></span>premium</div>
+      <div class="di"><span class="dot"></span>image host</div>
     </div>
-    <p class="stat">⚡ <%= count %> profil<%= count > 1 ? 's' : '' %> déjà créé<%= count > 1 ? 's' : '' %></p>
-  </section>
-
-  <section class="features">
-    <div class="feature"><div class="fic">🎵</div><b>Musique & ambiance</b><span>Cherche une musique ou uploade la tienne, fond image ou vidéo, effets animés.</span></div>
-    <div class="feature"><div class="fic">💬</div><b>Discord en direct</b><span>Affiche ton statut, ton activité et ton serveur, mis à jour en temps réel.</span></div>
-    <div class="feature"><div class="fic">✨</div><b>100% personnalisable</b><span>Couleurs, curseurs, badges, forme de carte… ta page te ressemble.</span></div>
-  </section>
-
-  <% if (recent.length) { %>
-    <h3 class="sec-title">Derniers profils</h3>
-    <div class="grid">
-      <% recent.forEach(function(r){ %>
-        <a class="ucard" href="/<%= r.username %>">
-          <% if (r.avatar) { %><img src="<%= r.avatar %>" alt="" /><% } else { %><div class="ph"></div><% } %>
-          <b>@<%= r.username %></b>
-          <% if (r.title) { %><small><%= r.title %></small><% } %>
-        </a>
-      <% }) %>
+    <div class="dmain">
+      <div class="h">Account overview</div>
+      <div class="tiles">
+        <div class="tile"><span>Username</span><b>$</b></div>
+        <div class="tile"><span>Alias</span><b>—</b></div>
+        <div class="tile"><span>UID</span><b>1</b></div>
+        <div class="tile"><span>Views</span><b>4.807</b></div>
+      </div>
+      <div class="chart"><div class="t">Profile views — 12h</div>
+        <svg viewBox="0 0 600 150" width="100%" height="150" preserveAspectRatio="none">
+          <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#818cf8" stop-opacity=".55"/><stop offset="1" stop-color="#818cf8" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,120 C40,110 70,60 110,70 C150,80 170,30 210,40 C250,50 270,95 310,80 C350,66 380,40 420,55 C460,70 490,100 530,72 C560,52 580,60 600,58 L600,150 L0,150 Z" fill="url(#ar)"/>
+          <path d="M0,120 C40,110 70,60 110,70 C150,80 170,30 210,40 C250,50 270,95 310,80 C350,66 380,40 420,55 C460,70 490,100 530,72 C560,52 580,60 600,58" fill="none" stroke="#a5b4fc" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <div class="manage"><div class="mbtn">Change username</div><div class="mbtn">Account settings</div></div>
     </div>
-  <% } %>
+  </div>
 
-  <footer class="foot">© <%= new Date().getFullYear() %> <%= siteName %> · fait avec ❤</footer>
-</div>
-</body>
-</html>
+  <%
+    var fmt = function(n){ return (n||0).toLocaleString('fr-FR').replace(/\s/g,'.'); };
+    showcase.forEach(function(c, i){
+      var pos = ['c1','c2','c3'][i] || 'c3';
+      var socs = []; try { socs = JSON.parse(c.socials || '[]'); } catch(e){}
+      var g = 'linear-gradient(135deg,' + (c.accent || '#818cf8') + ',' + (c.accent2 || '#22d3ee') + ')';
+      var cov = (!c.bg_is_video && c.background) ? c.background : '';
+  %>
+    <a class="panel pcard <%= pos %>" href="/<%= c.username %>">
+      <div class="cover" style="<%= (!c.bg_is_video && cov) ? ('background-image:url('+cov+')') : ('background:'+g) %>">
+        <% if (c.bg_is_video && c.background) { %><video class="coverv" src="<%= c.background %>" autoplay muted loop playsinline></video><% } %>
+        <span class="pa" style="<%= c.avatar ? ('background-image:url('+c.avatar+')') : ('background:'+g) %>"></span>
+      </div>
+      <div class="pb">
+        <h3>@<%= c.username %></h3>
+        <div class="role"><%= c.title || '' %></div>
+        <div class="metarow"><span><b><%= fmt(c.views) %></b> vues</span><span><b><%= fmt(c.likes) %></b> ❤</span></div>
+        <div class="soc"><% var ns = socs.length ? Math.min(socs.length,4) : 3; for (var k=0;k<ns;k++){ %><i></i><% } %></div>
+      </div>
+    </a>
+  <% }) %>
+</div></section>
+
+<section class="feats">
+  <div class="feat"><div class="ic"><span></span></div><b><%= t('feat1_t') %></b><p><%= t('feat1_d') %></p></div>
+  <div class="feat"><div class="ic"><span></span></div><b><%= t('feat2_t') %></b><p><%= t('feat2_d') %></p></div>
+  <div class="feat"><div class="ic"><span></span></div><b><%= t('feat3_t') %></b><p><%= t('feat3_d') %></p></div>
+</section>
+
+<footer class="foot">&copy; <%= new Date().getFullYear() %> <%= siteName %> &middot; <%= t('footer_made') %> &#10084;</footer>
+</body></html>
