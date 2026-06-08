@@ -236,7 +236,7 @@ app.get('/', (req, res) => {
     'SELECT username, avatar, title FROM users ORDER BY created_at DESC LIMIT 12'
   ).all();
   const showcase = db.prepare(
-    'SELECT username, avatar, background, bg_is_video, title, views, likes, socials, accent, accent2 FROM users ORDER BY views DESC, likes DESC LIMIT 3'
+    'SELECT username, avatar, background, bg_is_video, title, views, likes, socials, accent, accent2 FROM users ORDER BY views DESC, likes DESC LIMIT 2'
   ).all();
   res.render('index', { count, recent, showcase });
 });

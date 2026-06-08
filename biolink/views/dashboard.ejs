@@ -43,12 +43,27 @@
   <% if (pwerr === '2') { %><div class="error">❌ Le nouveau mot de passe doit faire au moins 6 caractères.</div><% } %>
 
   <form class="panel" method="POST" action="/dashboard" enctype="multipart/form-data">
-    <div class="tabs" id="tabs">
-      <button type="button" class="tab active" data-go="profil">👤 Profil</button>
-      <button type="button" class="tab" data-go="apparence">🎨 Apparence</button>
-      <button type="button" class="tab" data-go="media">🎵 Média</button>
-      <button type="button" class="tab" data-go="liens">🔗 Liens</button>
-      <button type="button" class="tab" data-go="infos">🏷️ Infos &amp; badges</button>
+   <div class="dash-layout">
+    <aside class="dash-side">
+      <div class="side-me">
+        <div class="side-av"<% if (u.avatar) { %> style="background-image:url(<%= u.avatar %>)"<% } %>></div>
+        <div><b>@<%= u.username %></b><span><%= u.views %> vues</span></div>
+      </div>
+      <div class="tabs" id="tabs">
+        <button type="button" class="tab active" data-go="profil">👤 Profil</button>
+        <button type="button" class="tab" data-go="apparence">🎨 Apparence</button>
+        <button type="button" class="tab" data-go="media">🎵 Média</button>
+        <button type="button" class="tab" data-go="liens">🔗 Liens</button>
+        <button type="button" class="tab" data-go="infos">🏷️ Infos &amp; badges</button>
+      </div>
+    </aside>
+    <div class="dash-main">
+
+    <div class="acct-tiles">
+      <div class="acct-tile"><span>Pseudo</span><b>@<%= u.username %></b></div>
+      <div class="acct-tile"><span>UID</span><b><%= u.id %></b></div>
+      <div class="acct-tile"><span>Vues</span><b><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
+      <div class="acct-tile"><span>Likes</span><b><%= (u.likes||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
     </div>
 
     <div class="section" data-tab="profil">
@@ -391,6 +406,8 @@
       <button class="btn btn-primary" type="submit">💾 Enregistrer</button>
       <a class="btn" href="/<%= u.username %>" target="_blank">Prévisualiser</a>
     </div>
+    </div><!-- /dash-main -->
+   </div><!-- /dash-layout -->
   </form>
 
   <div class="panel" style="margin-top:20px">
