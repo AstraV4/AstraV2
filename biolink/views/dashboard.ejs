@@ -61,7 +61,7 @@
 
     <div class="acct-tiles">
       <div class="acct-tile"><span>Pseudo</span><b>@<%= u.username %></b></div>
-      <div class="acct-tile"><span>UID</span><b><%= u.id %></b></div>
+      <div class="acct-tile"><span>UID</span><b><%= u.custom_uid || u.id %></b></div>
       <div class="acct-tile"><span>Vues</span><b><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
       <div class="acct-tile"><span>Likes</span><b><%= (u.likes||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
     </div>

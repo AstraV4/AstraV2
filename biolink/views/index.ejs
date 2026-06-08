@@ -31,12 +31,11 @@
   .b2{color:#dcdce4;padding:14px 22px;border:1px solid #2a2a36;border-radius:11px;text-decoration:none;font-weight:500}
   .stat{margin-top:18px;color:#74747f;font-size:.85rem}
 
-  .showcase{position:relative;z-index:5;perspective:1800px;overflow:hidden;padding:26px 0 60px;margin-top:6px}
-  .stage{position:relative;width:1140px;height:600px;margin:0 auto;transform-style:preserve-3d;
-    transform:rotateX(6deg) rotateY(-13deg) rotateZ(1deg);animation:floaty 7s ease-in-out infinite}
-  @keyframes floaty{50%{transform:rotateX(5deg) rotateY(-11deg) rotateZ(.5deg) translateY(-10px)}}
-  .panel{position:absolute;border:1px solid #26263340;border-radius:22px;box-shadow:0 50px 100px rgba(0,0,0,.6);overflow:hidden}
-  .dash{left:0;top:24px;width:690px;height:520px;background:linear-gradient(180deg,#121219,#0c0c12);display:flex}
+  .showcase{position:relative;z-index:5;padding:30px 0 56px}
+  .stage{max-width:1180px;margin:0 auto;padding:0 clamp(18px,4vw,34px);display:flex;gap:18px;align-items:stretch;flex-wrap:wrap;justify-content:center}
+  .panel{border:1px solid #26263340;border-radius:20px;box-shadow:0 26px 60px rgba(0,0,0,.45);overflow:hidden;transition:.25s}
+  .panel:hover{transform:translateY(-4px)}
+  .dash{flex:1 1 560px;min-width:300px;max-width:690px;background:linear-gradient(180deg,#121219,#0c0c12);display:flex}
   .dside{width:188px;border-right:1px solid #20202b;padding:18px 14px;display:flex;flex-direction:column;gap:6px}
   .dside .me{display:flex;align-items:center;gap:9px;padding:8px;border-radius:10px;background:#181820;margin-bottom:12px}
   .dside .me .a{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#22d3ee)}
@@ -52,21 +51,20 @@
   .chart .t{font-size:.66rem;color:#9a9aa6;margin-bottom:6px}
   .manage{margin-top:14px;display:grid;gap:6px}
   .mbtn{background:#16161e;border:1px solid #21212b;border-radius:9px;padding:9px 11px;font-size:.7rem;color:#b9b9c6}
-  .pcard{width:288px;background:#0e0e15;text-decoration:none;color:#fff}
+  .cards{display:flex;gap:16px;flex:1 1 360px;min-width:280px;justify-content:center;align-items:stretch}
+  .pcard{flex:1 1 200px;max-width:270px;background:#0e0e15;text-decoration:none;color:#fff}
   .pcard .cover{height:118px;background-size:cover;background-position:center;position:relative;overflow:hidden}
   .pcard .coverv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
   .pcard .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,#0e0e15)}
   .pcard .pa{width:74px;height:74px;border-radius:50%;border:3px solid #0e0e15;background-size:cover;background-position:center;position:absolute;left:50%;bottom:-37px;transform:translateX(-50%);z-index:2}
   .pcard .pb{padding:48px 20px 22px;text-align:center}
+  .pcard .pb.no-av{padding-top:22px}
   .pcard .pb h3{font-size:1.3rem;font-weight:700}
   .pcard .role{color:#9a9aa6;font-size:.8rem;margin:5px 0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .pcard .metarow{display:flex;justify-content:center;gap:14px;font-size:.78rem;color:#c7c7d2;margin-bottom:13px}
   .pcard .metarow b{color:#fff}
   .pcard .soc{display:flex;justify-content:center;gap:9px}
   .pcard .soc i{width:30px;height:30px;border-radius:8px;background:#1b1b25;display:block}
-  .c1{left:520px;top:48px;height:472px;transform:translateZ(55px)}
-  .c2{left:872px;top:118px;height:432px;transform:translateZ(120px)}
-  .c3{display:none}
   .feats{position:relative;z-index:5;max-width:1000px;margin:0 auto;padding:10px clamp(18px,4vw,34px) 70px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;border-top:1px solid #1a1a23;padding-top:46px}
   .feat .ic{width:38px;height:38px;border-radius:11px;background:#15151d;border:1px solid #23232e;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
   .feat .ic span{width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#818cf8,#22d3ee)}
@@ -75,8 +73,9 @@
   .foot{position:relative;z-index:5;border-top:1px solid #1a1a23;max-width:1180px;margin:0 auto;padding:26px clamp(18px,4vw,34px) 50px;color:#74747f;font-size:.8rem}
   body>*{animation:fu .7s both}.showcase{animation-delay:.12s}.feats{animation-delay:.18s}
   @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-  @media(max-width:1180px){.stage{transform:scale(.74) rotateX(6deg) rotateY(-13deg) rotateZ(1deg)}}
-  @media(max-width:760px){.links a:not(.pill):not(.langs a){display:none}.showcase{perspective:1100px;height:380px}.stage{transform:scale(.46) rotateX(5deg) rotateY(-11deg);transform-origin:top center}.feats{grid-template-columns:1fr}}
+  @media(max-width:900px){.dash{flex:1 1 100%;max-width:560px}.cards{flex:1 1 100%}}
+  @media(max-width:760px){.links a:not(.pill):not(.langs a){display:none}.dash{display:none}.pcard{max-width:340px}.feats{grid-template-columns:1fr}}
+  @media(max-width:430px){.cards{flex-direction:column;align-items:center}.pcard{max-width:100%;width:100%}.tiles{grid-template-columns:repeat(2,1fr)}}
 </style></head>
 <body>
 <div class="glow"></div>
@@ -114,11 +113,11 @@
   <div class="panel dash">
     <div class="dside">
       <div class="me"><span class="a"></span><div><b>Bon retour</b><span><%= siteName %></span></div></div>
-      <div class="di on"><span class="dot"></span>compte</div>
-      <div class="di"><span class="dot"></span>personnaliser</div>
-      <div class="di"><span class="dot"></span>liens</div>
-      <div class="di"><span class="dot"></span>premium</div>
-      <div class="di"><span class="dot"></span>hébergeur d'images</div>
+      <div class="di on"><span class="dot"></span>Profil</div>
+      <div class="di"><span class="dot"></span>Apparence</div>
+      <div class="di"><span class="dot"></span>Média</div>
+      <div class="di"><span class="dot"></span>Liens</div>
+      <div class="di"><span class="dot"></span>Infos &amp; badges</div>
     </div>
     <div class="dmain">
       <div class="h">Aperçu du compte</div>
@@ -139,27 +138,27 @@
     </div>
   </div>
 
+  <div class="cards">
   <%
     var fmt = function(n){ return (n||0).toLocaleString('fr-FR').replace(/\s/g,'.'); };
     showcase.forEach(function(c, i){
-      var pos = ['c1','c2','c3'][i] || 'c3';
       var socs = []; try { socs = JSON.parse(c.socials || '[]'); } catch(e){}
       var g = 'linear-gradient(135deg,' + (c.accent || '#818cf8') + ',' + (c.accent2 || '#22d3ee') + ')';
       var cov = (!c.bg_is_video && c.background) ? c.background : '';
   %>
-    <a class="panel pcard <%= pos %>" href="/<%= c.username %>">
+    <a class="panel pcard" href="/<%= c.username %>">
       <div class="cover" style="<%= (!c.bg_is_video && cov) ? ('background-image:url('+cov+')') : ('background:'+g) %>">
         <% if (c.bg_is_video && c.background) { %><video class="coverv" src="<%= c.background %>" autoplay muted loop playsinline></video><% } %>
-        <span class="pa" style="<%= c.avatar ? ('background-image:url('+c.avatar+')') : ('background:'+g) %>"></span>
+        <% if (c.avatar) { %><span class="pa" style="background-image:url(<%= c.avatar %>)"></span><% } %>
       </div>
-      <div class="pb">
+      <div class="pb<%= c.avatar ? '' : ' no-av' %>">
         <h3>@<%= c.username %></h3>
         <div class="role"><%= c.title || '' %></div>
         <div class="metarow"><span><b><%= fmt(c.views) %></b> vues</span><span><b><%= fmt(c.likes) %></b> ❤</span></div>
-        <div class="soc"><% var ns = socs.length ? Math.min(socs.length,4) : 3; for (var k=0;k<ns;k++){ %><i></i><% } %></div>
       </div>
     </a>
   <% }) %>
+  </div>
 </div></section>
 
 <section class="feats">

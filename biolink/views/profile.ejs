@@ -4,11 +4,22 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title><%= cfg.username %></title>
-<meta name="description" content="<%= cfg.title || ('Profil de ' + cfg.username) %>" />
-<meta property="og:title" content="<%= cfg.username %>" />
-<meta property="og:description" content="<%= cfg.title || ('Profil de ' + cfg.username) %>" />
-<% if (cfg.avatar) { %><meta property="og:image" content="<%= cfg.avatar %>" /><% } %>
-<meta name="theme-color" content="<%= cfg.accent %>" />
+<meta name="description" content="<%= meta.desc %>" />
+<meta property="og:type" content="profile" />
+<meta property="og:site_name" content="<%= meta.site %>" />
+<meta property="og:title" content="<%= meta.title %>" />
+<meta property="og:description" content="<%= meta.desc %>" />
+<meta property="og:url" content="<%= meta.url %>" />
+<% if (meta.image) { %>
+<meta property="og:image" content="<%= meta.image %>" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="<%= meta.image %>" />
+<% } else { %>
+<meta name="twitter:card" content="summary" />
+<% } %>
+<meta name="twitter:title" content="<%= meta.title %>" />
+<meta name="twitter:description" content="<%= meta.desc %>" />
+<meta name="theme-color" content="<%= meta.accent %>" />
 <link rel="stylesheet" href="/static/css/profile.css" />
 </head>
 <body>

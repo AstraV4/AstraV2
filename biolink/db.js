@@ -84,6 +84,7 @@ addCol('show_likes',    "INTEGER DEFAULT 1");
 addCol('username_color',"TEXT DEFAULT ''");
 addCol('title_color',   "TEXT DEFAULT ''");
 addCol('widget_color',  "TEXT DEFAULT ''");
+addCol('custom_uid',    "INTEGER DEFAULT 0");
 
 // Table des vues par jour (pour les statistiques)
 db.exec(`

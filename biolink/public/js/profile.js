@@ -248,30 +248,64 @@ if (CONFIG.discordGuild && /^[0-9]+$/.test(CONFIG.discordGuild)){
     .catch(() => {}); // widget desactive cote serveur ou ID invalide : on n'affiche rien
 }
 
-// --- Presence Discord en direct (Lanyard) ---
+// --- Presence Discord en direct (Lanyard) facon guns.lol ---
 if (CONFIG.discordUser && /^[0-9]+$/.test(CONFIG.discordUser)){
-  const COLORS = { online:'#22c55e', idle:'#f59e0b', dnd:'#ef4444', offline:'#6b7280' };
+  const COLORS = { online:'#23a55a', idle:'#f0b232', dnd:'#f23f43', offline:'#80848e' };
+  const VERB = { 0:'Joue à', 2:'Écoute', 3:'Regarde', 5:'Stream' };
   fetch('https://api.lanyard.rest/v1/users/' + CONFIG.discordUser)
     .then(r => r.ok ? r.json() : Promise.reject())
     .then(j => {
       if (!j.success) return;
       const d = j.data;
-      const card = document.createElement('div'); card.className = 'widget';
-      const top = document.createElement('div'); top.className = 'widget-main';
-      const dot = document.createElement('span');
-      dot.style.cssText = 'display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;background:' + (COLORS[d.discord_status] || COLORS.offline);
-      top.appendChild(dot);
-      top.appendChild(document.createTextNode((d.discord_user && d.discord_user.username) || 'Discord'));
-      const sub = document.createElement('div'); sub.className = 'widget-label';
-      const act = (d.activities || []).find(a => a.type !== 4); // 4 = custom status
-      if (d.listening_to_spotify && d.spotify){
-        sub.textContent = '🎧 ' + d.spotify.song + ' — ' + d.spotify.artist;
-      } else if (act){
-        sub.textContent = '🎮 ' + act.name;
-      } else {
-        sub.textContent = ({online:'En ligne',idle:'Inactif',dnd:'Ne pas déranger',offline:'Hors ligne'})[d.discord_status] || '';
+      const du = d.discord_user || {};
+      const card = document.createElement('div'); card.className = 'dc-card';
+
+      // Avatar + pastille de statut
+      const avWrap = document.createElement('div'); avWrap.className = 'dc-av';
+      const img = document.createElement('img');
+      const ext = (du.avatar && du.avatar.indexOf('a_') === 0) ? 'gif' : 'png';
+      img.src = du.avatar
+        ? ('https://cdn.discordapp.com/avatars/' + du.id + '/' + du.avatar + '.' + ext + '?size=128')
+        : ('https://cdn.discordapp.com/embed/avatars/' + (parseInt(du.discriminator || '0', 10) % 5) + '.png');
+      img.alt = ''; img.loading = 'lazy';
+      const dot = document.createElement('span'); dot.className = 'dc-dot';
+      dot.style.background = COLORS[d.discord_status] || COLORS.offline;
+      avWrap.appendChild(img); avWrap.appendChild(dot);
+
+      // Infos
+      const info = document.createElement('div'); info.className = 'dc-info';
+      const name = document.createElement('div'); name.className = 'dc-name';
+      const uname = document.createElement('span'); uname.className = 'dc-uname';
+      uname.textContent = du.global_name || du.username || 'Discord';
+      name.appendChild(uname);
+
+      const custom = (d.activities || []).find(a => a.type === 4); // statut perso
+      // Statut perso (emoji + texte) affiche a cote du pseudo
+      if (custom && (custom.state || (custom.emoji && (custom.emoji.name || custom.emoji.id)))){
+        const cs = document.createElement('span'); cs.className = 'dc-cs';
+        if (custom.emoji && custom.emoji.id){
+          const e = document.createElement('img'); e.className = 'dc-cse';
+          e.src = 'https://cdn.discordapp.com/emojis/' + custom.emoji.id + '.' + (custom.emoji.animated ? 'gif' : 'png') + '?size=24';
+          cs.appendChild(e);
+        } else if (custom.emoji && custom.emoji.name){
+          cs.appendChild(document.createTextNode(custom.emoji.name + ' '));
+        }
+        if (custom.state) cs.appendChild(document.createTextNode(custom.state));
+        name.appendChild(cs);
       }
-      card.appendChild(top); card.appendChild(sub);
+
+      const act = document.createElement('div'); act.className = 'dc-act';
+      const game = (d.activities || []).find(a => a.type !== 4);
+      if (d.listening_to_spotify && d.spotify){
+        act.innerHTML = '<span class="dc-pill spotify">Spotify</span> ' + d.spotify.song + ' — ' + d.spotify.artist;
+      } else if (game){
+        act.innerHTML = '<span class="dc-pill">' + (VERB[game.type] || 'Joue à') + '</span> ' + game.name;
+      } else {
+        act.textContent = ({online:'En ligne',idle:'Inactif',dnd:'Ne pas déranger',offline:'Hors ligne'})[d.discord_status] || '';
+      }
+      info.appendChild(name); info.appendChild(act);
+
+      card.appendChild(avWrap); card.appendChild(info);
       $('widgets').appendChild(card);
     })
     .catch(() => {}); // utilisateur pas dans le serveur Lanyard, ou ID invalide

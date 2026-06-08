@@ -170,3 +170,17 @@ input[type=color]{height:44px;padding:4px;cursor:pointer}
 .acct-tile span{font-size:.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
 .acct-tile b{font-size:1.05rem}
 @media(max-width:600px){.acct-tiles{grid-template-columns:repeat(2,1fr)}}
+
+/* Dashboard pleine largeur (marges sur les côtés) */
+.container.dash{max-width:1320px}
+/* Optimisation mobile */
+@media(max-width:600px){
+  .container{padding:0 14px}
+  .dash-head{flex-direction:column;align-items:flex-start;gap:10px}
+  .dash-head nav{flex-wrap:wrap}
+  .dash-head h2{font-size:1.35rem}
+  .dash .section{padding:18px 16px}
+  .acct-tiles{grid-template-columns:repeat(2,1fr)}
+  .btn{padding:10px 14px;font-size:.88rem}
+  .row2{grid-template-columns:1fr}
+}

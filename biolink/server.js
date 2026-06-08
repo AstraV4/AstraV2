@@ -338,9 +338,9 @@ app.post('/account/delete', requireAuth, (req, res) => {
 
 // ---- Panneau admin ----
 function renderAdmin(res, resetInfo){
-  const rows = db.prepare('SELECT id, username, created_at, views, likes, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
+  const rows = db.prepare('SELECT id, username, created_at, views, likes, custom_uid, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
   const users = rows.map(u => ({
-    id: u.id, username: u.username, views: u.views, likes: u.likes || 0, badges: userBadges(u),
+    id: u.id, username: u.username, views: u.views, likes: u.likes || 0, uid: u.custom_uid || u.id, badges: userBadges(u),
     createdAt: u.created_at, signupIp: u.signup_ip || '', lastIp: u.last_ip || '', lastLogin: u.last_login || 0
   }));
   res.render('admin', { users, catalog: BADGE_CATALOG, resetInfo: resetInfo || null });
@@ -382,6 +382,14 @@ app.post('/admin/addlikes', requireAdmin, (req, res) => {
   amount = Math.max(-1000000, Math.min(1000000, amount));
   const u = db.prepare('SELECT likes FROM users WHERE id = ?').get(id);
   if (u) db.prepare('UPDATE users SET likes = ? WHERE id = ?').run(Math.max(0, (u.likes || 0) + amount), id);
+  renderAdmin(res, null);
+});
+app.post('/admin/setuid', requireAdmin, (req, res) => {
+  const id = parseInt(req.body.id, 10);
+  let uid = parseInt(req.body.uid, 10);
+  if (!Number.isFinite(uid) || uid < 0) uid = 0; // 0 = revenir a l'UID reel
+  uid = Math.min(uid, 99999999);
+  db.prepare('UPDATE users SET custom_uid = ? WHERE id = ?').run(uid, id);
   renderAdmin(res, null);
 });
 app.post('/admin/delete', requireAdmin, (req, res) => {
@@ -638,7 +646,7 @@ app.get('/:username', (req, res, next) => {
     enterText:    u.enter_text || '',
     usernameEffect: u.username_effect || 'none',
     avatarSize:   u.avatar_size || 'md',
-    uid:          u.id,
+    uid:          u.custom_uid || u.id,
     showUid:      !!u.show_uid,
     badgeStyle:   u.badge_style || 'multi',
     badgeColor:   u.badge_color || '#8b5cf6',
@@ -661,7 +669,18 @@ app.get('/:username', (req, res, next) => {
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)
   const cfgJson = JSON.stringify(cfg).replace(/</g, '\\u003c');
-  res.render('profile', { cfg, cfgJson });
+  // Metadonnees Open Graph (apercu Discord / reseaux)
+  const origin = (req.headers['x-forwarded-proto'] || req.protocol || 'https') + '://' + req.get('host');
+  let ogImage = '';
+  if (!u.bg_is_video && u.background) ogImage = u.background;
+  else if (u.avatar) ogImage = u.avatar;
+  else if (!u.bg_is_video && u.banner) ogImage = u.banner;
+  if (ogImage && ogImage.charAt(0) === '/') ogImage = origin + ogImage;
+  const bio0 = (cfg.bio && cfg.bio[0]) ? cfg.bio[0] : '';
+  const fmtN = (n) => String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const ogDesc = [cfg.title, bio0, '👁 ' + fmtN(viewsCount || 0) + ' vues · ❤ ' + fmtN(u.likes || 0)].filter(Boolean).join('  ·  ');
+  const meta = { url: origin + '/' + u.username, image: ogImage, desc: ogDesc, title: '@' + u.username, accent: cfg.accent || '#8b5cf6', site: SITE_NAME };
+  res.render('profile', { cfg, cfgJson, meta });
 });
 
 app.use((req, res) => res.status(404).render('404'));
