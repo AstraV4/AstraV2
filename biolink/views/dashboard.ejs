@@ -95,17 +95,17 @@
       <h3><%= t('d_appearance') %></h3>
       <p class="section-desc"><%= t('d_appearance_desc') %></p>
       <div class="row2">
-        <div><label>Couleur principale</label><input type="color" name="accent" id="acc1" value="<%= u.accent %>" /></div>
-        <div><label>Couleur secondaire</label><input type="color" name="accent2" id="acc2" value="<%= u.accent2 %>" /></div>
+        <div><label><%= t('d_color_primary') %></label><input type="color" name="accent" id="acc1" value="<%= u.accent %>" /></div>
+        <div><label><%= t('d_color_secondary') %></label><input type="color" name="accent2" id="acc2" value="<%= u.accent2 %>" /></div>
       </div>
-      <label>🌈 Thèmes rapides (1 clic)</label>
+      <label><%= t('d_quick_themes') %></label>
       <div id="themes" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px">
         <% [['Violet/Cyan','#8b5cf6','#22d3ee'],['Rose/Orange','#ec4899','#f59e0b'],['Vert/Bleu','#22c55e','#3b82f6'],['Rouge/Noir','#ef4444','#1f2937'],['Or/Ambre','#fbbf24','#f59e0b'],['Cyan/Violet','#06b6d4','#a855f7'],['Rose/Violet','#f472b6','#8b5cf6'],['Lime/Teal','#84cc16','#14b8a6'],['Bleu glace','#60a5fa','#bae6fd']].forEach(function(t){ %>
           <button type="button" class="theme-swatch" data-c1="<%= t[1] %>" data-c2="<%= t[2] %>" title="<%= t[0] %>" style="background:linear-gradient(135deg,<%= t[1] %>,<%= t[2] %>)"></button>
         <% }) %>
       </div>
 
-      <label>🎭 Templates complets (couleurs + effet + curseur + carte)</label>
+      <label><%= t('d_templates') %></label>
       <div id="templates" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
         <% [
           ['Néon','#8b5cf6','#22d3ee','stars','magnet','glass'],
@@ -121,63 +121,63 @@
 
       <div class="row2">
         <div>
-          <label><input type="checkbox" name="text_color_on" style="width:auto;margin-right:6px" <%= u.text_color?'checked':'' %> />🅰️ Couleur du texte</label>
+          <label><input type="checkbox" name="text_color_on" style="width:auto;margin-right:6px" <%= u.text_color?'checked':'' %> /><%= t('d_text_color') %></label>
           <input type="color" name="text_color" value="<%= u.text_color || '#f5f5fc' %>" />
         </div>
         <div>
-          <label><input type="checkbox" name="bio_color_on" style="width:auto;margin-right:6px" <%= u.bio_color?'checked':'' %> />📝 Couleur de la description</label>
+          <label><input type="checkbox" name="bio_color_on" style="width:auto;margin-right:6px" <%= u.bio_color?'checked':'' %> /><%= t('d_bio_color') %></label>
           <input type="color" name="bio_color" value="<%= u.bio_color || '#9fa0bd' %>" />
         </div>
       </div>
-      <div class="hint">Coche la case pour activer la couleur perso (sinon couleur par défaut).</div>
+      <div class="hint"><%= t('d_color_hint1') %></div>
 
       <div class="row2">
         <div>
-          <label><input type="checkbox" name="username_color_on" style="width:auto;margin-right:6px" <%= u.username_color?'checked':'' %> />😎 Couleur du pseudo</label>
+          <label><input type="checkbox" name="username_color_on" style="width:auto;margin-right:6px" <%= u.username_color?'checked':'' %> /><%= t('d_uname_color') %></label>
           <input type="color" name="username_color" value="<%= u.username_color || '#ffffff' %>" />
         </div>
         <div>
-          <label><input type="checkbox" name="title_color_on" style="width:auto;margin-right:6px" <%= u.title_color?'checked':'' %> />🏷️ Couleur du titre</label>
+          <label><input type="checkbox" name="title_color_on" style="width:auto;margin-right:6px" <%= u.title_color?'checked':'' %> /><%= t('d_title_color') %></label>
           <input type="color" name="title_color" value="<%= u.title_color || '#9fa0bd' %>" />
         </div>
       </div>
       <div class="row2">
         <div>
-          <label><input type="checkbox" name="widget_color_on" style="width:auto;margin-right:6px" <%= u.widget_color?'checked':'' %> />🕐 Couleur des widgets (heure…)</label>
+          <label><input type="checkbox" name="widget_color_on" style="width:auto;margin-right:6px" <%= u.widget_color?'checked':'' %> /><%= t('d_widget_color') %></label>
           <input type="color" name="widget_color" value="<%= u.widget_color || '#f5f5fc' %>" />
         </div>
         <div></div>
       </div>
-      <div class="hint">💡 Astuce : pour colorer <b>seulement</b> la description, utilise « Couleur de la description » (pas « Couleur du texte » qui, elle, colore tout). Chaque couleur ci-dessus est indépendante.</div>
+      <div class="hint"><%= t('d_color_hint2') %></div>
 
       <div class="row2" style="margin-top:8px">
         <div>
-          <label>🔗 Couleur des logos (TikTok, Discord…)</label>
+          <label><%= t('d_social_color') %></label>
           <select name="social_color">
-            <% [['white','Blanc (défaut)'],['accent','Couleur d\u2019accent'],['brand','Couleurs officielles des marques'],['custom','Couleur personnalisée']].forEach(function(o){ %>
+            <% [['white',t('d_sc_white')],['accent',t('d_sc_accent')],['brand',t('d_sc_brand')],['custom',t('d_opt_custom')]].forEach(function(o){ %>
               <option value="<%= o[0] %>" <%= (u.social_color||'white')===o[0]?'selected':'' %>><%= o[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Couleur perso des logos</label>
+          <label><%= t('d_social_color_custom') %></label>
           <input type="color" name="social_color_hex" value="<%= u.social_color_hex || '#ffffff' %>" />
         </div>
       </div>
 
       <div class="row2">
         <div>
-          <label>Effet de fond</label>
+          <label><%= t('d_bg_effect') %></label>
           <select name="effect">
-            <% [['snow','Neige'],['rain','Pluie'],['stars','Étoiles'],['hearts','Cœurs 💖'],['bubbles','Bulles 🫧'],['none','Aucun']].forEach(function(e){ %>
+            <% [['snow',t('d_fx_snow')],['rain',t('d_fx_rain')],['stars',t('d_fx_stars')],['hearts',t('d_fx_hearts')],['bubbles',t('d_fx_bubbles')],['none',t('d_opt_none')]].forEach(function(e){ %>
               <option value="<%= e[0] %>" <%= u.effect===e[0]?'selected':'' %>><%= e[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Curseur</label>
+          <label><%= t('d_cursor') %></label>
           <select name="cursor_style">
-            <% [['none','Normal'],['magnet','Magnet ✨ (premium)'],['glow','Halo'],['ring','Anneau'],['dot','Point'],['cross','Croix'],['orbit','Orbite'],['trail','Traînée'],['comet','Comète ☄️'],['sparkle','Étincelles ✨'],['droplets','Gouttes d\u2019eau 💧'],['fire','Feu 🔥'],['hearts','Cœurs 💖'],['stars','Étoiles ⭐'],['bubbles','Bulles 🫧'],['snowtrail','Neige ❄️'],['petals','Pétales 🌸'],['neon','Néon'],['rainbow','Arc-en-ciel 🌈'],['image','Image perso 🖼️'],['image-trail','Image + traînée'],['image-drops','Image + gouttes 💧']].forEach(function(c){ %>
+            <% [['none',t('d_cur_none')],['magnet',t('d_cur_magnet')],['glow',t('d_cur_glow')],['ring',t('d_cur_ring')],['dot',t('d_cur_dot')],['cross',t('d_cur_cross')],['orbit',t('d_cur_orbit')],['trail',t('d_cur_trail')],['comet',t('d_cur_comet')],['sparkle',t('d_cur_sparkle')],['droplets',t('d_cur_droplets')],['fire',t('d_cur_fire')],['hearts',t('d_cur_hearts')],['stars',t('d_cur_stars')],['bubbles',t('d_cur_bubbles')],['snowtrail',t('d_cur_snowtrail')],['petals',t('d_cur_petals')],['neon',t('d_cur_neon')],['rainbow',t('d_cur_rainbow')],['image',t('d_cur_image')],['image-trail',t('d_cur_imgtrail')],['image-drops',t('d_cur_imgdrops')]].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.cursor_style||'none')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
@@ -185,41 +185,41 @@
       </div>
       <div class="row2">
         <div>
-          <label>Carte du profil</label>
+          <label><%= t('d_card') %></label>
           <select name="card_style">
-            <% [['glass','Verre dépoli'],['solid','Fond plein'],['none','Aucune (transparent)']].forEach(function(c){ %>
+            <% [['glass',t('d_card_glass')],['solid',t('d_card_solid')],['none',t('d_card_transparent')]].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.card_style||'glass')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Forme de la carte</label>
+          <label><%= t('d_card_shape') %></label>
           <select name="card_shape">
-            <% [['rounded','Arrondie'],['square','Carrée'],['round','Très arrondie']].forEach(function(c){ %>
+            <% [['rounded',t('d_shape_rounded')],['square',t('d_shape_square')],['round',t('d_shape_round')]].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.card_shape||'rounded')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
         </div>
       </div>
-      <label>🌫️ Intensité du flou de la carte (verre dépoli)</label>
+      <label><%= t('d_card_blur') %></label>
       <select name="card_blur">
-        <% [['none','Aucun (net)'],['light','Léger'],['medium','Moyen'],['strong','Fort']].forEach(function(c){ %>
+        <% [['none',t('d_blur_none')],['light',t('d_blur_light')],['medium',t('d_blur_medium')],['strong',t('d_blur_strong')]].forEach(function(c){ %>
           <option value="<%= c[0] %>" <%= (u.card_blur||'strong')===c[0]?'selected':'' %>><%= c[1] %></option>
         <% }) %>
       </select>
       <div class="row2">
         <div>
-          <label>Forme de l'avatar</label>
+          <label><%= t('d_avatar_shape') %></label>
           <select name="avatar_shape">
-            <% [['circle','Rond'],['rounded','Arrondi'],['square','Carré'],['none','Aucun (pas de photo)']].forEach(function(c){ %>
+            <% [['circle',t('d_av_circle')],['rounded',t('d_av_rounded')],['square',t('d_av_square')],['none',t('d_av_none')]].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.avatar_shape||'circle')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Taille de l'avatar</label>
+          <label><%= t('d_avatar_size') %></label>
           <select name="avatar_size">
-            <% [['sm','Petit'],['md','Moyen'],['lg','Grand'],['xl','Très grand']].forEach(function(c){ %>
+            <% [['sm',t('d_sz_sm')],['md',t('d_sz_md')],['lg',t('d_sz_lg')],['xl',t('d_sz_xl')]].forEach(function(c){ %>
               <option value="<%= c[0] %>" <%= (u.avatar_size||'md')===c[0]?'selected':'' %>><%= c[1] %></option>
             <% }) %>
           </select>
@@ -227,54 +227,54 @@
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
         <input type="checkbox" name="show_uid" id="show_uid" style="width:auto" <%= u.show_uid?'checked':'' %> />
-        <label for="show_uid" style="margin:0">Afficher mon UID (numéro de membre) sur le profil</label>
+        <label for="show_uid" style="margin:0"><%= t('d_show_uid') %></label>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
         <input type="checkbox" name="show_likes" id="show_likes" style="width:auto" <%= (u.show_likes===undefined||u.show_likes)?'checked':'' %> />
-        <label for="show_likes" style="margin:0">❤️ Afficher le bouton « J'aime » sur mon profil</label>
+        <label for="show_likes" style="margin:0"><%= t('d_show_likes') %></label>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
         <input type="checkbox" name="avatar_glow" id="avatar_glow" style="width:auto" <%= u.avatar_glow?'checked':'' %> />
-        <label for="avatar_glow" style="margin:0">✨ Halo animé autour de l'avatar</label>
+        <label for="avatar_glow" style="margin:0"><%= t('d_avatar_glow') %></label>
       </div>
 
       <div class="row2" style="margin-top:14px">
         <div>
-          <label>🎨 Couleur des badges</label>
+          <label><%= t('d_badge_color_label') %></label>
           <select name="badge_style">
-            <% [['multi','Multicolore (défaut)'],['accent','Mes couleurs d\u2019accent'],['custom','Couleur personnalisée']].forEach(function(o){ %>
+            <% [['multi',t('d_badge_multi')],['accent',t('d_badge_accent')],['custom',t('d_opt_custom')]].forEach(function(o){ %>
               <option value="<%= o[0] %>" <%= (u.badge_style||'multi')===o[0]?'selected':'' %>><%= o[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Couleur perso des badges</label>
+          <label><%= t('d_badge_color_custom') %></label>
           <input type="color" name="badge_color" value="<%= u.badge_color || '#8b5cf6' %>" style="height:46px;padding:4px" />
         </div>
       </div>
-      <label style="margin-top:8px">🌫️ Flou du fond</label>
+      <label><%= t('d_bg_blur') %></label>
       <select name="bg_blur">
-        <% [['none','Aucun'],['light','Léger'],['strong','Fort']].forEach(function(o){ %>
+        <% [['none',t('d_opt_none')],['light',t('d_blur_light')],['strong',t('d_blur_strong')]].forEach(function(o){ %>
           <option value="<%= o[0] %>" <%= (u.bg_blur||'none')===o[0]?'selected':'' %>><%= o[1] %></option>
         <% }) %>
       </select>
-      <label style="margin-top:8px">🎞️ Voile sombre sur le fond (lisibilité)</label>
+      <label><%= t('d_bg_overlay') %></label>
       <select name="bg_overlay">
-        <% [['none','Aucun (fond éclatant)'],['light','Léger'],['normal','Normal'],['strong','Fort']].forEach(function(o){ %>
+        <% [['none',t('d_ov_none')],['light',t('d_blur_light')],['normal',t('d_ov_normal')],['strong',t('d_blur_strong')]].forEach(function(o){ %>
           <option value="<%= o[0] %>" <%= (u.bg_overlay||'normal')===o[0]?'selected':'' %>><%= o[1] %></option>
         <% }) %>
       </select>
-      <div class="hint">Mets « Aucun » pour que ta vidéo/image ressorte en pleines couleurs (comme l'originale). Le texte peut être moins lisible selon le fond.</div>
+      <div class="hint"><%= t('d_bg_overlay_hint') %></div>
 
-      <label style="margin-top:14px">🖼️ Image de curseur personnalisé (PNG/GIF/WebP)</label>
+      <label><%= t('d_cursor_img') %></label>
       <input type="file" name="cursor_image" accept="image/*" />
-      <label>… ou colle le lien d'un curseur trouvé sur un site</label>
+      <label><%= t('d_cursor_img_url') %></label>
       <input type="text" name="cursor_image_url" value="<%= /^https?:/.test(u.cursor_image||'') ? u.cursor_image : '' %>" placeholder="https://.../curseur.png" />
-      <div class="hint">Choisis ensuite le curseur « Image perso » ou « Image + traînée » plus haut. Petite image carrée (~40px) à fond transparent recommandée.<% if (u.cursor_image) { %> · <a href="<%= u.cursor_image %>" target="_blank" style="color:var(--accent)">curseur actuel</a><% } %></div>
+      <div class="hint"><%= t('d_cursor_img_hint') %><% if (u.cursor_image) { %> · <a href="<%= u.cursor_image %>" target="_blank" style="color:var(--accent)"><%= t('d_current_cursor') %></a><% } %></div>
 
       <div class="row2" style="margin-top:14px">
         <div>
-          <label>🔤 Police du profil</label>
+          <label><%= t('d_font_profile') %></label>
           <select name="font">
             <% fontCatalog.forEach(function(f){ %>
               <option value="<%= f.key %>" <%= (u.font||'default')===f.key?'selected':'' %>><%= f.label %></option>
@@ -282,9 +282,9 @@
           </select>
         </div>
         <div>
-          <label>🔤 Police du pseudo <small style="color:var(--dim)">(optionnel)</small></label>
+          <label><%= t('d_font_username') %> <small style="color:var(--dim)"><%= t('d_optional') %></small></label>
           <select name="username_font">
-            <option value="" <%= !u.username_font?'selected':'' %>>— même que le profil —</option>
+            <option value="" <%= !u.username_font?'selected':'' %>><%= t('d_same_as_profile') %></option>
             <% fontCatalog.forEach(function(f){ if(f.key==='default') return; %>
               <option value="<%= f.key %>" <%= (u.username_font||'')===f.key?'selected':'' %>><%= f.label %></option>
             <% }) %>
@@ -293,29 +293,29 @@
       </div>
       <div class="row2" style="margin-top:14px">
         <div>
-          <label>✨ Effet du pseudo</label>
+          <label><%= t('d_uname_effect') %></label>
           <select name="username_effect">
-            <% [['none','Aucun'],['gradient','Dégradé'],['gradient-anim','Dégradé animé'],['glow','Lueur'],['shine','Reflet brillant'],['rainbow','Arc-en-ciel'],['glitch','Glitch']].forEach(function(e){ %>
+            <% [['none',t('d_opt_none')],['gradient',t('d_ue_gradient')],['gradient-anim',t('d_ue_gradanim')],['glow',t('d_ue_glow')],['shine',t('d_ue_shine')],['rainbow',t('d_ue_rainbow')],['glitch',t('d_ue_glitch')]].forEach(function(e){ %>
               <option value="<%= e[0] %>" <%= (u.username_effect||'none')===e[0]?'selected':'' %>><%= e[1] %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>Texte de l'écran d'entrée</label>
+          <label><%= t('d_enter_text') %></label>
           <input type="text" name="enter_text" value="<%= u.enter_text %>" maxlength="40" placeholder="click to enter" />
         </div>
       </div>
       <label class="check" style="margin-top:12px">
         <input type="checkbox" name="show_joined" value="1" <%= u.show_joined?'checked':'' %> />
-        🕐 Afficher « Membre depuis… » sous la bio
+        <%= t('d_show_joined') %>
       </label>
       <label class="check" style="margin-top:10px">
         <input type="checkbox" name="card_tilt" value="1" <%= u.card_tilt?'checked':'' %> />
-        🪄 Carte qui s'incline avec la souris (effet 3D)
+        <%= t('d_card_tilt') %>
       </label>
-      <label style="margin-top:8px">🎬 Animation d'entrée</label>
+      <label><%= t('d_enter_anim') %></label>
       <select name="enter_anim">
-        <% [['fade','Fondu'],['zoom','Zoom'],['slide','Glissé'],['blur','Flou'],['flip','Flip 3D']].forEach(function(o){ %>
+        <% [['fade',t('d_anim_fade')],['zoom',t('d_anim_zoom')],['slide',t('d_anim_slide')],['blur',t('d_anim_blur')],['flip',t('d_anim_flip')]].forEach(function(o){ %>
           <option value="<%= o[0] %>" <%= (u.enter_anim||'fade')===o[0]?'selected':'' %>><%= o[1] %></option>
         <% }) %>
       </select>
@@ -324,17 +324,17 @@
     <div class="section" data-tab="media">
       <h3><%= t('d_bg') %></h3>
       <p class="section-desc"><%= t('d_bg_desc') %></p>
-      <p class="hint">Image ou vidéo (mp4/webm). 50 Mo max.</p>
-      <label>Fond (image ou vidéo)</label>
+      <p class="hint"><%= t('d_bg_hint') %></p>
+      <label><%= t('d_bg_label') %></label>
       <input type="file" name="background" accept="image/*,video/mp4,video/webm" />
-      <% if (u.background) { %><div class="current">Actuel : <a href="<%= u.background %>" target="_blank">voir</a></div><% } %>
+      <% if (u.background) { %><div class="current"><%= t('d_current') %> <a href="<%= u.background %>" target="_blank"><%= t('d_see') %></a></div><% } %>
 
-      <label style="margin-top:14px">🖼️ Bannière (couverture en haut du profil)</label>
+      <label><%= t('d_banner') %></label>
       <input type="file" name="banner" accept="image/*" />
-      <div class="hint">Image large recommandée (ex: 1200×400). Elle s'affiche en haut de ta carte, avec l'avatar par-dessus.</div>
+      <div class="hint"><%= t('d_banner_hint') %></div>
       <% if (u.banner) { %>
-        <div class="current">Actuelle : <a href="<%= u.banner %>" target="_blank">voir</a>
-          <label style="display:inline-flex;align-items:center;gap:6px;margin-left:10px;font-weight:400"><input type="checkbox" name="banner_clear" value="1" style="width:auto" /> retirer la bannière</label>
+        <div class="current"><%= t('d_current') %> <a href="<%= u.banner %>" target="_blank"><%= t('d_see') %></a>
+          <label style="display:inline-flex;align-items:center;gap:6px;margin-left:10px;font-weight:400"><input type="checkbox" name="banner_clear" value="1" style="width:auto" /> <%= t('d_banner_remove') %></label>
         </div>
       <% } %>
     </div>
@@ -342,29 +342,29 @@
     <div class="section" data-tab="media">
       <h3><%= t('d_music') %></h3>
       <p class="section-desc"><%= t('d_music_desc') %></p>
-      <p class="hint">Cherche une musique (aperçu ~30 s) OU envoie ton propre fichier audio complet.</p>
+      <p class="hint"><%= t('d_music_hint') %></p>
 
-      <label>🔎 Rechercher une musique</label>
-      <input type="text" id="musicSearch" placeholder="Titre ou artiste (ex: Drake)" autocomplete="off" />
+      <label><%= t('d_music_search') %></label>
+      <input type="text" id="musicSearch" placeholder="<%= t('d_music_search_ph') %>" autocomplete="off" />
       <div id="musicResults"></div>
 
       <div id="selectedSong" class="current" style="margin-top:8px">
-        <% if (u.song) { %>🎵 Sélection actuelle : <b><%= u.song_name || u.song %></b><% } %>
+        <% if (u.song) { %><%= t('d_music_current') %> <b><%= u.song_name || u.song %></b><% } %>
       </div>
       <input type="hidden" name="song_url" id="song_url" value="<%= /^https?:/.test(u.song) ? u.song : '' %>" />
       <input type="hidden" name="song_art" id="song_art" value="<%= u.song_art || '' %>" />
 
-      <label style="margin-top:14px">Ou envoyer un fichier audio (musique complète)</label>
+      <label><%= t('d_music_upload') %></label>
       <input type="file" name="song" accept="audio/*" />
 
-      <label>Nom affiché dans le lecteur</label>
-      <input type="text" name="song_name" id="song_name" value="<%= u.song_name %>" maxlength="80" placeholder="Artiste - Titre" />
+      <label><%= t('d_music_name') %></label>
+      <input type="text" name="song_name" id="song_name" value="<%= u.song_name %>" maxlength="80" placeholder="<%= t('d_music_name_ph') %>" />
     </div>
 
     <div class="section" data-tab="liens">
       <h3><%= t('d_social_links') %></h3>
       <p class="section-desc"><%= t('d_social_desc') %></p>
-      <p class="hint">Types dispo : discord, github, instagram, x, youtube, spotify, tiktok, telegram, email, globe</p>
+      <p class="hint"><%= t('d_social_types') %></p>
       <div id="socials">
         <% (socials.length?socials:[{type:'',url:''}]).forEach(function(s){ %>
           <div class="repeat-row">
@@ -387,7 +387,7 @@
       <div id="buttons">
         <% buttons.forEach(function(bn){ %>
           <div class="repeat-row">
-            <input type="text" name="btn_label" value="<%= bn.label %>" placeholder="Libellé" />
+            <input type="text" name="btn_label" value="<%= bn.label %>" placeholder="<%= t('d_btn_label_ph') %>" />
             <input type="text" name="btn_url" value="<%= bn.url %>" placeholder="https://..." />
             <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
           </div>
@@ -401,36 +401,36 @@
       <p class="section-desc"><%= t('d_widgets_desc') %></p>
       <div class="row2">
         <div>
-          <label>⏰ Fuseau horaire (horloge en direct)</label>
+          <label><%= t('d_timezone') %></label>
           <select name="timezone">
             <% allowedTz.forEach(function(tz){ %>
-              <option value="<%= tz %>" <%= u.timezone===tz?'selected':'' %>><%= tz || '(aucun)' %></option>
+              <option value="<%= tz %>" <%= u.timezone===tz?'selected':'' %>><%= tz || t('d_none') %></option>
             <% }) %>
           </select>
         </div>
         <div>
-          <label>📍 Localisation (texte affiché)</label>
-          <input type="text" name="location" value="<%= u.location %>" maxlength="40" placeholder="ex: Paris, France" />
+          <label><%= t('d_location') %></label>
+          <input type="text" name="location" value="<%= u.location %>" maxlength="40" placeholder="<%= t('d_location_ph') %>" />
         </div>
       </div>
 
-      <label>💬 ID du serveur Discord (widget serveur)</label>
+      <label><%= t('d_discord_guild') %></label>
       <input type="text" name="discord_guild" value="<%= u.discord_guild %>" placeholder="ex: 1043523929361723402" />
-      <div class="hint">Active d'abord le widget sur ton serveur : Paramètres du serveur → Widget → « Activer le widget ». Puis colle l'ID du serveur (clic droit sur le serveur → Copier l'identifiant, en mode développeur).</div>
+      <div class="hint"><%= t('d_discord_guild_hint') %></div>
 
-      <label>🟢 Ton ID utilisateur Discord (présence en direct)</label>
+      <label><%= t('d_discord_user') %></label>
       <input type="text" name="discord_user" value="<%= u.discord_user %>" placeholder="ex: 338529452322422784" />
-      <div class="hint">Affiche ton statut/activité en direct. Rejoins d'abord le serveur Lanyard (<b>discord.gg/lanyard</b>), puis colle ton ID utilisateur Discord ici.</div>
+      <div class="hint"><%= t('d_discord_user_hint') %></div>
 
-      <label>🐙 Ton pseudo GitHub (widget GitHub)</label>
+      <label><%= t('d_github') %></label>
       <input type="text" name="github_user" value="<%= u.github_user %>" placeholder="ex: torvalds" />
-      <div class="hint">Affiche une carte avec ton avatar, tes abonnés et tes dépôts GitHub, plus un bouton « Voir le profil ».</div>
+      <div class="hint"><%= t('d_github_hint') %></div>
     </div>
 
     <div class="section" data-tab="infos">
       <h3><%= t('d_skills_badges') %></h3>
       <p class="section-desc"><%= t('d_skills_desc') %></p>
-      <p class="hint">Coche celles à afficher sur ta page (max 12).</p>
+      <p class="hint"><%= t('d_skills_hint') %></p>
       <div class="skills-grid">
         <% allowedSkills.forEach(function(sk){ %>
           <label class="skill-check">
@@ -576,12 +576,12 @@ if (musicSearch) musicSearch.addEventListener('input', () => {
   const q = musicSearch.value.trim();
   if (q.length < 2) { musicResults.innerHTML = ''; return; }
   mt = setTimeout(async () => {
-    musicResults.innerHTML = '<div class="current">Recherche…</div>';
+    musicResults.innerHTML = '<div class="current"><%= t("d_searching") %></div>';
     try {
       const r = await fetch('/api/music/search?q=' + encodeURIComponent(q));
       const list = await r.json();
       musicResults.innerHTML = '';
-      if (!list.length) { musicResults.innerHTML = '<div class="current">Aucun résultat.</div>'; return; }
+      if (!list.length) { musicResults.innerHTML = '<div class="current"><%= t("d_no_results") %></div>'; return; }
       list.forEach(t => {
         const row = document.createElement('div');
         row.className = 'music-row';
@@ -591,20 +591,20 @@ if (musicSearch) musicSearch.addEventListener('input', () => {
 
         const playBtn = document.createElement('button');
         playBtn.type = 'button'; playBtn.className = 'mini'; playBtn.textContent = '▶';
-        playBtn.title = 'Écouter un extrait';
+        playBtn.title = '<%= t("d_listen") %>';
         playBtn.addEventListener('click', () => {
           if (preview) { preview.pause(); }
           preview = new Audio(t.url); preview.volume = 0.6; preview.play().catch(()=>{});
         });
 
         const pick = document.createElement('button');
-        pick.type = 'button'; pick.className = 'btn'; pick.style.padding = '7px 12px'; pick.textContent = 'Choisir';
+        pick.type = 'button'; pick.className = 'btn'; pick.style.padding = '7px 12px'; pick.textContent = '<%= t("d_choose") %>';
         pick.addEventListener('click', () => {
           document.getElementById('song_url').value = t.url;
           document.getElementById('song_art').value = t.art;
           document.getElementById('song_name').value = t.name;
           const sel = document.getElementById('selectedSong');
-          sel.textContent = '🎵 Sélection : '; const b = document.createElement('b'); b.textContent = t.name; sel.appendChild(b);
+          sel.textContent = '<%= t("d_selection") %>'; const b = document.createElement('b'); b.textContent = t.name; sel.appendChild(b);
           if (preview) preview.pause();
           musicResults.innerHTML = '';
           musicSearch.value = '';
@@ -614,7 +614,7 @@ if (musicSearch) musicSearch.addEventListener('input', () => {
         musicResults.appendChild(row);
       });
     } catch (e) {
-      musicResults.innerHTML = '<div class="current">Erreur de recherche, réessaie.</div>';
+      musicResults.innerHTML = '<div class="current"><%= t("d_search_error") %></div>';
     }
   }, 350);
 });
