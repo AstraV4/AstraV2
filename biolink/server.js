@@ -126,7 +126,41 @@ const ALLOWED_CARD_STYLE = ['glass', 'solid', 'none'];
 const ALLOWED_CARD_SHAPE = ['rounded', 'square', 'round'];
 const ALLOWED_CARD_BLUR = ['none', 'light', 'medium', 'strong'];
 const ALLOWED_AVATAR_SHAPE = ['circle', 'rounded', 'square', 'none'];
-const ALLOWED_USERNAME_EFFECT = ['none', 'gradient', 'glow', 'shine'];
+const ALLOWED_USERNAME_EFFECT = ['none', 'gradient', 'gradient-anim', 'glow', 'shine', 'rainbow', 'glitch'];
+
+// Catalogue de polices (cle -> { label, family, gf }). gf = nom Google Fonts pour l'URL.
+const FONT_CATALOG = [
+  { key: 'default',      label: 'Par défaut',        family: "'Sora',sans-serif",                 gf: '' },
+  { key: 'poppins',      label: 'Poppins',            family: "'Poppins',sans-serif",             gf: 'Poppins:wght@400;600;700' },
+  { key: 'montserrat',   label: 'Montserrat',         family: "'Montserrat',sans-serif",          gf: 'Montserrat:wght@400;600;800' },
+  { key: 'playfair',     label: 'Playfair (élégant)', family: "'Playfair Display',serif",         gf: 'Playfair+Display:wght@400;600;700' },
+  { key: 'cormorant',    label: 'Cormorant (chic)',   family: "'Cormorant Garamond',serif",       gf: 'Cormorant+Garamond:wght@400;600;700' },
+  { key: 'bebas',        label: 'Bebas Neue',         family: "'Bebas Neue',sans-serif",          gf: 'Bebas+Neue' },
+  { key: 'anton',        label: 'Anton (impact)',     family: "'Anton',sans-serif",               gf: 'Anton' },
+  { key: 'bangers',      label: 'Bangers (BD)',       family: "'Bangers',cursive",                gf: 'Bangers' },
+  { key: 'russo',        label: 'Russo One',          family: "'Russo One',sans-serif",           gf: 'Russo+One' },
+  { key: 'orbitron',     label: 'Orbitron (futur)',   family: "'Orbitron',sans-serif",            gf: 'Orbitron:wght@400;700;900' },
+  { key: 'audiowide',    label: 'Audiowide (néon)',   family: "'Audiowide',cursive",              gf: 'Audiowide' },
+  { key: 'pressstart',   label: 'Pixel (Press Start)',family: "'Press Start 2P',monospace",       gf: 'Press+Start+2P' },
+  { key: 'vt323',        label: 'Pixel (VT323)',      family: "'VT323',monospace",                gf: 'VT323' },
+  { key: 'silkscreen',   label: 'Pixel (Silkscreen)', family: "'Silkscreen',monospace",           gf: 'Silkscreen:wght@400;700' },
+  { key: 'permanent',    label: 'Marqueur',           family: "'Permanent Marker',cursive",       gf: 'Permanent+Marker' },
+  { key: 'caveat',       label: 'Manuscrit (Caveat)', family: "'Caveat',cursive",                 gf: 'Caveat:wght@400;700' },
+  { key: 'shadows',      label: 'Manuscrit fin',      family: "'Shadows Into Light',cursive",     gf: 'Shadows+Into+Light' },
+  { key: 'satisfy',      label: 'Satisfy (script)',   family: "'Satisfy',cursive",                gf: 'Satisfy' },
+  { key: 'pacifico',     label: 'Pacifico',           family: "'Pacifico',cursive",               gf: 'Pacifico' },
+  { key: 'jetbrains',    label: 'Mono (JetBrains)',   family: "'JetBrains Mono',monospace",       gf: 'JetBrains+Mono:wght@400;700' }
+];
+const FONT_MAP = {};
+FONT_CATALOG.forEach(f => { FONT_MAP[f.key] = f; });
+const ALLOWED_FONT = FONT_CATALOG.map(f => f.key);
+// Construit l'URL Google Fonts pour 1 ou 2 polices choisies
+function googleFontsUrl(keys) {
+  const fams = [];
+  keys.forEach(k => { const f = FONT_MAP[k]; if (f && f.gf && fams.indexOf(f.gf) === -1) fams.push(f.gf); });
+  if (!fams.length) return '';
+  return 'https://fonts.googleapis.com/css2?' + fams.map(f => 'family=' + f).join('&') + '&display=swap';
+}
 
 // Catalogue de badges (cle -> libelle). Attribues depuis le panneau admin.
 const BADGE_CATALOG = [
@@ -141,7 +175,14 @@ const BADGE_CATALOG = [
   { key: 'early',     label: 'Early User' },
   { key: 'og',        label: 'OG' },
   { key: 'winner',    label: 'Gagnant' },
-  { key: 'bughunter', label: 'Bug Hunter' }
+  { key: 'bughunter', label: 'Bug Hunter' },
+  { key: 'gamer',     label: 'Gamer' },
+  { key: 'artist',    label: 'Artiste' },
+  { key: 'vip',       label: 'VIP' },
+  { key: 'legend',    label: 'Légende' },
+  { key: 'moderator', label: 'Modérateur' },
+  { key: 'creator',   label: 'Créateur' },
+  { key: 'supporter', label: 'Soutien' }
 ];
 const BADGE_KEYS = BADGE_CATALOG.map(b => b.key);
 // Badges effectifs d'un user (avec compat ascendante verified/staff)
@@ -422,6 +463,7 @@ app.get('/dashboard', requireAuth, (req, res) => {
     allowedCardStyle: ALLOWED_CARD_STYLE,
     allowedCardShape: ALLOWED_CARD_SHAPE,
     allowedAvatarShape: ALLOWED_AVATAR_SHAPE,
+    fontCatalog: FONT_CATALOG,
     stats,
     saved: req.query.saved === '1',
     pwok: req.query.pwok === '1',
@@ -444,7 +486,7 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const songName = (b.song_name || '').slice(0, 80);
     const accent = safeHex(b.accent, '#8b5cf6');
     const accent2 = safeHex(b.accent2, '#22d3ee');
-    const effect = ['snow', 'rain', 'stars', 'none'].includes(b.effect) ? b.effect : 'none';
+    const effect = ['snow', 'rain', 'stars', 'hearts', 'bubbles', 'none'].includes(b.effect) ? b.effect : 'none';
     const status = ['online', 'idle', 'dnd', 'offline', ''].includes(b.status) ? b.status : '';
     const cursorStyle = ALLOWED_CURSORS.includes(b.cursor_style) ? b.cursor_style : 'none';
     const cursor = cursorStyle !== 'none' ? 1 : 0;
@@ -461,6 +503,11 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const avatarShape = ALLOWED_AVATAR_SHAPE.includes(b.avatar_shape) ? b.avatar_shape : 'circle';
     const enterText = (b.enter_text || '').slice(0, 40);
     const usernameEffect = ALLOWED_USERNAME_EFFECT.includes(b.username_effect) ? b.username_effect : 'none';
+    const font = ALLOWED_FONT.includes(b.font) ? b.font : 'default';
+    const usernameFont = ALLOWED_FONT.includes(b.username_font) ? b.username_font : '';
+    const showJoined = b.show_joined ? 1 : 0;
+    const githubUser = /^[A-Za-z0-9-]{1,39}$/.test((b.github_user || '').trim()) ? b.github_user.trim() : '';
+    const cardTilt = b.card_tilt ? 1 : 0;
     const avatarSize = ALLOWED_AVATAR_SIZE.includes(b.avatar_size) ? b.avatar_size : 'md';
     const showUid = b.show_uid ? 1 : 0;
     const badgeStyle = ALLOWED_BADGE_STYLE.includes(b.badge_style) ? b.badge_style : 'multi';
@@ -521,14 +568,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -665,6 +712,13 @@ app.get('/:username', (req, res, next) => {
     titleColor:   u.title_color || '',
     widgetColor:  u.widget_color || '',
     liked:        !!(req.session.liked && req.session.liked[u.username_lower]),
+    font:         u.font || 'default',
+    fontFamily:   (FONT_MAP[u.font] || FONT_MAP.default).family,
+    usernameFontFamily: (u.username_font && FONT_MAP[u.username_font]) ? FONT_MAP[u.username_font].family : '',
+    showJoined:   !!u.show_joined,
+    joined:       u.created_at || 0,
+    githubUser:   u.github_user || '',
+    cardTilt:     !!u.card_tilt,
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)
@@ -680,7 +734,8 @@ app.get('/:username', (req, res, next) => {
   const fmtN = (n) => String(n || 0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   const ogDesc = [cfg.title, bio0, '👁 ' + fmtN(viewsCount || 0) + ' vues · ❤ ' + fmtN(u.likes || 0)].filter(Boolean).join('  ·  ');
   const meta = { url: origin + '/' + u.username, image: ogImage, desc: ogDesc, title: '@' + u.username, accent: cfg.accent || '#8b5cf6', site: SITE_NAME };
-  res.render('profile', { cfg, cfgJson, meta });
+  const gfUrl = googleFontsUrl([u.font, u.username_font].filter(Boolean));
+  res.render('profile', { cfg, cfgJson, meta, gfUrl });
 });
 
 app.use((req, res) => res.status(404).render('404'));

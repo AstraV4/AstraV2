@@ -167,7 +167,7 @@
         <div>
           <label>Effet de fond</label>
           <select name="effect">
-            <% [['snow','Neige'],['rain','Pluie'],['stars','Étoiles'],['none','Aucun']].forEach(function(e){ %>
+            <% [['snow','Neige'],['rain','Pluie'],['stars','Étoiles'],['hearts','Cœurs 💖'],['bubbles','Bulles 🫧'],['none','Aucun']].forEach(function(e){ %>
               <option value="<%= e[0] %>" <%= u.effect===e[0]?'selected':'' %>><%= e[1] %></option>
             <% }) %>
           </select>
@@ -272,9 +272,28 @@
 
       <div class="row2" style="margin-top:14px">
         <div>
+          <label>🔤 Police du profil</label>
+          <select name="font">
+            <% fontCatalog.forEach(function(f){ %>
+              <option value="<%= f.key %>" <%= (u.font||'default')===f.key?'selected':'' %>><%= f.label %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label>🔤 Police du pseudo <small style="color:var(--dim)">(optionnel)</small></label>
+          <select name="username_font">
+            <option value="" <%= !u.username_font?'selected':'' %>>— même que le profil —</option>
+            <% fontCatalog.forEach(function(f){ if(f.key==='default') return; %>
+              <option value="<%= f.key %>" <%= (u.username_font||'')===f.key?'selected':'' %>><%= f.label %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="row2" style="margin-top:14px">
+        <div>
           <label>✨ Effet du pseudo</label>
           <select name="username_effect">
-            <% [['none','Aucun'],['gradient','Dégradé animé'],['glow','Lueur'],['shine','Reflet brillant']].forEach(function(e){ %>
+            <% [['none','Aucun'],['gradient','Dégradé'],['gradient-anim','Dégradé animé'],['glow','Lueur'],['shine','Reflet brillant'],['rainbow','Arc-en-ciel'],['glitch','Glitch']].forEach(function(e){ %>
               <option value="<%= e[0] %>" <%= (u.username_effect||'none')===e[0]?'selected':'' %>><%= e[1] %></option>
             <% }) %>
           </select>
@@ -284,6 +303,14 @@
           <input type="text" name="enter_text" value="<%= u.enter_text %>" maxlength="40" placeholder="click to enter" />
         </div>
       </div>
+      <label class="check" style="margin-top:12px">
+        <input type="checkbox" name="show_joined" value="1" <%= u.show_joined?'checked':'' %> />
+        🕐 Afficher « Membre depuis… » sous la bio
+      </label>
+      <label class="check" style="margin-top:10px">
+        <input type="checkbox" name="card_tilt" value="1" <%= u.card_tilt?'checked':'' %> />
+        🪄 Carte qui s'incline avec la souris (effet 3D)
+      </label>
       <label style="margin-top:8px">🎬 Animation d'entrée</label>
       <select name="enter_anim">
         <% [['fade','Fondu'],['zoom','Zoom'],['slide','Glissé'],['blur','Flou'],['flip','Flip 3D']].forEach(function(o){ %>
@@ -387,6 +414,10 @@
       <label>🟢 Ton ID utilisateur Discord (présence en direct)</label>
       <input type="text" name="discord_user" value="<%= u.discord_user %>" placeholder="ex: 338529452322422784" />
       <div class="hint">Affiche ton statut/activité en direct. Rejoins d'abord le serveur Lanyard (<b>discord.gg/lanyard</b>), puis colle ton ID utilisateur Discord ici.</div>
+
+      <label>🐙 Ton pseudo GitHub (widget GitHub)</label>
+      <input type="text" name="github_user" value="<%= u.github_user %>" placeholder="ex: torvalds" />
+      <div class="hint">Affiche une carte avec ton avatar, tes abonnés et tes dépôts GitHub, plus un bouton « Voir le profil ».</div>
     </div>
 
     <div class="section" data-tab="infos">

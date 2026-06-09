@@ -20,7 +20,13 @@
 <meta name="twitter:title" content="<%= meta.title %>" />
 <meta name="twitter:description" content="<%= meta.desc %>" />
 <meta name="theme-color" content="<%= meta.accent %>" />
+<% if (gfUrl) { %><link href="<%= gfUrl %>" rel="stylesheet" /><% } %>
 <link rel="stylesheet" href="/static/css/profile.css" />
+<style>
+  :root{ --profile-font: <%= cfg.fontFamily %>;<% if (cfg.usernameFontFamily) { %> --username-font: <%= cfg.usernameFontFamily %>;<% } %> }
+  body, #card, .title, .bio, #widgets, .dc-card, .links, .btn-links { font-family: var(--profile-font) !important; }
+  <% if (cfg.usernameFontFamily) { %>.username, #uname-text { font-family: var(--username-font) !important; }<% } %>
+</style>
 </head>
 <body>
 <div id="bg"></div>
@@ -45,6 +51,7 @@
     <div class="badges-row" id="badges"></div>
     <div class="title" id="title"></div>
     <div class="bio"><span id="bio-text"></span><span class="cursor-blink">&nbsp;</span></div>
+    <div class="joined" id="joined" style="display:none"></div>
     <div class="views" id="views-wrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
       <span id="views">0</span>
@@ -53,6 +60,7 @@
     <div class="skills" id="skills"></div>
     <div class="uid" id="uid" style="display:none"></div>
     <button id="like-btn" class="like-btn" type="button" style="display:none"><span id="like-emoji">🤍</span> <span id="like-count">0</span></button>
+    <button id="share-btn" class="share-btn" type="button" title="Copier le lien">🔗 <span id="share-label">Partager</span></button>
     <div class="links" id="links"></div>
     <div class="btn-links" id="btn-links"></div>
     <div id="widgets"></div>

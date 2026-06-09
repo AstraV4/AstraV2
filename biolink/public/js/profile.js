@@ -164,9 +164,16 @@ const BADGE_DEFS = {
   early:    { label:'Early User',  icon:'clock',     c1:'#14b8a6', c2:'#06b6d4' },
   og:       { label:'OG',          icon:'star',      c1:'#f59e0b', c2:'#fb7185' },
   winner:   { label:'Gagnant',     icon:'trophy',    c1:'#fbbf24', c2:'#f59e0b' },
-  bughunter:{ label:'Bug Hunter',  icon:'bug',       c1:'#84cc16', c2:'#22c55e' }
+  bughunter:{ label:'Bug Hunter',  icon:'bug',       c1:'#84cc16', c2:'#22c55e' },
+  gamer:    { label:'Gamer',       icon:'gamepad-2', c1:'#22c55e', c2:'#3b82f6' },
+  artist:   { label:'Artiste',     icon:'palette',   c1:'#ec4899', c2:'#f59e0b' },
+  vip:      { label:'VIP',          icon:'sparkles',  c1:'#fbbf24', c2:'#ec4899' },
+  legend:   { label:'Légende',     icon:'flame',     c1:'#f97316', c2:'#ef4444' },
+  moderator:{ label:'Modérateur',  icon:'gavel',     c1:'#6366f1', c2:'#8b5cf6' },
+  creator:  { label:'Créateur',    icon:'clapperboard', c1:'#06b6d4', c2:'#8b5cf6' },
+  supporter:{ label:'Soutien',     icon:'hand-heart',c1:'#ec4899', c2:'#f472b6' }
 };
-const BADGE_ORDER = ['verified','staff','owner','developer','premium','donator','booster','partner','early','og','winner','bughunter'];
+const BADGE_ORDER = ['verified','staff','owner','developer','premium','donator','booster','partner','early','og','winner','bughunter','gamer','artist','vip','legend','moderator','creator','supporter'];
 const badgesBox = $('badges');
 const myBadges = CONFIG.badges || [];
 BADGE_ORDER.forEach(key => {
@@ -190,6 +197,32 @@ if (CONFIG.location){
   $('location').textContent = CONFIG.location;
   $('location-wrap').style.display = 'inline';
 }
+
+// --- Membre depuis ---
+if (CONFIG.showJoined && CONFIG.joined){
+  const diff = Date.now() - CONFIG.joined;
+  const days = Math.floor(diff / 86400000);
+  let txt;
+  if (days < 1) txt = "aujourd'hui";
+  else if (days < 30) txt = 'il y a ' + days + ' jour' + (days > 1 ? 's' : '');
+  else if (days < 365){ const m = Math.floor(days / 30); txt = 'il y a ' + m + ' mois'; }
+  else { const y = Math.floor(days / 365); txt = 'il y a ' + y + ' an' + (y > 1 ? 's' : ''); }
+  const j = $('joined');
+  j.textContent = 'Membre ' + txt;
+  j.style.display = 'block';
+}
+
+// --- Bouton partager (copier le lien) ---
+(function(){
+  const sb = $('share-btn'); if (!sb) return;
+  sb.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const url = location.href.split('?')[0];
+    const done = () => { const l = $('share-label'); if (l){ const old = l.textContent; l.textContent = 'Copié !'; setTimeout(() => l.textContent = old, 1500); } };
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(done); }
+    else { const t = document.createElement('textarea'); t.value = url; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch(_){} t.remove(); done(); }
+  });
+})();
 
 // --- Badges de competences (avec logos Devicon) ---
 const skillsBox = $('skills');
@@ -309,6 +342,47 @@ if (CONFIG.discordUser && /^[0-9]+$/.test(CONFIG.discordUser)){
       $('widgets').appendChild(card);
     })
     .catch(() => {}); // utilisateur pas dans le serveur Lanyard, ou ID invalide
+}
+
+// --- Widget GitHub ---
+if (CONFIG.githubUser && /^[A-Za-z0-9-]{1,39}$/.test(CONFIG.githubUser)){
+  fetch('https://api.github.com/users/' + CONFIG.githubUser)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(g => {
+      const card = document.createElement('a'); card.className = 'gh-card';
+      card.href = g.html_url; card.target = '_blank'; card.rel = 'noopener';
+      const img = document.createElement('img'); img.className = 'gh-av'; img.src = g.avatar_url; img.alt = ''; img.loading = 'lazy';
+      const info = document.createElement('div'); info.className = 'gh-info';
+      const name = document.createElement('div'); name.className = 'gh-name';
+      name.textContent = g.name || g.login;
+      const gh = document.createElement('span'); gh.className = 'gh-tag'; gh.textContent = 'GitHub';
+      name.appendChild(gh);
+      const meta = document.createElement('div'); meta.className = 'gh-meta';
+      meta.textContent = (g.followers || 0) + ' abonnés · ' + (g.public_repos || 0) + ' dépôts';
+      info.appendChild(name); info.appendChild(meta);
+      card.appendChild(img); card.appendChild(info);
+      $('widgets').appendChild(card);
+    })
+    .catch(() => {});
+}
+
+// --- Carte qui s'incline avec la souris (effet 3D) ---
+if (CONFIG.cardTilt && matchMedia('(pointer:fine)').matches){
+  const card = $('card');
+  const stage = $('stage');
+  if (card && stage){
+    stage.style.perspective = '900px';
+    card.style.transition = 'transform .12s ease-out';
+    card.style.transformStyle = 'preserve-3d';
+    addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+      const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+      const max = 7;
+      card.style.transform = 'rotateY(' + (dx * max) + 'deg) rotateX(' + (-dy * max) + 'deg)';
+    });
+    addEventListener('mouseleave', () => { card.style.transform = ''; });
+  }
 }
 
 // --- Curseur personnalise (canvas : fluide + elabore) ---
@@ -521,9 +595,19 @@ addEventListener('mouseleave', () => card.style.transform = '');
   });
   (function draw(){
     ctx.clearRect(0,0,W,H);
+    const EMO = { hearts:'❤️', bubbles:'🫧' };
+    const isEmo = !!EMO[CONFIG.effect];
     for (const p of P){
       ctx.beginPath();
-      if (CONFIG.effect==='rain'){
+      if (isEmo){
+        ctx.globalAlpha = p.a;
+        ctx.font = (p.r * 10 + 10) + 'px serif';
+        ctx.fillText(EMO[CONFIG.effect], p.x, p.y);
+        ctx.globalAlpha = 1;
+        p.y += p.s * (CONFIG.effect === 'bubbles' ? -.5 : .5);
+        p.x += Math.sin(p.y * .02) * .6 + p.d;
+        if (CONFIG.effect === 'bubbles' && p.y < -20){ p.y = H + 10; p.x = Math.random() * W; }
+      } else if (CONFIG.effect==='rain'){
         ctx.strokeStyle=`rgba(180,200,255,${p.a})`; ctx.lineWidth=p.r;
         ctx.moveTo(p.x,p.y); ctx.lineTo(p.x+p.d,p.y+p.s*2); ctx.stroke();
         p.y+=p.s*2; p.x+=p.d;
@@ -535,7 +619,7 @@ addEventListener('mouseleave', () => card.style.transform = '');
         ctx.fillStyle=`rgba(255,255,255,${p.a})`; ctx.arc(p.x,p.y,p.r,0,7); ctx.fill();
         p.y+=p.s*.4; p.x+=Math.sin(p.y*.01)*.5+p.d;
       }
-      if(p.y>H){p.y=-10;p.x=Math.random()*W}
+      if(CONFIG.effect!=='bubbles' && p.y>H){p.y=-10;p.x=Math.random()*W}
       if(p.x>W)p.x=0; if(p.x<0)p.x=W;
     }
     requestAnimationFrame(draw);

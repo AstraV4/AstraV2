@@ -85,6 +85,11 @@ addCol('username_color',"TEXT DEFAULT ''");
 addCol('title_color',   "TEXT DEFAULT ''");
 addCol('widget_color',  "TEXT DEFAULT ''");
 addCol('custom_uid',    "INTEGER DEFAULT 0");
+addCol('font',          "TEXT DEFAULT 'default'");
+addCol('username_font', "TEXT DEFAULT ''");
+addCol('show_joined',   "INTEGER DEFAULT 0");
+addCol('github_user',   "TEXT DEFAULT ''");
+addCol('card_tilt',     "INTEGER DEFAULT 0");
 
 // Table des vues par jour (pour les statistiques)
 db.exec(`

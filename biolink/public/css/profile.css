@@ -279,3 +279,37 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 .dc-card .dc-pill{flex:none;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
   color:#fff;background:color-mix(in srgb,var(--accent) 70%,transparent);padding:3px 8px;border-radius:7px}
 .dc-card .dc-pill.spotify{background:#1db954}
+
+/* ===== Membre depuis ===== */
+.joined{font-size:.82rem;color:var(--text-dim);margin-top:6px;opacity:.85}
+
+/* ===== Effets de pseudo supplementaires ===== */
+/* degrade statique (ue-gradient) : on coupe l'animation */
+.username.ue-gradient #uname-text,.username.ue-gradient{animation:none}
+/* degrade anime */
+.username.ue-gradient-anim #uname-text,.username.ue-gradient-anim{background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent));background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:ueflow 4s linear infinite}
+/* arc-en-ciel */
+.username.ue-rainbow #uname-text,.username.ue-rainbow{background:linear-gradient(90deg,#ff5e5e,#ffb65e,#ffee5e,#5eff8b,#5ec8ff,#9b5eff,#ff5ee1);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:ueflow 6s linear infinite}
+/* glitch */
+.username.ue-glitch{color:var(--text)}
+.username.ue-glitch #uname-text{position:relative;animation:ueglitch 2.2s steps(2) infinite}
+@keyframes ueglitch{0%,100%{text-shadow:none}20%{text-shadow:-2px 0 #ff2e6e,2px 0 #2ee6ff}21%{text-shadow:2px 0 #ff2e6e,-2px 0 #2ee6ff}40%{text-shadow:none}60%{text-shadow:-1px 0 #ff2e6e,1px 0 #2ee6ff}80%{text-shadow:none}}
+
+/* ===== Widget GitHub ===== */
+.gh-card{display:flex;align-items:center;gap:13px;margin-top:14px;padding:12px 15px;border-radius:18px;text-decoration:none;text-align:left;
+  background:rgba(16,16,22,.62);border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 10px 30px rgba(0,0,0,.35);transition:.2s}
+.gh-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2)}
+.gh-card .gh-av{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none;background:#1c1c26}
+.gh-card .gh-info{min-width:0;flex:1}
+.gh-card .gh-name{font-weight:700;font-size:1rem;color:var(--widget-text,var(--text));display:flex;align-items:center;gap:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gh-card .gh-tag{flex:none;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-dim);
+  background:rgba(255,255,255,.08);padding:3px 7px;border-radius:6px}
+.gh-card .gh-meta{font-size:.82rem;color:var(--text-dim);margin-top:3px}
+
+/* ===== Bouton partager ===== */
+.share-btn{margin:12px auto 0;display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--text);
+  font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:30px;transition:.2s;backdrop-filter:blur(6px)}
+.share-btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
