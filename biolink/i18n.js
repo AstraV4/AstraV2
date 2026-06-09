@@ -21,7 +21,20 @@ const I18N = {
     login_forgot: 'Mot de passe oublié ?', login_no_account: 'Pas encore de compte ?',
     register_h: 'Créer un compte', register_sub: "Choisis ton pseudo, c'est l'adresse de ta page.",
     register_btn: 'Créer mon profil', register_have: 'Déjà un compte ?',
-    f_username: 'Pseudo', f_password: 'Mot de passe', pw_min: '6 caractères minimum'
+    f_username: 'Pseudo', f_password: 'Mot de passe', pw_min: '6 caractères minimum',
+    d_title:'Mon profil', d_edit:'Modifier mon profil', d_yourpage:'Ta page :', d_views:'vues', d_viewpage:'Voir ma page', d_logout:'Déconnexion', d_admin:'🛠️ Admin',
+    d_saved:'✅ Profil enregistré !', d_pwok:'✅ Mot de passe changé !', d_pwerr1:'❌ Mot de passe actuel incorrect.', d_pwerr2:'❌ Le nouveau mot de passe doit faire au moins 6 caractères.',
+    d_tab_profil:'👤 Profil', d_tab_apparence:'🎨 Apparence', d_tab_media:'🎵 Média', d_tab_liens:'🔗 Liens', d_tab_infos:'🏷️ Infos & badges',
+    d_tile_user:'Pseudo', d_tile_views:'Vues', d_tile_likes:'Likes',
+    d_identity:'Identité', d_pseudo_label:'Pseudo', d_not_editable:'(non modifiable)',
+    d_avatar:'Photo de profil (image)', d_current:'Actuel :', d_see:'voir', d_status:'Statut', d_none:'(aucun)',
+    d_subtitle:'Sous-titre / localisation', d_subtitle_ph:'ex: développeur · Paris',
+    d_bio:'Bio (une ligne = un message qui défile, max 6)', d_bio_ph:'Bienvenue sur mon profil\nmerci de ta visite !',
+    d_appearance:'Apparence', d_bg:'Fond', d_music:'Musique de fond', d_social_links:'Liens sociaux (icônes)', d_text_buttons:'Boutons texte (optionnel)', d_widgets_info:'Widgets & infos', d_skills_badges:'🏷️ Compétences / badges',
+    d_save:'💾 Enregistrer', d_preview:'Prévisualiser', d_add_link:'+ Ajouter un lien', d_add_button:'+ Ajouter un bouton',
+    d_pw_title:'🔑 Changer mon mot de passe', d_pw_hint:'Saisis ton mot de passe actuel (ou celui donné par un admin), puis ton nouveau mot de passe.', d_pw_current:'Mot de passe actuel', d_pw_new:'Nouveau mot de passe', d_pw_btn:'Changer le mot de passe',
+    d_danger:'Zone de danger', d_danger_hint:'La suppression de ton compte est définitive : profil, fichiers et données seront perdus.', d_delete:'Supprimer mon compte', d_delete_confirm:'Supprimer ton compte définitivement ? Cette action est irréversible.',
+    d_stats:'📊 Statistiques — vues des 14 derniers jours', d_share:'🔗 Partager mon profil', d_copy:'📋 Copier le lien', d_copied:'✅ Copié !', d_qr_hint:'Scanne le QR code pour ouvrir ton profil sur un téléphone.', d_identity_desc:'Ton pseudo, ta photo, ton statut et ta bio.', d_appearance_desc:'Couleurs, polices, effets, curseur et forme de la carte.', d_bg_desc:"L'image ou la vidéo derrière ton profil, et la bannière du haut.", d_music_desc:'La musique qui se lance quand on ouvre ta page.', d_social_desc:'Les icônes cliquables (Discord, TikTok, Instagram…).', d_buttons_desc:'Des boutons avec un texte et un lien.', d_widgets_desc:'Horloge, localisation, présence Discord et GitHub.', d_skills_desc:'Tes technos / centres d\u2019intérêt affichés en logos.'
   },
   en: {
     nav_leaderboard: 'Leaderboard', nav_login: 'Log in', nav_register: 'Sign up',
@@ -41,7 +54,20 @@ const I18N = {
     login_forgot: 'Forgot password?', login_no_account: 'No account yet?',
     register_h: 'Create an account', register_sub: 'Pick your username, it becomes your page address.',
     register_btn: 'Create my profile', register_have: 'Already have an account?',
-    f_username: 'Username', f_password: 'Password', pw_min: '6 characters minimum'
+    f_username: 'Username', f_password: 'Password', pw_min: '6 characters minimum',
+    d_title:'My profile', d_edit:'Edit my profile', d_yourpage:'Your page:', d_views:'views', d_viewpage:'View my page', d_logout:'Log out', d_admin:'🛠️ Admin',
+    d_saved:'✅ Profile saved!', d_pwok:'✅ Password changed!', d_pwerr1:'❌ Current password is incorrect.', d_pwerr2:'❌ New password must be at least 6 characters.',
+    d_tab_profil:'👤 Profile', d_tab_apparence:'🎨 Appearance', d_tab_media:'🎵 Media', d_tab_liens:'🔗 Links', d_tab_infos:'🏷️ Info & badges',
+    d_tile_user:'Username', d_tile_views:'Views', d_tile_likes:'Likes',
+    d_identity:'Identity', d_pseudo_label:'Username', d_not_editable:'(cannot be changed)',
+    d_avatar:'Profile picture (image)', d_current:'Current:', d_see:'view', d_status:'Status', d_none:'(none)',
+    d_subtitle:'Subtitle / location', d_subtitle_ph:'e.g. developer · Paris',
+    d_bio:'Bio (one line = one scrolling message, max 6)', d_bio_ph:'Welcome to my profile\nthanks for visiting!',
+    d_appearance:'Appearance', d_bg:'Background', d_music:'Background music', d_social_links:'Social links (icons)', d_text_buttons:'Text buttons (optional)', d_widgets_info:'Widgets & info', d_skills_badges:'🏷️ Skills / badges',
+    d_save:'💾 Save', d_preview:'Preview', d_add_link:'+ Add a link', d_add_button:'+ Add a button',
+    d_pw_title:'🔑 Change my password', d_pw_hint:'Enter your current password (or the one given by an admin), then your new password.', d_pw_current:'Current password', d_pw_new:'New password', d_pw_btn:'Change password',
+    d_danger:'Danger zone', d_danger_hint:'Deleting your account is permanent: profile, files and data will be lost.', d_delete:'Delete my account', d_delete_confirm:'Permanently delete your account? This cannot be undone.',
+    d_stats:'📊 Stats — views over the last 14 days', d_share:'🔗 Share my profile', d_copy:'📋 Copy link', d_copied:'✅ Copied!', d_qr_hint:'Scan the QR code to open your profile on a phone.', d_identity_desc:'Your username, picture, status and bio.', d_appearance_desc:'Colors, fonts, effects, cursor and card shape.', d_bg_desc:'The image or video behind your profile, and the top banner.', d_music_desc:'The music that plays when your page opens.', d_social_desc:'Clickable icons (Discord, TikTok, Instagram…).', d_buttons_desc:'Buttons with a label and a link.', d_widgets_desc:'Clock, location, live Discord and GitHub.', d_skills_desc:'Your tech / interests shown as logos.'
   },
   es: {
     nav_leaderboard: 'Clasificación', nav_login: 'Entrar', nav_register: 'Registrarse',
@@ -61,7 +87,20 @@ const I18N = {
     login_forgot: '¿Olvidaste tu contraseña?', login_no_account: '¿Aún no tienes cuenta?',
     register_h: 'Crear una cuenta', register_sub: 'Elige tu nombre de usuario, será la dirección de tu página.',
     register_btn: 'Crear mi perfil', register_have: '¿Ya tienes cuenta?',
-    f_username: 'Usuario', f_password: 'Contraseña', pw_min: 'mínimo 6 caracteres'
+    f_username: 'Usuario', f_password: 'Contraseña', pw_min: 'mínimo 6 caracteres',
+    d_title:'Mi perfil', d_edit:'Editar mi perfil', d_yourpage:'Tu página:', d_views:'vistas', d_viewpage:'Ver mi página', d_logout:'Cerrar sesión', d_admin:'🛠️ Admin',
+    d_saved:'✅ ¡Perfil guardado!', d_pwok:'✅ ¡Contraseña cambiada!', d_pwerr1:'❌ Contraseña actual incorrecta.', d_pwerr2:'❌ La nueva contraseña debe tener al menos 6 caracteres.',
+    d_tab_profil:'👤 Perfil', d_tab_apparence:'🎨 Apariencia', d_tab_media:'🎵 Medios', d_tab_liens:'🔗 Enlaces', d_tab_infos:'🏷️ Info e insignias',
+    d_tile_user:'Usuario', d_tile_views:'Vistas', d_tile_likes:'Me gusta',
+    d_identity:'Identidad', d_pseudo_label:'Usuario', d_not_editable:'(no editable)',
+    d_avatar:'Foto de perfil (imagen)', d_current:'Actual:', d_see:'ver', d_status:'Estado', d_none:'(ninguno)',
+    d_subtitle:'Subtítulo / ubicación', d_subtitle_ph:'ej: desarrollador · París',
+    d_bio:'Bio (una línea = un mensaje que se desplaza, máx 6)', d_bio_ph:'Bienvenido a mi perfil\n¡gracias por tu visita!',
+    d_appearance:'Apariencia', d_bg:'Fondo', d_music:'Música de fondo', d_social_links:'Enlaces sociales (iconos)', d_text_buttons:'Botones de texto (opcional)', d_widgets_info:'Widgets e info', d_skills_badges:'🏷️ Habilidades / insignias',
+    d_save:'💾 Guardar', d_preview:'Vista previa', d_add_link:'+ Añadir un enlace', d_add_button:'+ Añadir un botón',
+    d_pw_title:'🔑 Cambiar mi contraseña', d_pw_hint:'Introduce tu contraseña actual (o la que te dio un admin), luego tu nueva contraseña.', d_pw_current:'Contraseña actual', d_pw_new:'Nueva contraseña', d_pw_btn:'Cambiar contraseña',
+    d_danger:'Zona de peligro', d_danger_hint:'Eliminar tu cuenta es permanente: perfil, archivos y datos se perderán.', d_delete:'Eliminar mi cuenta', d_delete_confirm:'¿Eliminar tu cuenta permanentemente? Esta acción es irreversible.',
+    d_stats:'📊 Estadísticas — vistas de los últimos 14 días', d_share:'🔗 Compartir mi perfil', d_copy:'📋 Copiar enlace', d_copied:'✅ ¡Copiado!', d_qr_hint:'Escanea el código QR para abrir tu perfil en un teléfono.', d_identity_desc:'Tu usuario, foto, estado y bio.', d_appearance_desc:'Colores, fuentes, efectos, cursor y forma de la tarjeta.', d_bg_desc:'La imagen o vídeo detrás de tu perfil, y el banner superior.', d_music_desc:'La música que suena al abrir tu página.', d_social_desc:'Iconos clicables (Discord, TikTok, Instagram…).', d_buttons_desc:'Botones con un texto y un enlace.', d_widgets_desc:'Reloj, ubicación, Discord en directo y GitHub.', d_skills_desc:'Tus tecnologías / intereses mostrados como logos.'
   }
 };
 

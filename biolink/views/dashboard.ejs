@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mon profil</title>
+<title><%= t('d_title') %></title>
 <link rel="stylesheet" href="/static/css/app.css" />
 <style>
 #musicResults{display:flex;flex-direction:column;gap:6px;margin-top:8px}
@@ -27,20 +27,20 @@
 
   <div class="dash-head">
     <div>
-      <h2>Modifier mon profil</h2>
-      <div class="current">Ta page : <a href="/<%= u.username %>" target="_blank" style="color:var(--accent)"><%= siteName %>/<%= u.username %></a> · <%= u.views %> vues</div>
+      <h2><%= t('d_edit') %></h2>
+      <div class="current"><%= t('d_yourpage') %> <a href="/<%= u.username %>" target="_blank" style="color:var(--accent)"><%= siteName %>/<%= u.username %></a> · <%= u.views %> <%= t('d_views') %></div>
     </div>
     <nav style="display:flex;gap:10px">
-      <% if (isAdmin) { %><a class="btn" href="/admin">🛠️ Admin</a><% } %>
-      <a class="btn" href="/<%= u.username %>" target="_blank">👁 Voir ma page</a>
-      <form method="POST" action="/logout"><button class="btn btn-danger" type="submit">Déconnexion</button></form>
+      <% if (isAdmin) { %><a class="btn" href="/admin"><%= t('d_admin') %></a><% } %>
+      <a class="btn" href="/<%= u.username %>" target="_blank">👁 <%= t('d_viewpage') %></a>
+      <form method="POST" action="/logout"><button class="btn btn-danger" type="submit"><%= t('d_logout') %></button></form>
     </nav>
   </div>
 
-  <% if (saved) { %><div class="ok">✅ Profil enregistré !</div><% } %>
-  <% if (pwok) { %><div class="ok">✅ Mot de passe changé !</div><% } %>
-  <% if (pwerr === '1') { %><div class="error">❌ Mot de passe actuel incorrect.</div><% } %>
-  <% if (pwerr === '2') { %><div class="error">❌ Le nouveau mot de passe doit faire au moins 6 caractères.</div><% } %>
+  <% if (saved) { %><div class="ok"><%= t('d_saved') %></div><% } %>
+  <% if (pwok) { %><div class="ok"><%= t('d_pwok') %></div><% } %>
+  <% if (pwerr === '1') { %><div class="error"><%= t('d_pwerr1') %></div><% } %>
+  <% if (pwerr === '2') { %><div class="error"><%= t('d_pwerr2') %></div><% } %>
 
   <form class="panel" method="POST" action="/dashboard" enctype="multipart/form-data">
    <div class="dash-layout">
@@ -50,48 +50,50 @@
         <div><b>@<%= u.username %></b><span><%= u.views %> vues</span></div>
       </div>
       <div class="tabs" id="tabs">
-        <button type="button" class="tab active" data-go="profil">👤 Profil</button>
-        <button type="button" class="tab" data-go="apparence">🎨 Apparence</button>
-        <button type="button" class="tab" data-go="media">🎵 Média</button>
-        <button type="button" class="tab" data-go="liens">🔗 Liens</button>
-        <button type="button" class="tab" data-go="infos">🏷️ Infos &amp; badges</button>
+        <button type="button" class="tab active" data-go="profil"><%= t('d_tab_profil') %></button>
+        <button type="button" class="tab" data-go="apparence"><%= t('d_tab_apparence') %></button>
+        <button type="button" class="tab" data-go="media"><%= t('d_tab_media') %></button>
+        <button type="button" class="tab" data-go="liens"><%= t('d_tab_liens') %></button>
+        <button type="button" class="tab" data-go="infos"><%= t('d_tab_infos') %></button>
       </div>
     </aside>
     <div class="dash-main">
 
     <div class="acct-tiles">
-      <div class="acct-tile"><span>Pseudo</span><b>@<%= u.username %></b></div>
+      <div class="acct-tile"><span><%= t('d_tile_user') %></span><b>@<%= u.username %></b></div>
       <div class="acct-tile"><span>UID</span><b><%= u.custom_uid || u.id %></b></div>
-      <div class="acct-tile"><span>Vues</span><b><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
-      <div class="acct-tile"><span>Likes</span><b><%= (u.likes||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
+      <div class="acct-tile"><span><%= t('d_tile_views') %></span><b><%= (u.views||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
+      <div class="acct-tile"><span><%= t('d_tile_likes') %></span><b><%= (u.likes||0).toLocaleString('fr-FR').replace(/\s/g,'.') %></b></div>
     </div>
 
     <div class="section" data-tab="profil">
-      <h3>Identité</h3>
-      <p class="hint">Pseudo : <b>@<%= u.username %></b> (non modifiable)</p>
+      <h3><%= t('d_identity') %></h3>
+      <p class="section-desc"><%= t('d_identity_desc') %></p>
+      <p class="hint"><%= t('d_pseudo_label') %> : <b>@<%= u.username %></b> <%= t('d_not_editable') %></p>
       <div class="row2">
         <div>
-          <label>Photo de profil (image)</label>
+          <label><%= t('d_avatar') %></label>
           <input type="file" name="avatar" accept="image/*" />
-          <% if (u.avatar) { %><div class="current">Actuelle : <a href="<%= u.avatar %>" target="_blank">voir</a></div><% } %>
+          <% if (u.avatar) { %><div class="current"><%= t('d_current') %> <a href="<%= u.avatar %>" target="_blank"><%= t('d_see') %></a></div><% } %>
         </div>
         <div>
-          <label>Statut</label>
+          <label><%= t('d_status') %></label>
           <select name="status">
             <% ['online','idle','dnd','offline',''].forEach(function(s){ %>
-              <option value="<%= s %>" <%= u.status===s?'selected':'' %>><%= s||'(aucun)' %></option>
+              <option value="<%= s %>" <%= u.status===s?'selected':'' %>><%= s||t('d_none') %></option>
             <% }) %>
           </select>
         </div>
       </div>
-      <label>Sous-titre / localisation</label>
-      <input type="text" name="title" value="<%= u.title %>" maxlength="80" placeholder="ex: développeur · Paris" />
-      <label>Bio (une ligne = un message qui défile, max 6)</label>
-      <textarea name="bio" placeholder="Bienvenue sur mon profil&#10;merci de ta visite !"><%= bio %></textarea>
+      <label><%= t('d_subtitle') %></label>
+      <input type="text" name="title" value="<%= u.title %>" maxlength="80" placeholder="<%= t('d_subtitle_ph') %>" />
+      <label><%= t('d_bio') %></label>
+      <textarea name="bio" placeholder="<%= t('d_bio_ph') %>"><%= bio %></textarea>
     </div>
 
     <div class="section" data-tab="apparence">
-      <h3>Apparence</h3>
+      <h3><%= t('d_appearance') %></h3>
+      <p class="section-desc"><%= t('d_appearance_desc') %></p>
       <div class="row2">
         <div><label>Couleur principale</label><input type="color" name="accent" id="acc1" value="<%= u.accent %>" /></div>
         <div><label>Couleur secondaire</label><input type="color" name="accent2" id="acc2" value="<%= u.accent2 %>" /></div>
@@ -320,7 +322,8 @@
     </div>
 
     <div class="section" data-tab="media">
-      <h3>Fond</h3>
+      <h3><%= t('d_bg') %></h3>
+      <p class="section-desc"><%= t('d_bg_desc') %></p>
       <p class="hint">Image ou vidéo (mp4/webm). 50 Mo max.</p>
       <label>Fond (image ou vidéo)</label>
       <input type="file" name="background" accept="image/*,video/mp4,video/webm" />
@@ -337,7 +340,8 @@
     </div>
 
     <div class="section" data-tab="media">
-      <h3>Musique de fond</h3>
+      <h3><%= t('d_music') %></h3>
+      <p class="section-desc"><%= t('d_music_desc') %></p>
       <p class="hint">Cherche une musique (aperçu ~30 s) OU envoie ton propre fichier audio complet.</p>
 
       <label>🔎 Rechercher une musique</label>
@@ -358,7 +362,8 @@
     </div>
 
     <div class="section" data-tab="liens">
-      <h3>Liens sociaux (icônes)</h3>
+      <h3><%= t('d_social_links') %></h3>
+      <p class="section-desc"><%= t('d_social_desc') %></p>
       <p class="hint">Types dispo : discord, github, instagram, x, youtube, spotify, tiktok, telegram, email, globe</p>
       <div id="socials">
         <% (socials.length?socials:[{type:'',url:''}]).forEach(function(s){ %>
@@ -373,11 +378,12 @@
           </div>
         <% }) %>
       </div>
-      <button type="button" class="btn btn-add" onclick="addSocial()">+ Ajouter un lien</button>
+      <button type="button" class="btn btn-add" onclick="addSocial()"><%= t('d_add_link') %></button>
     </div>
 
     <div class="section" data-tab="liens">
-      <h3>Boutons texte (optionnel)</h3>
+      <h3><%= t('d_text_buttons') %></h3>
+      <p class="section-desc"><%= t('d_buttons_desc') %></p>
       <div id="buttons">
         <% buttons.forEach(function(bn){ %>
           <div class="repeat-row">
@@ -387,11 +393,12 @@
           </div>
         <% }) %>
       </div>
-      <button type="button" class="btn btn-add" onclick="addButton()">+ Ajouter un bouton</button>
+      <button type="button" class="btn btn-add" onclick="addButton()"><%= t('d_add_button') %></button>
     </div>
 
     <div class="section" data-tab="infos">
-      <h3>Widgets & infos</h3>
+      <h3><%= t('d_widgets_info') %></h3>
+      <p class="section-desc"><%= t('d_widgets_desc') %></p>
       <div class="row2">
         <div>
           <label>⏰ Fuseau horaire (horloge en direct)</label>
@@ -421,7 +428,8 @@
     </div>
 
     <div class="section" data-tab="infos">
-      <h3>🏷️ Compétences / badges</h3>
+      <h3><%= t('d_skills_badges') %></h3>
+      <p class="section-desc"><%= t('d_skills_desc') %></p>
       <p class="hint">Coche celles à afficher sur ta page (max 12).</p>
       <div class="skills-grid">
         <% allowedSkills.forEach(function(sk){ %>
@@ -434,15 +442,15 @@
     </div>
 
     <div class="bar">
-      <button class="btn btn-primary" type="submit">💾 Enregistrer</button>
-      <a class="btn" href="/<%= u.username %>" target="_blank">Prévisualiser</a>
+      <button class="btn btn-primary" type="submit"><%= t('d_save') %></button>
+      <a class="btn" href="/<%= u.username %>" target="_blank"><%= t('d_preview') %></a>
     </div>
     </div><!-- /dash-main -->
    </div><!-- /dash-layout -->
   </form>
 
   <div class="panel" style="margin-top:20px">
-    <h3 style="margin-bottom:6px">📊 Statistiques — vues des 14 derniers jours</h3>
+    <h3 style="margin-bottom:6px"><%= t('d_stats') %></h3>
     <% var smax = Math.max(1, ...stats.map(function(s){return s.count;})); %>
     <div class="stats-chart">
       <% stats.forEach(function(s){ %>
@@ -455,40 +463,40 @@
   </div>
 
   <div class="panel" style="margin-top:20px">
-    <h3 style="margin-bottom:6px">🔗 Partager mon profil</h3>
+    <h3 style="margin-bottom:6px"><%= t('d_share') %></h3>
     <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
       <img id="qr" alt="QR code" width="150" height="150" style="background:#fff;border-radius:12px;padding:7px" />
       <div>
         <div id="profile-link" class="current" style="font-size:1.05rem;color:var(--accent);word-break:break-all"></div>
-        <button type="button" class="btn" id="copy-link" style="margin-top:12px">📋 Copier le lien</button>
-        <p class="hint" style="margin-top:8px">Scanne le QR code pour ouvrir ton profil sur un téléphone.</p>
+        <button type="button" class="btn" id="copy-link" style="margin-top:12px"><%= t('d_copy') %></button>
+        <p class="hint" style="margin-top:8px"><%= t('d_qr_hint') %></p>
       </div>
     </div>
   </div>
 
   <div class="panel" style="margin-top:20px">
-    <h3 style="margin-bottom:6px">🔑 Changer mon mot de passe</h3>
-    <p class="hint">Saisis ton mot de passe actuel (ou le mot de passe temporaire donné par un admin), puis ton nouveau mot de passe.</p>
+    <h3 style="margin-bottom:6px"><%= t('d_pw_title') %></h3>
+    <p class="hint"><%= t('d_pw_hint') %></p>
     <form method="POST" action="/account/password">
       <div class="row2">
         <div>
-          <label>Mot de passe actuel</label>
+          <label><%= t('d_pw_current') %></label>
           <input type="password" name="current" required />
         </div>
         <div>
-          <label>Nouveau mot de passe</label>
+          <label><%= t('d_pw_new') %></label>
           <input type="password" name="new" placeholder="6 caractères minimum" required />
         </div>
       </div>
-      <button class="btn btn-primary" type="submit" style="margin-top:12px">Changer le mot de passe</button>
+      <button class="btn btn-primary" type="submit" style="margin-top:12px"><%= t('d_pw_btn') %></button>
     </form>
   </div>
 
   <div class="panel" style="margin-top:20px;border-color:rgba(239,68,68,.3)">
-    <h3 style="color:#fca5a5;margin-bottom:6px">Zone de danger</h3>
-    <p class="hint">La suppression de ton compte est définitive : profil, fichiers et données seront perdus.</p>
-    <form method="POST" action="/account/delete" onsubmit="return confirm('Supprimer ton compte définitivement ? Cette action est irréversible.')">
-      <button class="btn btn-danger" type="submit">Supprimer mon compte</button>
+    <h3 style="color:#fca5a5;margin-bottom:6px"><%= t('d_danger') %></h3>
+    <p class="hint"><%= t('d_danger_hint') %></p>
+    <form method="POST" action="/account/delete" onsubmit="return confirm('<%= t('d_delete_confirm') %>')">
+      <button class="btn btn-danger" type="submit"><%= t('d_delete') %></button>
     </form>
   </div>
 </div>
@@ -538,7 +546,7 @@
   const qr = document.getElementById('qr'); if (qr) qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(url);
   const btn = document.getElementById('copy-link');
   if (btn) btn.addEventListener('click', () => {
-    navigator.clipboard.writeText(url).then(() => { btn.textContent = '✅ Copié !'; setTimeout(() => btn.textContent = '📋 Copier le lien', 1500); }).catch(() => {});
+    navigator.clipboard.writeText(url).then(() => { btn.textContent = '<%= t("d_copied") %>'; setTimeout(() => btn.textContent = '<%= t("d_copy") %>', 1500); }).catch(() => {});
   });
 })();
 const SOCIAL_TYPES = ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','email','globe'];
