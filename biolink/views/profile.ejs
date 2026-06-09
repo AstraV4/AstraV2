@@ -23,8 +23,8 @@
 <% if (gfUrl) { %><link href="<%= gfUrl %>" rel="stylesheet" /><% } %>
 <link rel="stylesheet" href="/static/css/profile.css" />
 <style>
-  :root{ --profile-font: <%= cfg.fontFamily %>;<% if (cfg.usernameFontFamily) { %> --username-font: <%= cfg.usernameFontFamily %>;<% } %> }
-  body, #card, .title, .bio, #widgets, .dc-card, .links, .btn-links { font-family: var(--profile-font) !important; }
+  :root{ --profile-font: <%- cfg.fontFamily %>;<% if (cfg.usernameFontFamily) { %> --username-font: <%- cfg.usernameFontFamily %>;<% } %> }
+  body, #card, .title, .bio, #bio-text, .username, #uname-text, .widget-main, #widgets, .dc-card, .gh-card, .links, .btn-links, .joined, .skills, .uid { font-family: var(--profile-font) !important; }
   <% if (cfg.usernameFontFamily) { %>.username, #uname-text { font-family: var(--username-font) !important; }<% } %>
 </style>
 </head>
