@@ -11,6 +11,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const db = require('./db');
+const sqlite3 = require('sqlite3');
 
 const app = express();
 app.set('trust proxy', true); // pour lire la vraie IP derriere Railway/Cloudflare
@@ -36,8 +37,10 @@ app.use('/static', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d' }));
 
 // --- Sessions (stockees en SQLite, persistantes apres redemarrage) ---
+// connect-sqlite3 recente : l'option "db" doit etre une connexion DEJA OUVERTE (pas juste un nom de fichier)
+const sessionDb = new sqlite3.Database(path.join(DATA_DIR, 'sessions.db'));
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.db', dir: DATA_DIR }),
+  store: new SQLiteStore({ db: sessionDb }),
   secret: process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex'),
   resave: false,
   saveUninitialized: false,
