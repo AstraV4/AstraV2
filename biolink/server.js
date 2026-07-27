@@ -340,8 +340,6 @@ app.post('/register', async (req, res) => {
     return render("Ce pseudo n'est pas autorise. Merci d'en choisir un autre.");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
     return render("Adresse e-mail invalide.");
-  if (!firstName || !lastName)
-    return render("Merci d'indiquer ton prenom et ton nom.");
   if (password.length < 6)
     return render('Le mot de passe doit faire au moins 6 caracteres.');
   const exists = db.prepare('SELECT 1 FROM users WHERE username_lower = ?').get(username.toLowerCase());

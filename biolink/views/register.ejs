@@ -24,12 +24,6 @@
     <input type="email" name="email" value="<%= email %>" placeholder="toi@exemple.com" autocomplete="email" required />
     <p class="sub" style="margin:-6px 0 10px;font-size:12px"><%= t('register_sub2') %></p>
 
-    <div class="row2">
-      <div><label><%= t('f_firstname') %></label><input type="text" name="first_name" value="<%= firstName %>" autocomplete="given-name" maxlength="60" required /></div>
-      <div><label><%= t('f_lastname') %></label><input type="text" name="last_name" value="<%= lastName %>" autocomplete="family-name" maxlength="60" required /></div>
-    </div>
-    <p class="sub" style="margin:-6px 0 10px;font-size:12px"><%= t('d_identity_extra_hint') %></p>
-
     <label><%= t('f_password') %></label>
     <input type="password" name="password" placeholder="<%= t('pw_min') %>" autocomplete="new-password" required />
 
