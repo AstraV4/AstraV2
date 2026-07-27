@@ -58,6 +58,24 @@ addCol('recovery_hash', "TEXT DEFAULT ''");
 addCol('card_style',    "TEXT DEFAULT 'glass'");
 addCol('card_shape',    "TEXT DEFAULT 'rounded'");
 addCol('card_blur',     "TEXT DEFAULT 'strong'");
+
+// --- E-mail (inscription, vérification, réinitialisation du mot de passe) ---
+addCol('email',           "TEXT DEFAULT ''");
+addCol('email_lower',     "TEXT DEFAULT ''");
+addCol('email_verified',  "INTEGER DEFAULT 0");
+addCol('verify_token',    "TEXT DEFAULT ''");
+addCol('reset_token',     "TEXT DEFAULT ''");
+addCol('reset_expires',   "INTEGER DEFAULT 0");
+// --- Identité (visible uniquement par l'admin) ---
+addCol('first_name',      "TEXT DEFAULT ''");
+addCol('last_name',       "TEXT DEFAULT ''");
+// --- Compte Discord lié (OAuth, différent du champ "discord_user" affiché sur le profil) ---
+addCol('discord_id',        "TEXT DEFAULT ''");
+addCol('discord_username',  "TEXT DEFAULT ''");
+addCol('discord_avatar',    "TEXT DEFAULT ''");
+addCol('discord_linked_at', "INTEGER DEFAULT 0");
+// Index unique sur l'e-mail une fois la colonne en place (permet plusieurs comptes sans e-mail encore renseigné, temporairement, mais empêche les doublons réels)
+db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower ON users(email_lower) WHERE email_lower != ''");
 addCol('avatar_shape',  "TEXT DEFAULT 'circle'");
 addCol('cursor_image',  "TEXT DEFAULT ''");
 addCol('badges',        "TEXT DEFAULT '[]'");

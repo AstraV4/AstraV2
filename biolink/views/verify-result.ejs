@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= siteName %></title>
+<link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+<div class="container"><header><a href="/" class="logo"><%= siteName %></a></header></div>
+<div class="auth-wrap">
+  <div class="auth panel" style="text-align:center">
+    <div style="font-size:42px;margin-bottom:6px"><%= ok ? '✅' : '❌' %></div>
+    <h2><%= ok ? t('verify_ok').replace('✅ ', '') : t('verify_err').replace('❌ ', '') %></h2>
+    <a class="btn btn-primary full" href="/login" style="margin-top:10px"><%= t('nav_login') %></a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= t('verify_sent_h') %> · <%= siteName %></title>
+<link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+<div class="container"><header><a href="/" class="logo"><%= siteName %></a></header></div>
+<div class="auth-wrap">
+  <div class="auth panel" style="text-align:center">
+    <div style="font-size:42px;margin-bottom:6px">📬</div>
+    <h2><%= t('verify_sent_h') %></h2>
+    <p class="sub"><%= t('verify_sent_msg') %><b><%= email %></b></p>
+    <p class="sub" style="font-size:13px"><%= t('verify_sent_hint') %></p>
+    <a class="btn btn-ghost full" href="/login" style="margin-top:10px"><%= t('nav_login') %></a>
+  </div>
+</div>
+</body>
+</html>

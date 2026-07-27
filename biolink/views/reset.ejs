@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title><%= t('reset_h') %> · <%= siteName %></title>
+<link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body>
+<div class="container"><header><a href="/" class="logo"><%= siteName %></a></header></div>
+<div class="auth-wrap">
+  <% if (!valid) { %>
+    <div class="auth panel">
+      <h2><%= t('reset_h') %></h2>
+      <div class="error"><%= t('reset_expired') %></div>
+      <a class="btn btn-primary full" href="/forgot"><%= t('forgot_h') %></a>
+    </div>
+  <% } else if (done) { %>
+    <div class="auth panel">
+      <h2><%= t('reset_h') %> ✅</h2>
+      <p class="sub"><%= t('reset_ok') %></p>
+      <a class="btn btn-primary full" href="/login"><%= t('nav_login') %></a>
+    </div>
+  <% } else { %>
+    <form class="auth panel" method="POST" action="/reset">
+      <h2><%= t('reset_h') %></h2>
+      <p class="sub"><%= t('reset_sub') %></p>
+      <% if (error) { %><div class="error"><%= error %></div><% } %>
+      <input type="hidden" name="token" value="<%= token %>" />
+
+      <label><%= t('f_password') %></label>
+      <input type="password" name="password" placeholder="<%= t('pw_min') %>" autocomplete="new-password" required autofocus />
+
+      <button class="btn btn-primary full" type="submit"><%= t('reset_btn') %></button>
+    </form>
+  <% } %>
+</div>
+</body>
+</html>

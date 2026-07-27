@@ -37,6 +37,9 @@
           <a href="/<%= u.username %>" target="_blank" style="color:var(--accent);font-weight:700;font-size:1.05rem">@<%= u.username %></a>
           <span class="current"> · <%= u.views %> vues · <%= u.badges.length %> badge<%= u.badges.length>1?'s':'' %></span>
           <div class="current" style="margin-top:6px;line-height:1.6">
+            📧 E-mail : <%= u.email || '—' %> <% if (u.email) { %><%= u.emailVerified ? '✅' : '⚠️ non confirmé' %><% } %><br/>
+            🪪 Nom : <%= u.fullName || '—' %><br/>
+            🎮 Discord lié : <%= u.discordUsername ? '@' + u.discordUsername : '—' %><br/>
             🕓 Inscrit le <%= new Date(u.createdAt).toLocaleString('fr-FR') %><br/>
             🔌 Dernière connexion : <%= u.lastLogin ? new Date(u.lastLogin).toLocaleString('fr-FR') : '—' %><br/>
             🌐 IP inscription : <%= u.signupIp || '—' %><% if (u.signupIp) { %> <a href="https://ipinfo.io/<%= u.signupIp %>" target="_blank" style="color:var(--accent)">(localiser)</a><% } %><br/>

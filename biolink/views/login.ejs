@@ -15,6 +15,15 @@
     <h2><%= t('login_h') %></h2>
     <p class="sub"><%= t('login_sub') %></p>
     <% if (error) { %><div class="error"><%= error %></div><% } %>
+    <% if (unverified) { %>
+      <div class="error">
+        <%= t('login_unverified') %>
+        <form method="POST" action="/verify/resend" style="margin-top:8px">
+          <input type="hidden" name="username" value="<%= username %>" />
+          <button class="btn btn-ghost" type="submit" style="padding:6px 10px"><%= t('login_resend') %></button>
+        </form>
+      </div>
+    <% } %>
 
     <label><%= t('f_username') %></label>
     <input type="text" name="username" value="<%= username %>" placeholder="<%= t('your_username') %>" autocomplete="username" required autofocus />

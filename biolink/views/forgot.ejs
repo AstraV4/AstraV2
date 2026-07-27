@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="<%= lang %>">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mot de passe oublié</title>
+<title><%= t('forgot_h') %> · <%= siteName %></title>
 <link rel="stylesheet" href="/static/css/app.css" />
 </head>
 <body>
@@ -11,27 +11,21 @@
 <div class="auth-wrap">
   <% if (done) { %>
     <div class="auth panel">
-      <h2>Mot de passe réinitialisé ✅</h2>
-      <p class="sub">Tu peux maintenant te connecter avec ton nouveau mot de passe.</p>
-      <a class="btn btn-primary full" href="/login">Se connecter</a>
+      <h2><%= t('forgot_h') %> ✅</h2>
+      <p class="sub"><%= t('forgot_done') %></p>
+      <a class="btn btn-primary full" href="/login"><%= t('nav_login') %></a>
     </div>
   <% } else { %>
     <form class="auth panel" method="POST" action="/forgot">
-      <h2>Mot de passe oublié</h2>
-      <p class="sub">Saisis ton pseudo, ton code de récupération, et un nouveau mot de passe.</p>
+      <h2><%= t('forgot_h') %></h2>
+      <p class="sub"><%= t('forgot_sub') %></p>
       <% if (error) { %><div class="error"><%= error %></div><% } %>
 
-      <label>Pseudo</label>
-      <input type="text" name="username" placeholder="tonpseudo" required autofocus />
+      <label><%= t('f_email') %></label>
+      <input type="email" name="email" placeholder="toi@exemple.com" required autofocus />
 
-      <label>Code de récupération</label>
-      <input type="text" name="code" placeholder="XXXXX-XXXXX-..." required />
-
-      <label>Nouveau mot de passe</label>
-      <input type="password" name="password" placeholder="6 caractères minimum" required />
-
-      <button class="btn btn-primary full" type="submit">Réinitialiser</button>
-      <p class="muted"><a href="/login" style="color:var(--accent)">Retour à la connexion</a></p>
+      <button class="btn btn-primary full" type="submit"><%= t('forgot_btn') %></button>
+      <p class="muted"><a href="/login" style="color:var(--accent)"><%= t('nav_login') %></a></p>
     </form>
   <% } %>
 </div>

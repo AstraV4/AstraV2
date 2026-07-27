@@ -89,6 +89,13 @@
       <input type="text" name="title" value="<%= u.title %>" maxlength="80" placeholder="<%= t('d_subtitle_ph') %>" />
       <label><%= t('d_bio') %></label>
       <textarea name="bio" placeholder="<%= t('d_bio_ph') %>"><%= bio %></textarea>
+
+      <h3 style="margin-top:26px"><%= t('d_identity_extra') %></h3>
+      <p class="section-desc"><%= t('d_identity_extra_hint') %></p>
+      <div class="row2">
+        <div><label><%= t('f_firstname') %></label><input type="text" name="first_name" value="<%= u.first_name || '' %>" maxlength="60" /></div>
+        <div><label><%= t('f_lastname') %></label><input type="text" name="last_name" value="<%= u.last_name || '' %>" maxlength="60" /></div>
+      </div>
     </div>
 
     <div class="section" data-tab="apparence">
@@ -394,6 +401,21 @@
         <% }) %>
       </div>
       <button type="button" class="btn btn-add" onclick="addButton()"><%= t('d_add_button') %></button>
+    </div>
+
+    <div class="section" data-tab="liens">
+      <h3><%= t('d_discord_link_h') %></h3>
+      <% if (typeof discordMsg !== 'undefined' && discordMsg === 'ok') { %><p class="hint" style="color:#22c55e">✅</p><% } %>
+      <% if (typeof discordMsg !== 'undefined' && discordMsg === 'err') { %><p class="hint" style="color:#ef4444">❌</p><% } %>
+      <% if (u.discord_id) { %>
+        <p class="hint"><%= t('d_discord_linked_as') %> : <b>@<%= u.discord_username %></b></p>
+        <button class="btn btn-danger" type="submit" formaction="/auth/discord/unlink" formmethod="POST" formnovalidate><%= t('d_discord_unlink_btn') %></button>
+      <% } else { %>
+        <p class="hint"><%= t('d_discord_not_linked') %></p>
+        <% if (typeof discordOauthEnabled !== 'undefined' && discordOauthEnabled) { %>
+          <a class="btn btn-primary" href="/auth/discord"><%= t('d_discord_link_btn') %></a>
+        <% } %>
+      <% } %>
     </div>
 
     <div class="section" data-tab="infos">

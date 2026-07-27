@@ -199,6 +199,41 @@ function userBadges(u) {
 
 // Nom du site (rebrandable) — defini par SITE_NAME, sinon "lvtm.lol"
 const SITE_NAME = process.env.SITE_NAME || 'lvtm.lol';
+
+// --- E-mail (Resend) : verification d'adresse + reinitialisation de mot de passe ---
+const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const MAIL_FROM = process.env.MAIL_FROM || ('no-reply@' + (process.env.APP_URL || 'example.com').replace(/^https?:\/\//, '').split('/')[0]);
+const MAIL_ENABLED = !!RESEND_API_KEY;
+function baseUrl(req) {
+  return (req.headers['x-forwarded-proto'] || req.protocol || 'https') + '://' + req.get('host');
+}
+async function sendMail(to, subject, html) {
+  if (!MAIL_ENABLED) { console.warn('[mail] RESEND_API_KEY absente, e-mail non envoye a', to); return; }
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + RESEND_API_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({ from: MAIL_FROM, to, subject, html })
+    });
+    if (!r.ok) console.error('[mail] erreur Resend', r.status, await r.text());
+  } catch (e) { console.error('[mail] exception', e); }
+}
+function mailLayout(title, bodyHtml) {
+  return '<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:30px 20px">' +
+    '<h2 style="color:#111">' + title + '</h2>' + bodyHtml +
+    '<p style="color:#999;font-size:12px;margin-top:30px">' + SITE_NAME + '</p></div>';
+}
+function mailButton(url, label) {
+  return '<p style="margin:24px 0"><a href="' + url + '" style="background:#8b5cf6;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;font-weight:600;display:inline-block">' + label + '</a></p>' +
+    '<p style="color:#999;font-size:12px">Ou copie ce lien : ' + url + '</p>';
+}
+function newToken() { return crypto.randomBytes(24).toString('hex'); }
+
+// --- Discord OAuth (liaison de compte, differe du champ "discord_user" affiche sur le profil) ---
+const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID || '';
+const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET || '';
+const DISCORD_OAUTH_ENABLED = !!(DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET);
+
 const { LANGS, LANG_LABEL, translator } = require('./i18n');
 const MAX_ACCOUNTS_PER_IP = parseInt(process.env.MAX_ACCOUNTS_PER_IP, 10) || 2;
 
@@ -288,21 +323,27 @@ app.get('/', (req, res) => {
 // ---- Inscription ----
 app.get('/register', (req, res) => {
   if (req.session.userId) return res.redirect('/dashboard');
-  res.render('register', { error: null, username: '' });
+  res.render('register', { error: null, username: '', email: '' });
 });
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
   const username = (req.body.username || '').trim();
+  const email = (req.body.email || '').trim();
+  const emailLower = email.toLowerCase();
   const password = req.body.password || '';
-  const render = (error) => res.status(400).render('register', { error, username });
+  const render = (error) => res.status(400).render('register', { error, username, email });
 
   if (!validUsername(username))
     return render("Pseudo invalide (1 a 20 caracteres : lettres, chiffres, _).");
   if (isOffensiveUsername(username))
     return render("Ce pseudo n'est pas autorise. Merci d'en choisir un autre.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
+    return render("Adresse e-mail invalide.");
   if (password.length < 6)
     return render('Le mot de passe doit faire au moins 6 caracteres.');
   const exists = db.prepare('SELECT 1 FROM users WHERE username_lower = ?').get(username.toLowerCase());
   if (exists) return render('Ce pseudo est deja pris.');
+  const emailTaken = db.prepare('SELECT 1 FROM users WHERE email_lower = ?').get(emailLower);
+  if (emailTaken) return render('Cette adresse e-mail est deja utilisee.');
 
   // Anti multi-comptes : max 2 comptes par adresse IP
   const signupIp = clientIp(req);
@@ -316,44 +357,89 @@ app.post('/register', (req, res) => {
   const recoveryCode = makeRecoveryCode();
   const recoveryHash = bcrypt.hashSync(recoveryCode, 10);
   const ip = clientIp(req);
+  const verifyToken = MAIL_ENABLED ? newToken() : '';
   const info = db.prepare(
-    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash, signup_ip, last_ip, last_login) VALUES (?,?,?,?,?,?,?,?)'
-  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash, ip, ip, Date.now());
+    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash, signup_ip, last_ip, last_login, email, email_lower, email_verified, verify_token) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
+  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash, ip, ip, Date.now(), email, emailLower, MAIL_ENABLED ? 0 : 1, verifyToken);
+
+  if (MAIL_ENABLED) {
+    const link = baseUrl(req) + '/verify?token=' + verifyToken;
+    await sendMail(email, 'Confirme ton adresse e-mail',
+      mailLayout('Bienvenue \u{1F44B}', '<p style="color:#3c4149;font-size:14px;line-height:1.6">Merci de t\'être inscrit sur ' + SITE_NAME + ' ! Clique sur le bouton pour activer ton compte.</p>' + mailButton(link, 'Confirmer mon adresse')));
+    return res.render('verify-sent', { email });
+  }
+  // Pas d'e-mail configure sur le serveur : on connecte directement (comportement de secours)
   req.session.userId = info.lastInsertRowid;
-  // On montre le code de recuperation UNE SEULE FOIS
   res.render('recovery', { username, recoveryCode });
 });
 
-// ---- Mot de passe oublie (code de recuperation, sans e-mail) ----
-app.get('/forgot', (req, res) => res.render('forgot', { error: null, done: false }));
-app.post('/forgot', (req, res) => {
+// ---- Verification d'adresse e-mail ----
+app.get('/verify', (req, res) => {
+  const token = (req.query.token || '').toString();
+  const user = token ? db.prepare('SELECT * FROM users WHERE verify_token = ? AND verify_token != \'\'').get(token) : null;
+  if (!user) return res.render('verify-result', { ok: false });
+  db.prepare('UPDATE users SET email_verified = 1, verify_token = ? WHERE id = ?').run('', user.id);
+  res.render('verify-result', { ok: true });
+});
+app.post('/verify/resend', async (req, res) => {
   const username = (req.body.username || '').trim().toLowerCase();
-  const code = (req.body.code || '').trim();
-  const newPassword = req.body.password || '';
-  const fail = (error) => res.status(400).render('forgot', { error, done: false });
-  if (newPassword.length < 6) return fail('Le nouveau mot de passe doit faire au moins 6 caracteres.');
   const user = db.prepare('SELECT * FROM users WHERE username_lower = ?').get(username);
-  if (!user || !user.recovery_hash || !bcrypt.compareSync(code, user.recovery_hash)) {
-    return fail('Pseudo ou code de recuperation incorrect.');
+  if (user && !user.email_verified && user.email && MAIL_ENABLED) {
+    const verifyToken = newToken();
+    db.prepare('UPDATE users SET verify_token = ? WHERE id = ?').run(verifyToken, user.id);
+    const link = baseUrl(req) + '/verify?token=' + verifyToken;
+    await sendMail(user.email, 'Confirme ton adresse e-mail', mailLayout('Bienvenue \u{1F44B}', mailButton(link, 'Confirmer mon adresse')));
   }
-  // Nouveau mot de passe + nouveau code de recuperation
-  const newCode = makeRecoveryCode();
-  db.prepare('UPDATE users SET password = ?, recovery_hash = ? WHERE id = ?')
-    .run(bcrypt.hashSync(newPassword, 10), bcrypt.hashSync(newCode, 10), user.id);
+  res.render('verify-sent', { email: user ? user.email : '' });
+});
+
+// ---- Mot de passe oublie (par e-mail) ----
+app.get('/forgot', (req, res) => res.render('forgot', { error: null, done: false }));
+app.post('/forgot', async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  const user = email ? db.prepare('SELECT * FROM users WHERE email_lower = ?').get(email) : null;
+  // Toujours le meme message, qu'un compte existe ou non (evite de reveler quels e-mails sont inscrits)
+  if (user && MAIL_ENABLED) {
+    const resetToken = newToken();
+    const resetExpires = Date.now() + 60 * 60 * 1000; // 1 heure
+    db.prepare('UPDATE users SET reset_token = ?, reset_expires = ? WHERE id = ?').run(resetToken, resetExpires, user.id);
+    const link = baseUrl(req) + '/reset?token=' + resetToken;
+    await sendMail(user.email, 'Réinitialise ton mot de passe',
+      mailLayout('Mot de passe oublié ?', '<p style="color:#3c4149;font-size:14px;line-height:1.6">Clique sur le bouton pour choisir un nouveau mot de passe. Ce lien est valable 1 heure.</p>' + mailButton(link, 'Réinitialiser mon mot de passe')));
+  }
   res.render('forgot', { error: null, done: true });
+});
+app.get('/reset', (req, res) => {
+  const token = (req.query.token || '').toString();
+  const user = token ? db.prepare('SELECT * FROM users WHERE reset_token = ? AND reset_token != \'\'').get(token) : null;
+  const valid = !!(user && user.reset_expires > Date.now());
+  res.render('reset', { token, valid, error: null, done: false });
+});
+app.post('/reset', (req, res) => {
+  const token = (req.body.token || '').toString();
+  const password = req.body.password || '';
+  const user = token ? db.prepare('SELECT * FROM users WHERE reset_token = ? AND reset_token != \'\'').get(token) : null;
+  const valid = !!(user && user.reset_expires > Date.now());
+  if (!valid) return res.render('reset', { token, valid: false, error: null, done: false });
+  if (password.length < 6) return res.render('reset', { token, valid: true, error: 'Le nouveau mot de passe doit faire au moins 6 caracteres.', done: false });
+  db.prepare('UPDATE users SET password = ?, reset_token = ?, reset_expires = 0 WHERE id = ?').run(bcrypt.hashSync(password, 10), '', user.id);
+  res.render('reset', { token, valid: true, error: null, done: true });
 });
 
 // ---- Connexion ----
 app.get('/login', (req, res) => {
   if (req.session.userId) return res.redirect('/dashboard');
-  res.render('login', { error: null, username: '' });
+  res.render('login', { error: null, username: '', unverified: false });
 });
 app.post('/login', (req, res) => {
   const username = (req.body.username || '').trim();
   const password = req.body.password || '';
   const user = db.prepare('SELECT * FROM users WHERE username_lower = ?').get(username.toLowerCase());
   if (!user || !bcrypt.compareSync(password, user.password)) {
-    return res.status(401).render('login', { error: 'Pseudo ou mot de passe incorrect.', username });
+    return res.status(401).render('login', { error: 'Pseudo ou mot de passe incorrect.', username, unverified: false });
+  }
+  if (MAIL_ENABLED && user.email && !user.email_verified) {
+    return res.status(401).render('login', { error: null, username, unverified: true });
   }
   req.session.userId = user.id;
   db.prepare('UPDATE users SET last_ip = ?, last_login = ? WHERE id = ?').run(clientIp(req), Date.now(), user.id);
@@ -382,10 +468,13 @@ app.post('/account/delete', requireAuth, (req, res) => {
 
 // ---- Panneau admin ----
 function renderAdmin(res, resetInfo){
-  const rows = db.prepare('SELECT id, username, created_at, views, likes, custom_uid, badges, verified, staff, signup_ip, last_ip, last_login FROM users ORDER BY created_at DESC').all();
+  const rows = db.prepare('SELECT id, username, created_at, views, likes, custom_uid, badges, verified, staff, signup_ip, last_ip, last_login, email, email_verified, first_name, last_name, discord_username FROM users ORDER BY created_at DESC').all();
   const users = rows.map(u => ({
     id: u.id, username: u.username, views: u.views, likes: u.likes || 0, uid: u.custom_uid || u.id, badges: userBadges(u),
-    createdAt: u.created_at, signupIp: u.signup_ip || '', lastIp: u.last_ip || '', lastLogin: u.last_login || 0
+    createdAt: u.created_at, signupIp: u.signup_ip || '', lastIp: u.last_ip || '', lastLogin: u.last_login || 0,
+    email: u.email || '', emailVerified: !!u.email_verified,
+    fullName: [u.first_name, u.last_name].filter(Boolean).join(' '),
+    discordUsername: u.discord_username || ''
   }));
   res.render('admin', { users, catalog: BADGE_CATALOG, resetInfo: resetInfo || null });
 }
@@ -444,6 +533,54 @@ app.post('/admin/delete', requireAdmin, (req, res) => {
 // ===========================================================================
 //  ROUTES — DASHBOARD (edition du profil)
 // ===========================================================================
+// ---- Liaison de compte Discord (OAuth2) ----
+app.get('/auth/discord', requireAuth, (req, res) => {
+  if (!DISCORD_OAUTH_ENABLED) return res.status(500).send("La liaison Discord n'est pas configurée sur ce serveur.");
+  const redirectUri = baseUrl(req) + '/auth/discord/callback';
+  const state = crypto.randomBytes(12).toString('hex');
+  req.session.discordState = state;
+  const url = 'https://discord.com/api/oauth2/authorize?' + new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID, redirect_uri: redirectUri, response_type: 'code', scope: 'identify', state
+  }).toString();
+  res.redirect(url);
+});
+app.get('/auth/discord/callback', requireAuth, async (req, res) => {
+  if (!DISCORD_OAUTH_ENABLED) return res.status(500).send("La liaison Discord n'est pas configurée sur ce serveur.");
+  const { code, state } = req.query;
+  if (!code || !state || state !== req.session.discordState) return res.redirect('/dashboard?discord=err');
+  req.session.discordState = null;
+  try {
+    const redirectUri = baseUrl(req) + '/auth/discord/callback';
+    const tokenRes = await fetch('https://discord.com/api/oauth2/token', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: DISCORD_CLIENT_ID, client_secret: DISCORD_CLIENT_SECRET,
+        grant_type: 'authorization_code', code, redirect_uri: redirectUri
+      }).toString()
+    });
+    if (!tokenRes.ok) throw new Error('token exchange failed');
+    const tokenData = await tokenRes.json();
+    const meRes = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: 'Bearer ' + tokenData.access_token }
+    });
+    if (!meRes.ok) throw new Error('user fetch failed');
+    const me = await meRes.json();
+    const discordUsername = me.username + (me.discriminator && me.discriminator !== '0' ? '#' + me.discriminator : '');
+    db.prepare('UPDATE users SET discord_id = ?, discord_username = ?, discord_avatar = ?, discord_linked_at = ? WHERE id = ?')
+      .run(me.id, discordUsername, me.avatar || '', Date.now(), req.session.userId);
+    res.redirect('/dashboard?discord=ok');
+  } catch (e) {
+    console.error('[discord oauth]', e);
+    res.redirect('/dashboard?discord=err');
+  }
+});
+app.post('/auth/discord/unlink', requireAuth, (req, res) => {
+  db.prepare('UPDATE users SET discord_id = ?, discord_username = ?, discord_avatar = ?, discord_linked_at = 0 WHERE id = ?')
+    .run('', '', '', req.session.userId);
+  res.redirect('/dashboard?discord=unlinked');
+});
+
 app.get('/dashboard', requireAuth, (req, res) => {
   const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
   // Statistiques : vues des 14 derniers jours
@@ -470,7 +607,9 @@ app.get('/dashboard', requireAuth, (req, res) => {
     stats,
     saved: req.query.saved === '1',
     pwok: req.query.pwok === '1',
-    pwerr: req.query.pwerr || ''
+    pwerr: req.query.pwerr || '',
+    discordMsg: req.query.discord || '',
+    discordOauthEnabled: DISCORD_OAUTH_ENABLED
   });
 });
 
@@ -485,6 +624,8 @@ app.post('/dashboard', requireAuth, (req, res) => {
 
     // Champs texte
     const title = (b.title || '').slice(0, 80);
+    const firstName = (b.first_name || '').trim().slice(0, 60);
+    const lastName = (b.last_name || '').trim().slice(0, 60);
     const bioLines = JSON.stringify((b.bio || '').split('\n').map(s => s.trim()).filter(Boolean).slice(0, 6));
     const songName = (b.song_name || '').slice(0, 80);
     const accent = safeHex(b.accent, '#8b5cf6');
@@ -571,14 +712,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, u.id
     );
 
     res.redirect('/dashboard?saved=1');
