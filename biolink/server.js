@@ -323,14 +323,16 @@ app.get('/', (req, res) => {
 // ---- Inscription ----
 app.get('/register', (req, res) => {
   if (req.session.userId) return res.redirect('/dashboard');
-  res.render('register', { error: null, username: '', email: '' });
+  res.render('register', { error: null, username: '', email: '', firstName: '', lastName: '' });
 });
 app.post('/register', async (req, res) => {
   const username = (req.body.username || '').trim();
   const email = (req.body.email || '').trim();
   const emailLower = email.toLowerCase();
   const password = req.body.password || '';
-  const render = (error) => res.status(400).render('register', { error, username, email });
+  const firstName = (req.body.first_name || '').trim().slice(0, 60);
+  const lastName = (req.body.last_name || '').trim().slice(0, 60);
+  const render = (error) => res.status(400).render('register', { error, username, email, firstName, lastName });
 
   if (!validUsername(username))
     return render("Pseudo invalide (1 a 20 caracteres : lettres, chiffres, _).");
@@ -338,6 +340,8 @@ app.post('/register', async (req, res) => {
     return render("Ce pseudo n'est pas autorise. Merci d'en choisir un autre.");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
     return render("Adresse e-mail invalide.");
+  if (!firstName || !lastName)
+    return render("Merci d'indiquer ton prenom et ton nom.");
   if (password.length < 6)
     return render('Le mot de passe doit faire au moins 6 caracteres.');
   const exists = db.prepare('SELECT 1 FROM users WHERE username_lower = ?').get(username.toLowerCase());
@@ -359,8 +363,8 @@ app.post('/register', async (req, res) => {
   const ip = clientIp(req);
   const verifyToken = MAIL_ENABLED ? newToken() : '';
   const info = db.prepare(
-    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash, signup_ip, last_ip, last_login, email, email_lower, email_verified, verify_token) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)'
-  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash, ip, ip, Date.now(), email, emailLower, MAIL_ENABLED ? 0 : 1, verifyToken);
+    'INSERT INTO users (username, username_lower, password, created_at, recovery_hash, signup_ip, last_ip, last_login, email, email_lower, email_verified, verify_token, first_name, last_name) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+  ).run(username, username.toLowerCase(), hash, Date.now(), recoveryHash, ip, ip, Date.now(), email, emailLower, MAIL_ENABLED ? 0 : 1, verifyToken, firstName, lastName);
 
   if (MAIL_ENABLED) {
     const link = baseUrl(req) + '/verify?token=' + verifyToken;

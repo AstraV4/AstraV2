@@ -61,10 +61,13 @@ nav{display:flex;gap:10px;align-items:center}
 .auth h2{font-size:1.6rem;margin-bottom:6px}
 .auth .sub{color:var(--dim);margin-bottom:22px;font-size:.92rem}
 label{display:block;font-size:.85rem;color:var(--dim);margin:14px 0 6px;font-weight:500}
-input[type=text],input[type=password],input[type=url],input[type=color],select,textarea{
+input[type=text],input[type=password],input[type=url],input[type=email],input[type=number],input[type=color],select,textarea{
   width:100%;padding:11px 13px;border-radius:11px;border:1px solid var(--border);
   background:rgba(0,0,0,.25);color:var(--text);font-family:inherit;font-size:.93rem;transition:.2s}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(129,140,248,.2)}
+/* Empeche le navigateur de forcer un fond blanc quand il propose l'auto-remplissage (email, mdp enregistres...) */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{
+  -webkit-text-fill-color:var(--text);-webkit-box-shadow:0 0 0 1000px var(--panel-2) inset;transition:background-color 5000s ease-in-out 0s}
 textarea{resize:vertical;min-height:80px}
 input[type=color]{height:44px;padding:4px;cursor:pointer}
 .error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#fca5a5;
