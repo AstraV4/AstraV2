@@ -632,7 +632,9 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const songName = (b.song_name || '').slice(0, 80);
     const accent = safeHex(b.accent, '#8b5cf6');
     const accent2 = safeHex(b.accent2, '#22d3ee');
-    const effect = ['snow', 'rain', 'stars', 'hearts', 'bubbles', 'none'].includes(b.effect) ? b.effect : 'none';
+    const effect = ['snow', 'rain', 'stars', 'hearts', 'bubbles', 'particles', 'fireflies', 'sakura', 'matrix', 'shootingstars', 'constellation', 'none'].includes(b.effect) ? b.effect : 'none';
+    const effectIntensity = ['low', 'medium', 'high'].includes(b.effect_intensity) ? b.effect_intensity : 'medium';
+    const layout = ['standard', 'split', 'grid', 'void', 'glass', 'cards'].includes(b.layout) ? b.layout : 'standard';
     const status = ['online', 'idle', 'dnd', 'offline', ''].includes(b.status) ? b.status : '';
     const cursorStyle = ALLOWED_CURSORS.includes(b.cursor_style) ? b.cursor_style : 'none';
     const cursor = cursorStyle !== 'none' ? 1 : 0;
@@ -714,14 +716,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?, effect_intensity=?, layout=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, effectIntensity, layout, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -865,6 +867,8 @@ app.get('/:username', (req, res, next) => {
     joined:       u.created_at || 0,
     githubUser:   u.github_user || '',
     cardTilt:     !!u.card_tilt,
+    effectIntensity: u.effect_intensity || 'medium',
+    layout:       u.layout || 'standard',
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)

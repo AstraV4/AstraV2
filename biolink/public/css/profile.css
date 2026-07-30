@@ -313,3 +313,50 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:var(--text);
   font-size:.82rem;font-weight:600;padding:8px 16px;border-radius:30px;transition:.2s;backdrop-filter:blur(6px)}
 .share-btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
+
+/* ===================================================================
+   Mises en page (layout) : réarrangent les éléments existants,
+   aucune fonctionnalité dupliquée — badges/musique/likes marchent partout.
+   =================================================================== */
+
+/* --- Split : en-tête sur une ligne (avatar à gauche, texte à droite) --- */
+body[data-layout="split"] .card{text-align:left}
+body[data-layout="split"] .avatar-wrap,
+body[data-layout="split"] .username,
+body[data-layout="split"] .badges-row,
+body[data-layout="split"] .title{
+  display:inline-block;vertical-align:top}
+body[data-layout="split"] #card > .avatar-wrap{float:left;margin:4px 14px 10px 0}
+body[data-layout="split"] .bio,
+body[data-layout="split"] .joined,
+body[data-layout="split"] .views,
+body[data-layout="split"] .skills,
+body[data-layout="split"] .links,
+body[data-layout="split"] .btn-links{clear:both}
+
+/* --- Void : minimaliste, texte pur, pas de bloc décoratif --- */
+body[data-layout="void"] .avatar-wrap,
+body[data-layout="void"] .badges-row,
+body[data-layout="void"] .skills,
+body[data-layout="void"] .uid,
+body[data-layout="void"] .views,
+body[data-layout="void"] .banner{display:none !important}
+body[data-layout="void"] .card{background:transparent;box-shadow:none;backdrop-filter:none;padding:40px 20px}
+body[data-layout="void"] .card::before,
+body[data-layout="void"] .card::after{display:none}
+body[data-layout="void"] .username{font-size:1.6rem;letter-spacing:-.02em}
+body[data-layout="void"] .btn-link{background:none;border:none;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;padding:12px 0;text-align:center}
+body[data-layout="void"] .btn-link:hover{background:rgba(255,255,255,.05)}
+
+/* --- Glass : chaque lien devient sa propre carte translucide --- */
+body[data-layout="glass"] .btn-links{gap:12px}
+body[data-layout="glass"] .btn-link{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+body[data-layout="glass"] .links a{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px)}
+
+/* --- Portfolio (grille) : les liens en grille 2 colonnes --- */
+body[data-layout="grid"] .btn-links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+body[data-layout="grid"] .btn-link{text-align:center}
+
+/* --- Cards : gros boutons espacés, plus de respiration --- */
+body[data-layout="cards"] .btn-links{gap:16px}
+body[data-layout="cards"] .btn-link{padding:18px;font-size:1.02rem;border-radius:18px}

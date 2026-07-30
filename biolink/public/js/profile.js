@@ -4,6 +4,7 @@
 //  valides, jamais via innerHTML. Seules les icones (constantes) sont en HTML.
 // ===========================================================================
 const CONFIG = JSON.parse(document.getElementById('cfg').textContent);
+document.body.dataset.layout = CONFIG.layout || 'standard';
 const $ = id => document.getElementById(id);
 
 // --- Icones (constantes de confiance) ---
@@ -113,7 +114,10 @@ if (CONFIG.status && STATUS_COLORS[CONFIG.status]){
 
 // --- Liens sociaux (logos de marque via Simple Icons) ---
 const SI_SLUG = { discord:'discord', github:'github', instagram:'instagram', x:'x',
-  youtube:'youtube', spotify:'spotify', tiktok:'tiktok', telegram:'telegram' };
+  youtube:'youtube', spotify:'spotify', tiktok:'tiktok', telegram:'telegram',
+  twitch:'twitch', reddit:'reddit', linkedin:'linkedin', steam:'steam',
+  pinterest:'pinterest', snapchat:'snapchat', facebook:'facebook', threads:'threads',
+  patreon:'patreon', paypal:'paypal', kofi:'kofi', gmail:'gmail', soundcloud:'soundcloud' };
 // Couleur des logos : white | accent | brand | custom
 const SC = CONFIG.socialColor || 'white';
 let iconHex = 'ffffff', linkColor = '#ffffff', brandColors = false;
@@ -586,7 +590,67 @@ addEventListener('mouseleave', () => card.style.transform = '');
   let W, H, P = [];
   function size(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
   size(); addEventListener('resize', size);
-  const N = CONFIG.effect === 'stars' ? 120 : 90;
+  const INT_MUL = { low:.5, medium:1, high:1.9 }[CONFIG.effectIntensity] || 1;
+  const NEW_TYPES = ['particles','fireflies','sakura','matrix','shootingstars','constellation'];
+  const rnd = (a,b) => a + Math.random()*(b-a);
+
+  if (NEW_TYPES.includes(CONFIG.effect)) {
+    // --- Moteur des 6 nouveaux effets (indépendant de l'ancien moteur ci-dessous) ---
+    const baseCounts = { particles:34, fireflies:20, sakura:28, matrix:18, shootingstars:6, constellation:26 };
+    const n = Math.round(baseCounts[CONFIG.effect] * INT_MUL);
+    function spawn(){
+      const p = { x: rnd(0,W), y: rnd(0,H) };
+      if (CONFIG.effect==='particles'){ p.r=rnd(1.5,3); p.vx=rnd(-.3,.3); p.vy=rnd(-.3,.3); }
+      else if (CONFIG.effect==='fireflies'){ p.r=rnd(1.5,2.6); p.vx=rnd(-.4,.4); p.vy=rnd(-.4,.4); p.phase=Math.random()*Math.PI*2; }
+      else if (CONFIG.effect==='sakura'){ p.r=rnd(4,7); p.vy=rnd(.5,1.2); p.vx=rnd(-.5,.5); p.rot=Math.random()*Math.PI*2; p.vr=rnd(-.02,.02); }
+      else if (CONFIG.effect==='matrix'){ p.x=Math.floor(rnd(0,W)/16)*16; p.vy=rnd(2.5,6); p.chars=[]; for(let i=0;i<16;i++) p.chars.push(Math.random()>0.5?'1':'0'); }
+      else if (CONFIG.effect==='shootingstars'){ p.x=rnd(0,W); p.y=rnd(0,H*0.5); p.vx=rnd(4,8); p.vy=rnd(2,4); p.life=0; p.maxLife=rnd(30,60); }
+      else if (CONFIG.effect==='constellation'){ p.vx=rnd(-.25,.25); p.vy=rnd(-.25,.25); }
+      return p;
+    }
+    for (let i=0;i<n;i++) P.push(spawn());
+    (function draw(){
+      ctx.clearRect(0,0,W,H);
+      if (CONFIG.effect==='particles'){
+        ctx.fillStyle='#a78bfa';
+        P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1; ctx.globalAlpha=.7; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); });
+      } else if (CONFIG.effect==='fireflies'){
+        P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.phase+=.06; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+          const a=(Math.sin(p.phase)+1)/2; const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,6);
+          g.addColorStop(0,'rgba(255,240,150,'+(.5+a*.5)+')'); g.addColorStop(1,'rgba(255,240,150,0)');
+          ctx.fillStyle=g; ctx.globalAlpha=1; ctx.beginPath(); ctx.arc(p.x,p.y,6,0,7); ctx.fill(); });
+      } else if (CONFIG.effect==='sakura'){
+        ctx.fillStyle='#f9a8d4';
+        P.forEach(p=>{ p.y+=p.vy; p.x+=p.vx+Math.sin(p.y*0.05)*.3; p.rot+=p.vr; if(p.y>H) p.y=-8;
+          ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=.85; ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*.6,0,0,7); ctx.fill(); ctx.restore(); });
+      } else if (CONFIG.effect==='matrix'){
+        ctx.font='13px monospace'; ctx.fillStyle='#22c55e';
+        P.forEach(p=>{ p.y+=p.vy; if(p.y>H+180) p.y=-180;
+          p.chars.forEach((c,i)=>{ ctx.globalAlpha = 1 - i/p.chars.length; ctx.fillText(c, p.x, p.y - i*13); }); });
+      } else if (CONFIG.effect==='shootingstars'){
+        ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.lineCap='round';
+        P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.life++;
+          if(p.life>p.maxLife || p.x>W || p.y>H){ p.x=rnd(0,W*.4); p.y=rnd(0,H*.3); p.life=0; }
+          ctx.globalAlpha = 1 - p.life/p.maxLife;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-p.vx*4,p.y-p.vy*4); ctx.stroke(); });
+      } else if (CONFIG.effect==='constellation'){
+        P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1; });
+        ctx.strokeStyle='rgba(167,139,250,.35)'; ctx.lineWidth=1;
+        for(let i=0;i<P.length;i++) for(let j=i+1;j<P.length;j++){
+          const a=P[i],b=P[j]; const d=Math.hypot(a.x-b.x,a.y-b.y);
+          if(d<70){ ctx.globalAlpha=1-d/70; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+        }
+        ctx.fillStyle='#c4b5fd'; ctx.globalAlpha=.9;
+        P.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,2,0,7); ctx.fill(); });
+      }
+      ctx.globalAlpha=1;
+      requestAnimationFrame(draw);
+    })();
+    return;
+  }
+
+  // --- Ancien moteur (neige / pluie / étoiles / cœurs / bulles), inchangé, + intensité ---
+  const N = Math.round((CONFIG.effect === 'stars' ? 120 : 90) * INT_MUL);
   for (let i=0;i<N;i++) P.push({
     x:Math.random()*W, y:Math.random()*H,
     r: CONFIG.effect==='rain'?Math.random()*1+.5:Math.random()*2.2+.6,

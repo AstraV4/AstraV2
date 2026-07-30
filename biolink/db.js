@@ -108,6 +108,8 @@ addCol('username_font', "TEXT DEFAULT ''");
 addCol('show_joined',   "INTEGER DEFAULT 0");
 addCol('github_user',   "TEXT DEFAULT ''");
 addCol('card_tilt',     "INTEGER DEFAULT 0");
+addCol('layout',        "TEXT DEFAULT 'standard'");
+addCol('effect_intensity', "TEXT DEFAULT 'medium'");
 
 // Table des vues par jour (pour les statistiques)
 db.exec(`

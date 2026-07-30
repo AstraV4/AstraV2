@@ -99,7 +99,27 @@
     </div>
 
     <div class="section" data-tab="apparence">
-      <h3><%= t('d_appearance') %></h3>
+      <h3><%= t('d_layout') %></h3>
+      <div class="layout-grid">
+        <% [
+          ['standard', t('d_layout_standard'), 'standard'],
+          ['split', t('d_layout_split'), 'split'],
+          ['grid', t('d_layout_grid'), 'grid'],
+          ['void', t('d_layout_void'), 'void'],
+          ['glass', t('d_layout_glass'), 'glass'],
+          ['cards', t('d_layout_cards'), 'cards']
+        ].forEach(function(l){ %>
+          <label class="layout-opt <%= (u.layout||'standard')===l[0]?'active':'' %>" data-layout-key="<%= l[0] %>">
+            <input type="radio" name="layout" value="<%= l[0] %>" <%= (u.layout||'standard')===l[0]?'checked':'' %> style="display:none" />
+            <div class="thumb mini-<%= l[2] %>">
+              <div class="l-dot"></div><div class="l-bar w"></div><div class="l-bar"></div><div class="l-bar"></div>
+            </div>
+            <div class="name"><%= l[1] %></div>
+          </label>
+        <% }) %>
+      </div>
+
+      <h3 style="margin-top:26px"><%= t('d_appearance') %></h3>
       <p class="section-desc"><%= t('d_appearance_desc') %></p>
       <div class="row2">
         <div><label><%= t('d_color_primary') %></label><input type="color" name="accent" id="acc1" value="<%= u.accent %>" /></div>
@@ -176,11 +196,21 @@
         <div>
           <label><%= t('d_bg_effect') %></label>
           <select name="effect">
-            <% [['snow',t('d_fx_snow')],['rain',t('d_fx_rain')],['stars',t('d_fx_stars')],['hearts',t('d_fx_hearts')],['bubbles',t('d_fx_bubbles')],['none',t('d_opt_none')]].forEach(function(e){ %>
+            <% [['snow',t('d_fx_snow')],['rain',t('d_fx_rain')],['stars',t('d_fx_stars')],['hearts',t('d_fx_hearts')],['bubbles',t('d_fx_bubbles')],['particles',t('d_fx_particles')],['fireflies',t('d_fx_fireflies')],['sakura',t('d_fx_sakura')],['matrix',t('d_fx_matrix')],['shootingstars',t('d_fx_shootingstars')],['constellation',t('d_fx_constellation')],['none',t('d_opt_none')]].forEach(function(e){ %>
               <option value="<%= e[0] %>" <%= u.effect===e[0]?'selected':'' %>><%= e[1] %></option>
             <% }) %>
           </select>
         </div>
+        <div>
+          <label><%= t('d_fx_intensity') %></label>
+          <select name="effect_intensity">
+            <% [['low',t('d_fx_low')],['medium',t('d_fx_medium')],['high',t('d_fx_high')]].forEach(function(e){ %>
+              <option value="<%= e[0] %>" <%= (u.effect_intensity||'medium')===e[0]?'selected':'' %>><%= e[1] %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="row2">
         <div>
           <label><%= t('d_cursor') %></label>
           <select name="cursor_style">
@@ -371,17 +401,15 @@
     <div class="section" data-tab="liens">
       <h3><%= t('d_social_links') %></h3>
       <p class="section-desc"><%= t('d_social_desc') %></p>
-      <p class="hint"><%= t('d_social_types') %></p>
       <div id="socials">
-        <% (socials.length?socials:[{type:'',url:''}]).forEach(function(s){ %>
-          <div class="repeat-row">
-            <select name="social_type">
-              <% ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','email','globe'].forEach(function(t){ %>
-                <option value="<%= t %>" <%= s.type===t?'selected':'' %>><%= t %></option>
-              <% }) %>
-            </select>
+        <% (socials.length?socials:[{type:'discord',url:''}]).forEach(function(s){ %>
+          <div class="repeat-row social-row">
+            <button type="button" class="platform-btn" data-current="<%= s.type||'discord' %>" onclick="openPlatformPicker(this)">
+              <img src="https://cdn.simpleicons.org/<%= s.type||'discord' %>" alt="" />
+            </button>
+            <input type="hidden" name="social_type" value="<%= s.type||'discord' %>" />
             <input type="text" name="social_url" value="<%= s.url %>" placeholder="https://..." />
-            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>
+            <button type="button" class="btn btn-danger" onclick="this.closest('.social-row').remove()">✕</button>
           </div>
         <% }) %>
       </div>
@@ -471,6 +499,23 @@
    </div><!-- /dash-layout -->
   </form>
 
+  <div class="platform-picker" id="platformPicker" hidden>
+    <div class="pp-grid">
+      <% [
+        ['discord','Discord'],['github','GitHub'],['instagram','Instagram'],['x','X'],['youtube','YouTube'],
+        ['spotify','Spotify'],['tiktok','TikTok'],['telegram','Telegram'],['twitch','Twitch'],['reddit','Reddit'],
+        ['linkedin','LinkedIn'],['steam','Steam'],['pinterest','Pinterest'],['snapchat','Snapchat'],['facebook','Facebook'],
+        ['threads','Threads'],['patreon','Patreon'],['paypal','PayPal'],['kofi','Ko-fi'],['gmail','Gmail'],['soundcloud','SoundCloud']
+      ].forEach(function(p){ %>
+        <button type="button" class="pp-item" onclick="pickPlatform('<%= p[0] %>')" title="<%= p[1] %>">
+          <img src="https://cdn.simpleicons.org/<%= p[0] %>" alt="<%= p[1] %>" loading="lazy" />
+        </button>
+      <% }) %>
+    </div>
+    <button type="button" class="pp-custom" onclick="pickPlatform('globe')">🔗 <%= t('d_custom_url') %></button>
+    <button type="button" class="pp-custom" onclick="pickPlatform('email')">✉️ Email</button>
+  </div>
+
   <div class="panel" style="margin-top:20px">
     <h3 style="margin-bottom:6px"><%= t('d_stats') %></h3>
     <% var smax = Math.max(1, ...stats.map(function(s){return s.count;})); %>
@@ -524,6 +569,13 @@
 </div>
 
 <script>
+// Choix de la mise en page : surligne l'option cliquée
+document.querySelectorAll('.layout-opt').forEach(function(opt){
+  opt.addEventListener('click', function(){
+    document.querySelectorAll('.layout-opt').forEach(function(o){ o.classList.remove('active'); });
+    opt.classList.add('active');
+  });
+});
 // Navigation par onglets
 (function(){
   const tabs = document.getElementById('tabs');
@@ -571,15 +623,36 @@
     navigator.clipboard.writeText(url).then(() => { btn.textContent = '<%= t("d_copied") %>'; setTimeout(() => btn.textContent = '<%= t("d_copy") %>', 1500); }).catch(() => {});
   });
 })();
-const SOCIAL_TYPES = ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','email','globe'];
+const SOCIAL_TYPES = ['discord','github','instagram','x','youtube','spotify','tiktok','telegram','twitch','reddit','linkedin','steam','pinterest','snapchat','facebook','threads','patreon','paypal','kofi','gmail','soundcloud','email','globe'];
 function addSocial(){
   const row = document.createElement('div');
-  row.className = 'repeat-row';
-  const sel = '<select name="social_type">' + SOCIAL_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('') + '</select>';
-  row.innerHTML = sel + '<input type="text" name="social_url" placeholder="https://..." />' +
-    '<button type="button" class="btn btn-danger" onclick="this.parentElement.remove()">✕</button>';
+  row.className = 'repeat-row social-row';
+  row.innerHTML = '<button type="button" class="platform-btn" data-current="discord" onclick="openPlatformPicker(this)"><img src="https://cdn.simpleicons.org/discord" alt="" /></button>' +
+    '<input type="hidden" name="social_type" value="discord" />' +
+    '<input type="text" name="social_url" placeholder="https://..." />' +
+    '<button type="button" class="btn btn-danger" onclick="this.closest(\'.social-row\').remove()">✕</button>';
   document.getElementById('socials').appendChild(row);
 }
+// --- Sélecteur visuel de plateforme (vraies icônes via Simple Icons) ---
+let pickerTargetRow = null;
+const platformPicker = document.getElementById('platformPicker');
+function openPlatformPicker(btn){
+  pickerTargetRow = btn.closest('.social-row');
+  platformPicker.hidden = false;
+  const r = btn.getBoundingClientRect();
+  platformPicker.style.top = (r.bottom + window.scrollY + 6) + 'px';
+  platformPicker.style.left = Math.max(10, r.left + window.scrollX - 4) + 'px';
+}
+function pickPlatform(type){
+  if (!pickerTargetRow) return;
+  pickerTargetRow.querySelector('.platform-btn').setAttribute('data-current', type);
+  pickerTargetRow.querySelector('.platform-btn img').src = 'https://cdn.simpleicons.org/' + type;
+  pickerTargetRow.querySelector('input[name="social_type"]').value = type;
+  platformPicker.hidden = true;
+}
+document.addEventListener('click', function(e){
+  if (!platformPicker.hidden && !platformPicker.contains(e.target) && !e.target.closest('.platform-btn')) platformPicker.hidden = true;
+});
 function addButton(){
   const row = document.createElement('div');
   row.className = 'repeat-row';
