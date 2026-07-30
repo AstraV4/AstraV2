@@ -44,7 +44,8 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 .card{width:min(430px,92vw);background:var(--card-bg);border-radius:var(--radius);
   backdrop-filter:blur(26px) saturate(150%);
   box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 90px color-mix(in srgb,var(--accent) 14%,transparent),inset 0 1px 0 rgba(255,255,255,.10);
-  padding:34px 28px 26px;text-align:center;transform-style:preserve-3d;transition:transform .15s ease-out;position:relative;overflow:hidden}
+  padding:34px 28px 26px;text-align:center;transform-style:preserve-3d;transition:transform .15s ease-out;position:relative;overflow:hidden;
+  transform:rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg))}
 /* halo anime derriere le contenu de la carte */
 .card::before{content:"";position:absolute;inset:-40%;
   background:conic-gradient(from 0deg,transparent,color-mix(in srgb,var(--accent) 50%,transparent),transparent 40%,color-mix(in srgb,var(--accent-2) 50%,transparent),transparent);
@@ -403,7 +404,7 @@ body[data-layout="cards"] .btn-link:hover{transform:translateX(4px)}
 
 /* --- hud-classic : petite carte compacte centrée, minimaliste --- */
 body[data-layout="hud-classic"] #card{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(360px,90vw);
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));width:min(360px,90vw);
   background:rgba(10,10,14,.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);
   border-radius:16px;padding:18px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.4)}
 body[data-layout="hud-classic"] .avatar-wrap,
@@ -422,7 +423,7 @@ body[data-layout="hud-classic"] .btn-link{background:rgba(255,255,255,.06);borde
 
 /* --- hud-rich : carte plus grande, widgets + reseaux + stats --- */
 body[data-layout="hud-rich"] #card{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));width:min(400px,90vw);
   background:rgba(8,8,10,.55);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);
   border-radius:18px;padding:20px;text-align:left;box-shadow:0 25px 60px rgba(0,0,0,.5)}
 body[data-layout="hud-rich"] .avatar-wrap{border-radius:14px;width:56px;height:56px;display:inline-block;margin:0 12px 0 0}
@@ -437,7 +438,7 @@ body[data-layout="hud-rich"] .views{justify-content:flex-start;margin-top:10px}
 
 /* --- hud-float : carte compacte en bas a gauche (pas centree) --- */
 body[data-layout="hud-float"] #card{
-  position:fixed;left:24px;bottom:24px;top:auto;transform:none;width:min(340px,86vw);
+  position:fixed;left:24px;bottom:24px;top:auto;transform:rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));width:min(340px,86vw);
   background:rgba(10,10,14,.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);
   border-radius:16px;padding:16px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.4)}
 body[data-layout="hud-float"] .banner,body[data-layout="hud-float"] .skills{display:none !important}
@@ -448,7 +449,7 @@ body[data-layout="hud-float"] .links{justify-content:flex-start;margin-top:10px}
 
 /* --- hud-status : carte minimaliste avec statut/activite en avant --- */
 body[data-layout="hud-status"] #card{
-  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,90vw);
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));width:min(340px,90vw);
   background:rgba(10,10,14,.45);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);
   border-radius:20px;padding:22px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
 body[data-layout="hud-status"] .banner,body[data-layout="hud-status"] .skills,body[data-layout="hud-status"] .uid{display:none !important}

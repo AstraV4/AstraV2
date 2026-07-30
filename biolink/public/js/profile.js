@@ -417,9 +417,11 @@ if (CONFIG.cardTilt && matchMedia('(pointer:fine)').matches){
       const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
       const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
       const max = 7;
-      card.style.transform = 'rotateY(' + (dx * max) + 'deg) rotateX(' + (-dy * max) + 'deg)';
+      // Variables CSS : ne remplace jamais le "transform" de base (centrage des mises en page HUD notamment)
+      card.style.setProperty('--tilt-y', (dx * max) + 'deg');
+      card.style.setProperty('--tilt-x', (-dy * max) + 'deg');
     });
-    addEventListener('mouseleave', () => { card.style.transform = ''; });
+    addEventListener('mouseleave', () => { card.style.setProperty('--tilt-y', '0deg'); card.style.setProperty('--tilt-x', '0deg'); });
   }
 }
 
@@ -606,16 +608,6 @@ if (cursorStyle && cursorStyle !== 'none' && matchMedia('(pointer:fine)').matche
     else { del = false; li = (li+1) % lines.length; setTimeout(tick, 300); }
   })();
 })();
-
-// --- Tilt 3D ---
-const card = $('card');
-addEventListener('mousemove', e => {
-  const r = card.getBoundingClientRect();
-  const x = (e.clientX - r.left) / r.width - .5;
-  const y = (e.clientY - r.top) / r.height - .5;
-  card.style.transform = `rotateY(${x*9}deg) rotateX(${-y*9}deg)`;
-});
-addEventListener('mouseleave', () => card.style.transform = '');
 
 // --- Particules ---
 (function fx(){
