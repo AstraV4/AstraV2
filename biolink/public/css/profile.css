@@ -334,27 +334,13 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
    toujours sur les mêmes éléments (badges/musique/likes marchent partout).
    =================================================================== */
 
-/* --- Split : vraie 2 colonnes (avatar/infos à gauche, liens à droite) ---
-   Lignes de grille explicites (et non auto) pour garantir que les 2 colonnes
-   démarrent bien en haut, quel que soit l'ordre d'apparition dans le DOM. */
+/* --- Split : simplifie en rectangle propre, alignement a gauche (robuste, jamais de chevauchement) --- */
 body[data-layout="split"] #card{
-  display:grid;grid-template-columns:150px 1fr;column-gap:20px;row-gap:8px;
-  text-align:left;align-items:start;padding:26px 22px;overflow-wrap:anywhere}
-body[data-layout="split"] #card > .banner{grid-column:1/3;grid-row:1}
-body[data-layout="split"] #card > .avatar-wrap{grid-column:1;grid-row:2;margin:0 auto 10px}
-body[data-layout="split"] #card > .username{grid-column:1;grid-row:3;text-align:center}
-body[data-layout="split"] #card > .badges-row{grid-column:1;grid-row:4;text-align:center}
-body[data-layout="split"] #card > .title{grid-column:1;grid-row:5;text-align:center}
-body[data-layout="split"] #card > .bio{grid-column:1;grid-row:6;text-align:center}
-body[data-layout="split"] #card > .joined{grid-column:1;grid-row:7;text-align:center}
-body[data-layout="split"] #card > .views{grid-column:1;grid-row:8;text-align:center}
-body[data-layout="split"] #card > .skills{grid-column:1;grid-row:9;text-align:center}
-body[data-layout="split"] #card > .links{grid-column:1;grid-row:10;flex-direction:column;gap:8px}
-body[data-layout="split"] #card > .uid{grid-column:2;grid-row:2}
-body[data-layout="split"] #card > #like-btn{grid-column:2;grid-row:3}
-body[data-layout="split"] #card > .share-btn{grid-column:2;grid-row:4}
-body[data-layout="split"] #card > .btn-links{grid-column:2;grid-row:5}
-body[data-layout="split"] #card > #widgets{grid-column:2;grid-row:6}
+  text-align:left;padding:28px 26px;max-width:480px}
+body[data-layout="split"] .avatar-wrap{margin:0 0 14px}
+body[data-layout="split"] .views,
+body[data-layout="split"] .links{justify-content:flex-start}
+
 
 /* --- Void : ultra minimaliste, grand texte, pas de carte --- */
 body[data-layout="void"] .avatar-wrap,
@@ -399,15 +385,18 @@ body[data-layout="cards"] .btn-link{padding:18px 20px;font-size:1rem;border-radi
 body[data-layout="cards"] .btn-link:hover{transform:translateX(4px)}
 
 
+
 /* ===================================================================
    Mises en page HUD (carte compacte flottante, style guns.lol)
-   Technique robuste : #card devient une colonne flex qui empile TOUJOURS
-   ses enfants proprement, sans jamais les superposer, quel que soit le
-   nombre d'éléments actifs sur le profil (widgets, badges, boutons...).
+   Version soignee : empilement vertical garanti + aucun debordement
+   horizontal possible (chaque enfant est explicitement contraint),
+   defilement vertical fin et discret si le contenu est trop long.
    =================================================================== */
 body[data-layout^="hud-"] #card{
-  display:flex !important;flex-direction:column;gap:10px;align-items:stretch;
-  text-align:left;overflow:visible}
+  display:flex !important;flex-direction:column;gap:12px;align-items:stretch;
+  text-align:left;box-sizing:border-box;overflow-x:hidden}
+body[data-layout^="hud-"] #card,
+body[data-layout^="hud-"] #card *{box-sizing:border-box}
 body[data-layout^="hud-"] .avatar-wrap,
 body[data-layout^="hud-"] .username,
 body[data-layout^="hud-"] .badges-row,
@@ -420,55 +409,76 @@ body[data-layout^="hud-"] #like-btn,
 body[data-layout^="hud-"] .share-btn,
 body[data-layout^="hud-"] .links,
 body[data-layout^="hud-"] .btn-links,
-body[data-layout^="hud-"] #widgets{margin:0 !important;width:auto}
+body[data-layout^="hud-"] #widgets{margin:0 !important;width:100%;max-width:100%;min-width:0}
 body[data-layout^="hud-"] .banner,
 body[data-layout^="hud-"] .skills{display:none !important}
-body[data-layout^="hud-"] .views{justify-content:flex-start}
-body[data-layout^="hud-"] .links{justify-content:flex-start;flex-wrap:wrap}
-body[data-layout^="hud-"] #widgets > *{margin-top:0 !important}
-body[data-layout^="hud-"] #widgets{display:flex;flex-direction:column;gap:8px}
+body[data-layout^="hud-"] .views{justify-content:flex-start;font-size:.78rem}
+body[data-layout^="hud-"] .links{justify-content:flex-start;flex-wrap:wrap;row-gap:8px}
+body[data-layout^="hud-"] #widgets{display:flex;flex-direction:column;gap:8px;min-width:0}
+body[data-layout^="hud-"] #widgets > *{max-width:100%;min-width:0;overflow:hidden;margin-top:0 !important}
+body[data-layout^="hud-"] #widgets .gh-name,
+body[data-layout^="hud-"] #widgets .yt-name,
+body[data-layout^="hud-"] #widgets .tg-name,
+body[data-layout^="hud-"] #widgets .dc-name,
+body[data-layout^="hud-"] #widgets .dc-act,
+body[data-layout^="hud-"] #widgets .gh-meta{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+body[data-layout^="hud-"] #widgets .gh-info,
+body[data-layout^="hud-"] #widgets .yt-info,
+body[data-layout^="hud-"] #widgets .tg-info,
+body[data-layout^="hud-"] #widgets .dc-info{min-width:0;flex:1;overflow:hidden}
+body[data-layout^="hud-"] #widgets .dc-name{display:flex;min-width:0}
+body[data-layout^="hud-"] #widgets .dc-cs{flex:0 1 auto !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+/* Ascenseur vertical fin et discret plutot que la barre grise du navigateur */
+body[data-layout^="hud-"] #card{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
+body[data-layout^="hud-"] #card::-webkit-scrollbar{width:5px}
+body[data-layout^="hud-"] #card::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:3px}
+/* Petites separations discretes entre les grands groupes d'infos */
+body[data-layout^="hud-"] .views{padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
+body[data-layout^="hud-"] #widgets{padding-top:10px;border-top:1px solid rgba(255,255,255,.08)}
 
-/* --- hud-classic : petite carte compacte centrée, minimaliste --- */
+/* --- hud-classic : carte compacte, sobre et lisible --- */
 body[data-layout="hud-classic"] #card{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));
-  width:min(340px,90vw);background:rgba(10,10,14,.5);backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-body[data-layout="hud-classic"] .avatar-wrap{width:44px;height:44px}
+  width:min(340px,90vw);max-height:80vh;overflow-y:auto;
+  background:linear-gradient(160deg,rgba(20,20,26,.7),rgba(8,8,11,.7));backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:22px;box-shadow:0 25px 60px rgba(0,0,0,.45)}
+body[data-layout="hud-classic"] .avatar-wrap{width:46px;height:46px;box-shadow:0 0 0 3px rgba(255,255,255,.08)}
+body[data-layout="hud-classic"] .username{font-size:1rem;font-weight:800}
 body[data-layout="hud-classic"] .title,
 body[data-layout="hud-classic"] #widgets{display:none !important}
-body[data-layout="hud-classic"] .username{font-size:.95rem}
-body[data-layout="hud-classic"] .btn-link{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+body[data-layout="hud-classic"] .btn-link{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px}
 
-/* --- hud-rich : carte plus grande, widgets + reseaux + stats --- */
+/* --- hud-rich : carte plus grande, widgets + reseaux + stats, finitions soignees --- */
 body[data-layout="hud-rich"] #card{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));
-  width:min(380px,90vw);max-height:82vh;overflow-y:auto;background:rgba(8,8,10,.6);backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:20px;box-shadow:0 25px 60px rgba(0,0,0,.5)}
-body[data-layout="hud-rich"] .avatar-wrap{width:52px;height:52px;border-radius:14px}
-body[data-layout="hud-rich"] .avatar-wrap img{border-radius:14px}
+  width:min(380px,90vw);max-height:80vh;overflow-y:auto;
+  background:linear-gradient(160deg,rgba(18,18,24,.72),rgba(6,6,9,.72));backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:24px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+body[data-layout="hud-rich"] .avatar-wrap{width:54px;height:54px;border-radius:16px;box-shadow:0 0 0 3px rgba(255,255,255,.08)}
+body[data-layout="hud-rich"] .avatar-wrap img{border-radius:16px}
+body[data-layout="hud-rich"] .username{font-size:1.05rem;font-weight:800}
 
 /* --- hud-float : carte compacte en bas a gauche (pas centree) --- */
 body[data-layout="hud-float"] #card{
   position:fixed;left:24px;bottom:24px;top:auto;transform:rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));
-  width:min(320px,86vw);max-height:70vh;overflow-y:auto;background:rgba(10,10,14,.5);backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-body[data-layout="hud-float"] .avatar-wrap{width:38px;height:38px}
+  width:min(320px,86vw);max-height:65vh;overflow-y:auto;
+  background:linear-gradient(160deg,rgba(20,20,26,.7),rgba(8,8,11,.7));backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+body[data-layout="hud-float"] .avatar-wrap{width:40px;height:40px}
 body[data-layout="hud-float"] .title,
 body[data-layout="hud-float"] #widgets{display:none !important}
 
-/* --- hud-status : carte minimaliste centree, tout en colonne --- */
+/* --- hud-status : carte minimaliste centree --- */
 body[data-layout="hud-status"] #card{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotateY(var(--tilt-y,0deg)) rotateX(var(--tilt-x,0deg));
-  width:min(320px,90vw);background:rgba(10,10,14,.45);backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:22px;text-align:center;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-body[data-layout="hud-status"] .avatar-wrap{width:60px;height:60px;margin:0 auto !important}
+  width:min(320px,90vw);max-height:75vh;overflow-y:auto;
+  background:linear-gradient(160deg,rgba(20,20,26,.65),rgba(8,8,11,.65));backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:24px;text-align:center;align-items:center;
+  box-shadow:0 25px 60px rgba(0,0,0,.45)}
+body[data-layout="hud-status"] .avatar-wrap{width:64px;height:64px;margin:0 auto !important}
 body[data-layout="hud-status"] .links{justify-content:center}
+body[data-layout="hud-status"] .views{text-align:center;justify-content:center;border-top:none}
 body[data-layout="hud-status"] .title,
 body[data-layout="hud-status"] #widgets,
 body[data-layout="hud-status"] .uid{display:none !important}
 body[data-layout="hud-status"] .btn-link{border-radius:20px;text-align:center}
-
-/* --- Portfolio : les reseaux (pas que les boutons perso) passent aussi en grille d'icones,
-       pour qu'on voie une vraie difference meme sans bouton personnalise --- */
-body[data-layout="grid"] .links{display:grid;grid-template-columns:repeat(auto-fill,54px);justify-content:center;gap:10px}
-body[data-layout="grid"] .links a{width:54px;height:54px;border-radius:16px}
