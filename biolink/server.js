@@ -686,7 +686,6 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const cardTilt = b.card_tilt ? 1 : 0;
     const widgetYoutube = /^[A-Za-z0-9_@.\/-]{1,60}$/.test((b.widget_youtube || '').trim()) ? b.widget_youtube.trim() : '';
     const widgetTelegram = /^[A-Za-z0-9_]{1,32}$/.test((b.widget_telegram || '').trim()) ? b.widget_telegram.trim() : '';
-    const bioTypewriter = b.bio_typewriter ? 1 : 0;
     const showViews = b.show_views ? 1 : 0;
     const hideBadges = b.hide_badges ? 1 : 0;
     const avatarSize = ALLOWED_AVATAR_SIZE.includes(b.avatar_size) ? b.avatar_size : 'md';
@@ -749,14 +748,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?, effect_intensity=?, layout=?, widget_youtube=?, widget_telegram=?, bio_typewriter=?, show_views=?, hide_badges=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?, effect_intensity=?, layout=?, widget_youtube=?, widget_telegram=?, show_views=?, hide_badges=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, effectIntensity, layout, widgetYoutube, widgetTelegram, bioTypewriter, showViews, hideBadges, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, effectIntensity, layout, widgetYoutube, widgetTelegram, showViews, hideBadges, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -927,7 +926,6 @@ app.get('/:username', (req, res, next) => {
     layout:       u.layout || 'standard',
     widgetYoutube: u.widget_youtube || '',
     widgetTelegram: u.widget_telegram || '',
-    bioTypewriter: !!u.bio_typewriter,
     showViews: u.show_views === undefined ? true : !!u.show_views,
     hideBadges: !!u.hide_badges,
     views:      viewsCount
