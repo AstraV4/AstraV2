@@ -396,3 +396,62 @@ body[data-layout="cards"] .btn-link{padding:18px 20px;font-size:1rem;border-radi
   background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--accent-2) 12%,transparent));
   border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 32px rgba(0,0,0,.35);transition:transform .2s}
 body[data-layout="cards"] .btn-link:hover{transform:translateX(4px)}
+
+/* ===================================================================
+   Mises en page HUD (façon carte compacte flottante, style guns.lol)
+   =================================================================== */
+
+/* --- hud-classic : petite carte compacte centrée, minimaliste --- */
+body[data-layout="hud-classic"] #card{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(360px,90vw);
+  background:rgba(10,10,14,.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:18px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+body[data-layout="hud-classic"] .avatar-wrap,
+body[data-layout="hud-classic"] .username,
+body[data-layout="hud-classic"] .badges-row{display:inline-flex;vertical-align:middle}
+body[data-layout="hud-classic"] .avatar-wrap{width:40px;height:40px;margin:0 10px 0 0}
+body[data-layout="hud-classic"] .title,
+body[data-layout="hud-classic"] .bio,
+body[data-layout="hud-classic"] .skills,
+body[data-layout="hud-classic"] .banner{display:none !important}
+body[data-layout="hud-classic"] .username{font-size:.95rem}
+body[data-layout="hud-classic"] .views{margin-top:10px;font-size:.75rem;justify-content:flex-start}
+body[data-layout="hud-classic"] .links{justify-content:flex-start;margin-top:14px}
+body[data-layout="hud-classic"] .btn-links{margin-top:8px}
+body[data-layout="hud-classic"] .btn-link{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+
+/* --- hud-rich : carte plus grande, widgets + reseaux + stats --- */
+body[data-layout="hud-rich"] #card{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,90vw);
+  background:rgba(8,8,10,.55);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;padding:20px;text-align:left;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+body[data-layout="hud-rich"] .avatar-wrap{border-radius:14px;width:56px;height:56px;display:inline-block;margin:0 12px 0 0}
+body[data-layout="hud-rich"] .avatar-wrap img{border-radius:14px}
+body[data-layout="hud-rich"] .username,body[data-layout="hud-rich"] .title,body[data-layout="hud-rich"] .bio{display:inline-block;vertical-align:top}
+body[data-layout="hud-rich"] .bio{display:block;margin-top:2px}
+body[data-layout="hud-rich"] .banner,body[data-layout="hud-rich"] .skills{display:none !important}
+body[data-layout="hud-rich"] #widgets{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+body[data-layout="hud-rich"] .gh-card,body[data-layout="hud-rich"] .yt-card,body[data-layout="hud-rich"] .tg-card,body[data-layout="hud-rich"] .dc-card{margin-top:0}
+body[data-layout="hud-rich"] .links{justify-content:flex-start;margin-top:14px}
+body[data-layout="hud-rich"] .views{justify-content:flex-start;margin-top:10px}
+
+/* --- hud-float : carte compacte en bas a gauche (pas centree) --- */
+body[data-layout="hud-float"] #card{
+  position:fixed;left:24px;bottom:24px;top:auto;transform:none;width:min(340px,86vw);
+  background:rgba(10,10,14,.5);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:16px;text-align:left;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+body[data-layout="hud-float"] .banner,body[data-layout="hud-float"] .skills{display:none !important}
+body[data-layout="hud-float"] .avatar-wrap{width:38px;height:38px;display:inline-block;margin:0 10px 0 0}
+body[data-layout="hud-float"] .username,body[data-layout="hud-float"] .title{display:inline-block;vertical-align:middle}
+body[data-layout="hud-float"] .bio{margin-top:8px;font-size:.78rem}
+body[data-layout="hud-float"] .links{justify-content:flex-start;margin-top:10px}
+
+/* --- hud-status : carte minimaliste avec statut/activite en avant --- */
+body[data-layout="hud-status"] #card{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,90vw);
+  background:rgba(10,10,14,.45);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:22px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+body[data-layout="hud-status"] .banner,body[data-layout="hud-status"] .skills,body[data-layout="hud-status"] .uid{display:none !important}
+body[data-layout="hud-status"] .avatar-wrap{width:60px;height:60px;margin:0 auto 10px}
+body[data-layout="hud-status"] .btn-links{margin-top:16px}
+body[data-layout="hud-status"] .btn-link{border-radius:20px;text-align:center}

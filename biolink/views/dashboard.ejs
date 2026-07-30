@@ -107,7 +107,11 @@
           ['grid', t('d_layout_grid'), 'grid'],
           ['void', t('d_layout_void'), 'void'],
           ['glass', t('d_layout_glass'), 'glass'],
-          ['cards', t('d_layout_cards'), 'cards']
+          ['cards', t('d_layout_cards'), 'cards'],
+          ['hud-classic', t('d_layout_hud_classic'), 'standard'],
+          ['hud-rich', t('d_layout_hud_rich'), 'standard'],
+          ['hud-float', t('d_layout_hud_float'), 'standard'],
+          ['hud-status', t('d_layout_hud_status'), 'standard']
         ].forEach(function(l){ %>
           <label class="layout-opt <%= (u.layout||'standard')===l[0]?'active':'' %>" data-layout-key="<%= l[0] %>">
             <input type="radio" name="layout" value="<%= l[0] %>" <%= (u.layout||'standard')===l[0]?'checked':'' %> style="display:none" />
@@ -528,15 +532,9 @@
     <aside class="dash-preview">
       <div class="preview-sticky">
         <div class="phone-mock">
-          <div class="phone-screen-mock" id="pvScreen">
-            <div class="pv-av" id="pvAv"<% if (u.avatar) { %> style="background-image:url(<%= u.avatar %>)"<% } %>></div>
-            <div class="pv-name" id="pvName"><%= u.title || ('@' + u.username) %></div>
-            <div class="pv-bio" id="pvBio"><%= bio.split('\n')[0] || '' %></div>
-            <div class="pv-lnk">🔗 <%= t('d_preview_link') %></div>
-            <div class="pv-lnk">🔗 <%= t('d_preview_link') %></div>
-          </div>
+          <iframe id="pvFrame" class="phone-screen-mock" src="/<%= u.username %>?preview=1" loading="lazy" title="Aperçu en direct"></iframe>
         </div>
-        <p class="preview-label"><%= t('d_preview_label') %></p>
+        <p class="preview-label" id="pvLabel"><%= t('d_preview_label') %></p>
       </div>
     </aside>
    </div><!-- /dash-layout -->
@@ -661,23 +659,24 @@ document.querySelectorAll('.layout-opt').forEach(function(opt){
 
 // --- Aperçu en direct (titre, bio, couleur, avatar) ---
 (function livePreview(){
-  const titleInput = document.querySelector('input[name="title"]');
-  const bioInput = document.querySelector('textarea[name="bio"]');
-  const accentInput = document.getElementById('acc1');
-  const avatarInput = document.querySelector('input[name="avatar"]');
-  const pvName = document.getElementById('pvName');
-  const pvBio = document.getElementById('pvBio');
-  const pvAv = document.getElementById('pvAv');
-  if (!pvName) return; // colonne d'aperçu masquée (petit écran) : rien à faire
-  if (titleInput) titleInput.addEventListener('input', () => { pvName.textContent = titleInput.value || pvName.dataset.fallback || '@'; });
-  if (bioInput) bioInput.addEventListener('input', () => { pvBio.textContent = (bioInput.value || '').split('\n')[0]; });
-  if (accentInput) accentInput.addEventListener('input', () => { document.documentElement.style.setProperty('--pv-accent', accentInput.value); pvAv.style.background = accentInput.value; });
-  if (avatarInput) avatarInput.addEventListener('change', () => {
-    const f = avatarInput.files && avatarInput.files[0]; if (!f) return;
-    const url = URL.createObjectURL(f);
-    pvAv.style.backgroundImage = 'url(' + url + ')';
-    pvAv.style.backgroundSize = 'cover'; pvAv.style.backgroundPosition = 'center';
-  });
+  const frame = document.getElementById('pvFrame');
+  const label = document.getElementById('pvLabel');
+  if (!frame) return; // colonne d'aperçu masquée (petit écran) : rien à faire
+  const form = frame.closest('.dash-layout') ? document.querySelector('form.panel') : null;
+  if (!form) return;
+  let timer = null;
+  function refresh(){
+    if (label) label.textContent = '⏳ mise à jour…';
+    const fd = new FormData(form);
+    fetch('/api/preview', { method: 'POST', body: new URLSearchParams([...fd.entries()].filter(([k,v]) => typeof v === 'string')) })
+      .then(() => {
+        frame.src = '/<%= u.username %>?preview=1&t=' + Date.now();
+        if (label) label.textContent = "<%= t('d_preview_label') %>";
+      })
+      .catch(() => { if (label) label.textContent = "<%= t('d_preview_label') %>"; });
+  }
+  form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(refresh, 500); });
+  form.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(refresh, 250); });
 })();
 
 // --- Aperçu animé des particules (même moteur que le vrai profil, condensé) ---

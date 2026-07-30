@@ -189,6 +189,45 @@ const BADGE_CATALOG = [
 ];
 const BADGE_KEYS = BADGE_CATALOG.map(b => b.key);
 // Badges effectifs d'un user (avec compat ascendante verified/staff)
+// ---------------------------------------------------------------------------
+// Apercu en direct : fusionne temporairement les modifications du formulaire
+// (jamais enregistrees en base) par-dessus le vrai profil, pour l'affichage
+// dans l'iframe d'apercu du dashboard uniquement.
+// ---------------------------------------------------------------------------
+const PREVIEW_BOOL_FIELDS = ['avatar_glow', 'card_tilt', 'hide_badges', 'show_joined', 'show_likes', 'show_uid', 'show_views', 'text_color_on', 'bio_color_on', 'username_color_on', 'title_color_on', 'widget_color_on'];
+const PREVIEW_TEXT_FIELDS = ['accent', 'accent2', 'effect', 'effect_intensity', 'layout', 'status', 'cursor_style', 'card_style', 'card_shape', 'avatar_shape', 'font', 'username_font', 'badge_style', 'badge_color', 'text_color', 'bio_color', 'username_color', 'title_color', 'widget_color', 'social_color', 'social_color_hex', 'enter_text', 'enter_anim', 'username_effect', 'avatar_size', 'timezone', 'location', 'github_user', 'widget_youtube', 'widget_telegram', 'discord_guild', 'discord_user', 'title', 'cursor_image_url'];
+function applyPreviewOverride(u, ov) {
+  if (!ov) return u;
+  const merged = Object.assign({}, u);
+  PREVIEW_TEXT_FIELDS.forEach(f => { if (ov[f] !== undefined) merged[f] = ov[f]; });
+  PREVIEW_BOOL_FIELDS.forEach(f => { merged[f] = ov[f] ? 1 : 0; });
+  if (ov.bio !== undefined) merged.bio = JSON.stringify(String(ov.bio).split('\n').map(s => s.trim()).filter(Boolean).slice(0, 6));
+  if (Array.isArray(ov.skills) || typeof ov.skills === 'string') {
+    const list = Array.isArray(ov.skills) ? ov.skills : [ov.skills];
+    merged.skills = JSON.stringify(list.filter(s => ALLOWED_SKILLS.includes(s)).slice(0, 12));
+  }
+  const socialTypes = ov.social_type ? (Array.isArray(ov.social_type) ? ov.social_type : [ov.social_type]) : [];
+  const socialUrls = ov.social_url ? (Array.isArray(ov.social_url) ? ov.social_url : [ov.social_url]) : [];
+  if (socialTypes.length) {
+    const socials = [];
+    for (let i = 0; i < socialTypes.length; i++) { const url = safeUrl(socialUrls[i]); if (url && socialTypes[i]) socials.push({ type: String(socialTypes[i]).slice(0, 20), url }); }
+    merged.socials = JSON.stringify(socials);
+  }
+  const btnLabels = ov.btn_label ? (Array.isArray(ov.btn_label) ? ov.btn_label : [ov.btn_label]) : [];
+  const btnUrls = ov.btn_url ? (Array.isArray(ov.btn_url) ? ov.btn_url : [ov.btn_url]) : [];
+  if (btnLabels.length) {
+    const buttons = [];
+    for (let i = 0; i < btnLabels.length; i++) { const url = safeUrl(btnUrls[i]); const label = String(btnLabels[i] || '').trim().slice(0, 40); if (url && label) buttons.push({ label, url }); }
+    merged.buttons = JSON.stringify(buttons);
+  }
+  return merged;
+}
+
+app.post('/api/preview', requireAuth, (req, res) => {
+  req.session.previewOverride = req.body;
+  res.json({ ok: true });
+});
+
 function userBadges(u) {
   let list = [];
   try { list = JSON.parse(u.badges || '[]'); } catch (e) { list = []; }
@@ -662,7 +701,7 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const accent2 = safeHex(b.accent2, '#22d3ee');
     const effect = ['snow', 'rain', 'stars', 'hearts', 'bubbles', 'particles', 'fireflies', 'sakura', 'matrix', 'shootingstars', 'constellation', 'none'].includes(b.effect) ? b.effect : 'none';
     const effectIntensity = ['low', 'medium', 'high'].includes(b.effect_intensity) ? b.effect_intensity : 'medium';
-    const layout = ['standard', 'split', 'grid', 'void', 'glass', 'cards'].includes(b.layout) ? b.layout : 'standard';
+    const layout = ['standard', 'split', 'grid', 'void', 'glass', 'cards', 'hud-classic', 'hud-rich', 'hud-float', 'hud-status'].includes(b.layout) ? b.layout : 'standard';
     const status = ['online', 'idle', 'dnd', 'offline', ''].includes(b.status) ? b.status : '';
     const cursorStyle = ALLOWED_CURSORS.includes(b.cursor_style) ? b.cursor_style : 'none';
     const cursor = cursorStyle !== 'none' ? 1 : 0;
@@ -825,6 +864,10 @@ app.get('/:username', (req, res, next) => {
     if (alias) u = db.prepare('SELECT * FROM users WHERE id = ?').get(alias.user_id);
   }
   if (!u) return res.status(404).render('404');
+
+  // Apercu en direct : le proprietaire du profil peut voir ses modifications non enregistrees
+  const isPreview = req.query.preview === '1' && req.session.userId === u.id;
+  if (isPreview && req.session.previewOverride) u = applyPreviewOverride(u, req.session.previewOverride);
 
   // Compteur de vues "intelligent" :
   //  - on ne compte pas les visites du proprietaire du profil
