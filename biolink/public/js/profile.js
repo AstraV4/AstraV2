@@ -374,23 +374,20 @@ if (CONFIG.githubUser && /^[A-Za-z0-9-]{1,39}$/.test(CONFIG.githubUser)){
     .catch(() => {});
 }
 
-// --- Widget YouTube (miniature + titre via oEmbed, sans cle API) ---
+// --- Widget YouTube (carte de redirection, fiable, pas d'appel API fragile) ---
 if (CONFIG.widgetYoutube) {
-  fetch('/api/widget/youtube?ch=' + encodeURIComponent(CONFIG.widgetYoutube))
-    .then(r => r.json())
-    .then(d => {
-      if (!d || !d.title) return;
-      const card = document.createElement('a'); card.className = 'yt-card';
-      card.href = d.url || ('https://www.youtube.com/' + CONFIG.widgetYoutube); card.target = '_blank'; card.rel = 'noopener';
-      if (d.thumbnail) { const img = document.createElement('img'); img.className = 'yt-av'; img.src = d.thumbnail; img.alt = ''; img.loading = 'lazy'; card.appendChild(img); }
-      const info = document.createElement('div'); info.className = 'yt-info';
-      const name = document.createElement('div'); name.className = 'yt-name'; name.textContent = d.title;
-      const tag = document.createElement('span'); tag.className = 'yt-tag'; tag.textContent = '▶ YouTube';
-      info.appendChild(name); info.appendChild(tag);
-      card.appendChild(info);
-      $('widgets').appendChild(card);
-    })
-    .catch(() => {});
+  const handle = CONFIG.widgetYoutube;
+  const target = handle.startsWith('@') ? ('https://www.youtube.com/' + handle) : ('https://www.youtube.com/channel/' + handle);
+  const card = document.createElement('a'); card.className = 'yt-card';
+  card.href = target; card.target = '_blank'; card.rel = 'noopener';
+  const icon = document.createElement('span'); icon.className = 'yt-icon'; icon.textContent = '▶';
+  const info = document.createElement('div'); info.className = 'yt-info';
+  const name = document.createElement('div'); name.className = 'yt-name'; name.textContent = handle;
+  const tag = document.createElement('span'); tag.className = 'yt-tag'; tag.textContent = 'YouTube';
+  info.appendChild(name); info.appendChild(tag);
+  const join = document.createElement('span'); join.className = 'yt-join'; join.textContent = "S'abonner";
+  card.appendChild(icon); card.appendChild(info); card.appendChild(join);
+  $('widgets').appendChild(card);
 }
 
 // --- Widget Telegram (carte de redirection vers le canal) ---

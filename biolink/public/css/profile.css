@@ -313,6 +313,8 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
   box-shadow:0 10px 30px rgba(0,0,0,.35);transition:.2s}
 .yt-card:hover,.tg-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2)}
 .yt-card .yt-av{width:48px;height:36px;border-radius:8px;object-fit:cover;flex:none;background:#1c1c26}
+.yt-card .yt-icon{width:38px;height:38px;border-radius:50%;background:rgba(255,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none;color:#ff0000}
+.yt-card .yt-join{flex:none;font-size:.75rem;font-weight:700;background:#ff0000;color:#fff;padding:6px 12px;border-radius:20px}
 .yt-card .yt-info,.tg-card .tg-info{min-width:0;flex:1}
 .yt-card .yt-name,.tg-card .tg-name{font-weight:700;font-size:.92rem;color:var(--widget-text,var(--text));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .yt-card .yt-tag,.tg-card .tg-tag{display:block;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#ff0000;margin-top:3px}

@@ -766,18 +766,6 @@ app.post('/dashboard', requireAuth, (req, res) => {
 //  API — RECHERCHE DE MUSIQUE (proxy iTunes Search, gratuit, sans cle)
 //  Renvoie des apercus de ~30s. Doit etre AVANT la route /:username.
 // ===========================================================================
-app.get('/api/widget/youtube', async (req, res) => {
-  const ch = (req.query.ch || '').trim();
-  if (!ch) return res.json({});
-  const target = ch.startsWith('@') ? ('https://www.youtube.com/' + ch) : ('https://www.youtube.com/channel/' + ch);
-  try {
-    const r = await fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent(target));
-    if (!r.ok) return res.json({});
-    const data = await r.json();
-    res.json({ title: data.title || '', thumbnail: data.thumbnail_url || '', url: target });
-  } catch (e) { res.json({}); }
-});
-
 app.get('/api/music/search', async (req, res) => {
   const q = (req.query.q || '').toString().trim();
   if (q.length < 2) return res.json([]);

@@ -50,11 +50,11 @@
         <div><b>@<%= u.username %></b><span><%= u.views %> vues</span></div>
       </div>
       <div class="tabs" id="tabs">
-        <button type="button" class="tab active" data-go="profil"><%= t('d_tab_profil') %></button>
-        <button type="button" class="tab" data-go="apparence"><%= t('d_tab_apparence') %></button>
-        <button type="button" class="tab" data-go="media"><%= t('d_tab_media') %></button>
-        <button type="button" class="tab" data-go="liens"><%= t('d_tab_liens') %></button>
-        <button type="button" class="tab" data-go="infos"><%= t('d_tab_infos') %></button>
+        <button type="button" class="tab active" data-go="profil">👤 <%= t('d_tab_profil') %></button>
+        <button type="button" class="tab" data-go="apparence">🎨 <%= t('d_tab_apparence') %></button>
+        <button type="button" class="tab" data-go="media">🖼️ <%= t('d_tab_media') %></button>
+        <button type="button" class="tab" data-go="liens">🔗 <%= t('d_tab_liens') %></button>
+        <button type="button" class="tab" data-go="infos">🧩 <%= t('d_tab_infos') %></button>
       </div>
     </aside>
     <div class="dash-main">
@@ -266,18 +266,21 @@
           </select>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
-        <input type="checkbox" name="show_uid" id="show_uid" style="width:auto" <%= u.show_uid?'checked':'' %> />
-        <label for="show_uid" style="margin:0"><%= t('d_show_uid') %></label>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
-        <input type="checkbox" name="show_likes" id="show_likes" style="width:auto" <%= (u.show_likes===undefined||u.show_likes)?'checked':'' %> />
-        <label for="show_likes" style="margin:0"><%= t('d_show_likes') %></label>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
-        <input type="checkbox" name="avatar_glow" id="avatar_glow" style="width:auto" <%= u.avatar_glow?'checked':'' %> />
-        <label for="avatar_glow" style="margin:0"><%= t('d_avatar_glow') %></label>
-      </div>
+      <label class="switch-wrap" style="margin-top:14px">
+        <input type="checkbox" name="show_uid" <%= u.show_uid?'checked':'' %> />
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_show_uid') %></span>
+      </label>
+      <label class="switch-wrap" style="margin-top:10px">
+        <input type="checkbox" name="show_likes" <%= (u.show_likes===undefined||u.show_likes)?'checked':'' %> />
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_show_likes') %></span>
+      </label>
+      <label class="switch-wrap" style="margin-top:10px">
+        <input type="checkbox" name="avatar_glow" <%= u.avatar_glow?'checked':'' %> />
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_avatar_glow') %></span>
+      </label>
 
       <div class="row2" style="margin-top:14px">
         <div>
@@ -346,13 +349,15 @@
           <input type="text" name="enter_text" value="<%= u.enter_text %>" maxlength="40" placeholder="click to enter" />
         </div>
       </div>
-      <label class="check" style="margin-top:12px">
+      <label class="switch-wrap" style="margin-top:12px">
         <input type="checkbox" name="show_joined" value="1" <%= u.show_joined?'checked':'' %> />
-        <%= t('d_show_joined') %>
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_show_joined') %></span>
       </label>
-      <label class="check" style="margin-top:10px">
+      <label class="switch-wrap" style="margin-top:10px">
         <input type="checkbox" name="card_tilt" value="1" <%= u.card_tilt?'checked':'' %> />
-        <%= t('d_card_tilt') %>
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_card_tilt') %></span>
       </label>
       <label><%= t('d_enter_anim') %></label>
       <select name="enter_anim">
@@ -488,14 +493,16 @@
       <input type="text" name="widget_telegram" value="<%= u.widget_telegram %>" placeholder="ex: monCanal" />
       <div class="hint"><%= t('d_widget_telegram_hint') %></div>
 
-      <div style="display:flex;align-items:center;gap:8px;margin-top:18px">
-        <input type="checkbox" name="show_views" id="show_views" style="width:auto" <%= (u.show_views===undefined||u.show_views)?'checked':'' %> />
-        <label for="show_views" style="margin:0"><%= t('d_show_views') %></label>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
-        <input type="checkbox" name="hide_badges" id="hide_badges" style="width:auto" <%= u.hide_badges?'checked':'' %> />
-        <label for="hide_badges" style="margin:0"><%= t('d_hide_badges') %></label>
-      </div>
+      <label class="switch-wrap" style="margin-top:18px">
+        <input type="checkbox" name="show_views" <%= (u.show_views===undefined||u.show_views)?'checked':'' %> />
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_show_views') %></span>
+      </label>
+      <label class="switch-wrap" style="margin-top:10px">
+        <input type="checkbox" name="hide_badges" <%= u.hide_badges?'checked':'' %> />
+        <span class="switch-track"><span class="switch-knob"></span></span>
+        <span class="switch-text"><%= t('d_hide_badges') %></span>
+      </label>
     </div>
 
     <div class="section" data-tab="infos">
@@ -517,6 +524,21 @@
       <a class="btn" href="/<%= u.username %>" target="_blank"><%= t('d_preview') %></a>
     </div>
     </div><!-- /dash-main -->
+
+    <aside class="dash-preview">
+      <div class="preview-sticky">
+        <div class="phone-mock">
+          <div class="phone-screen-mock" id="pvScreen">
+            <div class="pv-av" id="pvAv"<% if (u.avatar) { %> style="background-image:url(<%= u.avatar %>)"<% } %>></div>
+            <div class="pv-name" id="pvName"><%= u.title || ('@' + u.username) %></div>
+            <div class="pv-bio" id="pvBio"><%= bio.split('\n')[0] || '' %></div>
+            <div class="pv-lnk">🔗 <%= t('d_preview_link') %></div>
+            <div class="pv-lnk">🔗 <%= t('d_preview_link') %></div>
+          </div>
+        </div>
+        <p class="preview-label"><%= t('d_preview_label') %></p>
+      </div>
+    </aside>
    </div><!-- /dash-layout -->
   </form>
 
@@ -636,6 +658,27 @@ document.querySelectorAll('.layout-opt').forEach(function(opt){
     opt.classList.add('active');
   });
 });
+
+// --- Aperçu en direct (titre, bio, couleur, avatar) ---
+(function livePreview(){
+  const titleInput = document.querySelector('input[name="title"]');
+  const bioInput = document.querySelector('textarea[name="bio"]');
+  const accentInput = document.getElementById('acc1');
+  const avatarInput = document.querySelector('input[name="avatar"]');
+  const pvName = document.getElementById('pvName');
+  const pvBio = document.getElementById('pvBio');
+  const pvAv = document.getElementById('pvAv');
+  if (!pvName) return; // colonne d'aperçu masquée (petit écran) : rien à faire
+  if (titleInput) titleInput.addEventListener('input', () => { pvName.textContent = titleInput.value || pvName.dataset.fallback || '@'; });
+  if (bioInput) bioInput.addEventListener('input', () => { pvBio.textContent = (bioInput.value || '').split('\n')[0]; });
+  if (accentInput) accentInput.addEventListener('input', () => { document.documentElement.style.setProperty('--pv-accent', accentInput.value); pvAv.style.background = accentInput.value; });
+  if (avatarInput) avatarInput.addEventListener('change', () => {
+    const f = avatarInput.files && avatarInput.files[0]; if (!f) return;
+    const url = URL.createObjectURL(f);
+    pvAv.style.backgroundImage = 'url(' + url + ')';
+    pvAv.style.backgroundSize = 'cover'; pvAv.style.backgroundPosition = 'center';
+  });
+})();
 
 // --- Aperçu animé des particules (même moteur que le vrai profil, condensé) ---
 (function fxPreview(){
