@@ -583,6 +583,25 @@ app.post('/auth/discord/unlink', requireAuth, (req, res) => {
   res.redirect('/dashboard?discord=unlinked');
 });
 
+// ---- Pseudos alias (redirigent vers le meme profil) ----
+app.post('/account/alias/add', requireAuth, (req, res) => {
+  const alias = (req.body.alias || '').trim();
+  const aliasLower = alias.toLowerCase();
+  if (!validUsername(alias)) return res.redirect('/dashboard?aliaserr=1#alias');
+  if (isOffensiveUsername(alias)) return res.redirect('/dashboard?aliaserr=1#alias');
+  const takenByUser = db.prepare('SELECT 1 FROM users WHERE username_lower = ?').get(aliasLower);
+  const takenByAlias = db.prepare('SELECT 1 FROM aliases WHERE alias_lower = ?').get(aliasLower);
+  if (takenByUser || takenByAlias) return res.redirect('/dashboard?aliaserr=2#alias');
+  const count = db.prepare('SELECT COUNT(*) c FROM aliases WHERE user_id = ?').get(req.session.userId).c;
+  if (count >= 5) return res.redirect('/dashboard?aliaserr=3#alias');
+  db.prepare('INSERT INTO aliases (alias_lower, alias, user_id, created_at) VALUES (?,?,?,?)').run(aliasLower, alias, req.session.userId, Date.now());
+  res.redirect('/dashboard#alias');
+});
+app.post('/account/alias/delete', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM aliases WHERE alias_lower = ? AND user_id = ?').run((req.body.alias || '').toLowerCase(), req.session.userId);
+  res.redirect('/dashboard#alias');
+});
+
 app.get('/dashboard', requireAuth, (req, res) => {
   const u = db.prepare('SELECT * FROM users WHERE id = ?').get(req.session.userId);
   // Statistiques : vues des 14 derniers jours
@@ -593,6 +612,11 @@ app.get('/dashboard', requireAuth, (req, res) => {
     const r = dayRow.get(u.id, d);
     stats.push({ day: d.slice(5), count: r ? r.count : 0 });
   }
+  // Statistiques avancees : repartition par appareil et par provenance (30 derniers jours)
+  const since = Date.now() - 30 * 86400000;
+  const deviceStats = db.prepare('SELECT device, COUNT(*) c FROM views_meta WHERE user_id = ? AND created_at > ? GROUP BY device ORDER BY c DESC').all(u.id, since);
+  const referrerStats = db.prepare('SELECT referrer, COUNT(*) c FROM views_meta WHERE user_id = ? AND created_at > ? GROUP BY referrer ORDER BY c DESC LIMIT 8').all(u.id, since);
+  const aliases = db.prepare('SELECT alias, created_at FROM aliases WHERE user_id = ? ORDER BY created_at DESC').all(u.id);
   res.render('dashboard', {
     u,
     bio: JSON.parse(u.bio || '[]').join('\n'),
@@ -607,6 +631,10 @@ app.get('/dashboard', requireAuth, (req, res) => {
     allowedAvatarShape: ALLOWED_AVATAR_SHAPE,
     fontCatalog: FONT_CATALOG,
     stats,
+    deviceStats,
+    referrerStats,
+    aliases,
+    aliasError: req.query.aliaserr || null,
     saved: req.query.saved === '1',
     pwok: req.query.pwok === '1',
     pwerr: req.query.pwerr || '',
@@ -656,6 +684,11 @@ app.post('/dashboard', requireAuth, (req, res) => {
     const showJoined = b.show_joined ? 1 : 0;
     const githubUser = /^[A-Za-z0-9-]{1,39}$/.test((b.github_user || '').trim()) ? b.github_user.trim() : '';
     const cardTilt = b.card_tilt ? 1 : 0;
+    const widgetYoutube = /^[A-Za-z0-9_@.\/-]{1,60}$/.test((b.widget_youtube || '').trim()) ? b.widget_youtube.trim() : '';
+    const widgetTelegram = /^[A-Za-z0-9_]{1,32}$/.test((b.widget_telegram || '').trim()) ? b.widget_telegram.trim() : '';
+    const bioTypewriter = b.bio_typewriter ? 1 : 0;
+    const showViews = b.show_views ? 1 : 0;
+    const hideBadges = b.hide_badges ? 1 : 0;
     const avatarSize = ALLOWED_AVATAR_SIZE.includes(b.avatar_size) ? b.avatar_size : 'md';
     const showUid = b.show_uid ? 1 : 0;
     const badgeStyle = ALLOWED_BADGE_STYLE.includes(b.badge_style) ? b.badge_style : 'multi';
@@ -716,14 +749,14 @@ app.post('/dashboard', requireAuth, (req, res) => {
       socials=?, buttons=?, avatar=?, background=?, bg_is_video=?, song=?, song_art=?,
       timezone=?, skills=?, location=?, discord_guild=?, discord_user=?, cursor_style=?,
       card_style=?, card_shape=?, avatar_shape=?, cursor_image=?, enter_text=?, username_effect=?,
-      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?, effect_intensity=?, layout=?
+      avatar_size=?, show_uid=?, badge_style=?, badge_color=?, bg_blur=?, avatar_glow=?, banner=?, enter_anim=?, card_blur=?, bg_overlay=?, text_color=?, bio_color=?, social_color=?, social_color_hex=?, show_likes=?, username_color=?, title_color=?, widget_color=?, font=?, username_font=?, show_joined=?, github_user=?, card_tilt=?, first_name=?, last_name=?, effect_intensity=?, layout=?, widget_youtube=?, widget_telegram=?, bio_typewriter=?, show_views=?, hide_badges=?
       WHERE id=?`).run(
       title, bioLines, songName, accent, accent2, effect, status, cursor,
       JSON.stringify(socials), JSON.stringify(buttons),
       avatar, background, bgIsVideo, song, songArt,
       timezone, skills, location, discordGuild, discordUser, cursorStyle,
       cardStyle, cardShape, avatarShape, cursorImage, enterText, usernameEffect,
-      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, effectIntensity, layout, u.id
+      avatarSize, showUid, badgeStyle, badgeColor, bgBlur, avatarGlow, banner, enterAnim, cardBlur, bgOverlay, textColor, bioColor, socialColor, socialColorHex, showLikes, usernameColor, titleColor, widgetColor, font, usernameFont, showJoined, githubUser, cardTilt, firstName, lastName, effectIntensity, layout, widgetYoutube, widgetTelegram, bioTypewriter, showViews, hideBadges, u.id
     );
 
     res.redirect('/dashboard?saved=1');
@@ -734,6 +767,18 @@ app.post('/dashboard', requireAuth, (req, res) => {
 //  API — RECHERCHE DE MUSIQUE (proxy iTunes Search, gratuit, sans cle)
 //  Renvoie des apercus de ~30s. Doit etre AVANT la route /:username.
 // ===========================================================================
+app.get('/api/widget/youtube', async (req, res) => {
+  const ch = (req.query.ch || '').trim();
+  if (!ch) return res.json({});
+  const target = ch.startsWith('@') ? ('https://www.youtube.com/' + ch) : ('https://www.youtube.com/channel/' + ch);
+  try {
+    const r = await fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent(target));
+    if (!r.ok) return res.json({});
+    const data = await r.json();
+    res.json({ title: data.title || '', thumbnail: data.thumbnail_url || '', url: target });
+  } catch (e) { res.json({}); }
+});
+
 app.get('/api/music/search', async (req, res) => {
   const q = (req.query.q || '').toString().trim();
   if (q.length < 2) return res.json([]);
@@ -786,7 +831,12 @@ app.get('/leaderboard', (req, res) => {
 app.get('/:username', (req, res, next) => {
   const name = req.params.username;
   if (RESERVED.has(name.toLowerCase())) return next();
-  const u = db.prepare('SELECT * FROM users WHERE username_lower = ?').get(name.toLowerCase());
+  let u = db.prepare('SELECT * FROM users WHERE username_lower = ?').get(name.toLowerCase());
+  if (!u) {
+    // Pas de pseudo direct : peut-être un alias qui redirige vers un vrai compte
+    const alias = db.prepare('SELECT user_id FROM aliases WHERE alias_lower = ?').get(name.toLowerCase());
+    if (alias) u = db.prepare('SELECT * FROM users WHERE id = ?').get(alias.user_id);
+  }
   if (!u) return res.status(404).render('404');
 
   // Compteur de vues "intelligent" :
@@ -801,6 +851,12 @@ app.get('/:username', (req, res, next) => {
       db.prepare('UPDATE users SET views = views + 1 WHERE id = ?').run(u.id);
       const today = new Date().toISOString().slice(0, 10);
       db.prepare('INSERT INTO views_daily (user_id, day, count) VALUES (?,?,1) ON CONFLICT(user_id,day) DO UPDATE SET count = count + 1').run(u.id, today);
+      const ua = (req.headers['user-agent'] || '').toLowerCase();
+      const device = /mobile|android|iphone/.test(ua) ? 'mobile' : (/ipad|tablet/.test(ua) ? 'tablette' : 'ordinateur');
+      let referrer = 'direct';
+      const ref = req.headers['referer'] || '';
+      if (ref) { try { referrer = new URL(ref).hostname.replace(/^www\./, '').slice(0, 60) || 'direct'; } catch (e) {} }
+      db.prepare('INSERT INTO views_meta (user_id, device, referrer, created_at) VALUES (?,?,?,?)').run(u.id, device, referrer, Date.now());
       req.session.viewed[u.username_lower] = Date.now();
       viewsCount = u.views + 1;
     }
@@ -869,6 +925,11 @@ app.get('/:username', (req, res, next) => {
     cardTilt:     !!u.card_tilt,
     effectIntensity: u.effect_intensity || 'medium',
     layout:       u.layout || 'standard',
+    widgetYoutube: u.widget_youtube || '',
+    widgetTelegram: u.widget_telegram || '',
+    bioTypewriter: !!u.bio_typewriter,
+    showViews: u.show_views === undefined ? true : !!u.show_views,
+    hideBadges: !!u.hide_badges,
     views:      viewsCount
   };
   // Serialisation JSON sure (empeche la cassure de la balise </script>)

@@ -179,6 +179,10 @@ const BADGE_DEFS = {
 };
 const BADGE_ORDER = ['verified','staff','owner','developer','premium','donator','booster','partner','early','og','winner','bughunter','gamer','artist','vip','legend','moderator','creator','supporter'];
 const badgesBox = $('badges');
+// --- Masquer les vues et/ou les badges, si l'utilisateur l'a choisi ---
+if (CONFIG.showViews === false) $('views-wrap').style.display = 'none';
+if (CONFIG.hideBadges) $('badges').style.display = 'none';
+
 const myBadges = CONFIG.badges || [];
 BADGE_ORDER.forEach(key => {
   if (myBadges.indexOf(key) < 0) return;
@@ -368,6 +372,39 @@ if (CONFIG.githubUser && /^[A-Za-z0-9-]{1,39}$/.test(CONFIG.githubUser)){
       $('widgets').appendChild(card);
     })
     .catch(() => {});
+}
+
+// --- Widget YouTube (miniature + titre via oEmbed, sans cle API) ---
+if (CONFIG.widgetYoutube) {
+  fetch('/api/widget/youtube?ch=' + encodeURIComponent(CONFIG.widgetYoutube))
+    .then(r => r.json())
+    .then(d => {
+      if (!d || !d.title) return;
+      const card = document.createElement('a'); card.className = 'yt-card';
+      card.href = d.url || ('https://www.youtube.com/' + CONFIG.widgetYoutube); card.target = '_blank'; card.rel = 'noopener';
+      if (d.thumbnail) { const img = document.createElement('img'); img.className = 'yt-av'; img.src = d.thumbnail; img.alt = ''; img.loading = 'lazy'; card.appendChild(img); }
+      const info = document.createElement('div'); info.className = 'yt-info';
+      const name = document.createElement('div'); name.className = 'yt-name'; name.textContent = d.title;
+      const tag = document.createElement('span'); tag.className = 'yt-tag'; tag.textContent = '▶ YouTube';
+      info.appendChild(name); info.appendChild(tag);
+      card.appendChild(info);
+      $('widgets').appendChild(card);
+    })
+    .catch(() => {});
+}
+
+// --- Widget Telegram (carte de redirection vers le canal) ---
+if (CONFIG.widgetTelegram) {
+  const card = document.createElement('a'); card.className = 'tg-card';
+  card.href = 'https://t.me/' + CONFIG.widgetTelegram; card.target = '_blank'; card.rel = 'noopener';
+  const icon = document.createElement('span'); icon.className = 'tg-icon'; icon.textContent = '✈️';
+  const info = document.createElement('div'); info.className = 'tg-info';
+  const name = document.createElement('div'); name.className = 'tg-name'; name.textContent = '@' + CONFIG.widgetTelegram;
+  const tag = document.createElement('span'); tag.className = 'tg-tag'; tag.textContent = 'Telegram';
+  info.appendChild(name); info.appendChild(tag);
+  const join = document.createElement('span'); join.className = 'tg-join'; join.textContent = 'Rejoindre';
+  card.appendChild(icon); card.appendChild(info); card.appendChild(join);
+  $('widgets').appendChild(card);
 }
 
 // --- Carte qui s'incline avec la souris (effet 3D) ---

@@ -262,3 +262,10 @@ input[type=color]{height:44px;padding:4px;cursor:pointer}
 .fx-preview-box{position:relative;height:110px;border-radius:12px;overflow:hidden;background:#0a0a0f;border:1px solid var(--border);margin:10px 0 4px}
 .fx-preview-box canvas{position:absolute;inset:0;width:100%;height:100%}
 .fx-preview-label{position:absolute;bottom:6px;left:10px;font-size:.72rem;color:var(--dim);background:rgba(0,0,0,.5);padding:2px 8px;border-radius:10px}
+
+/* ---------- Barres de statistiques (appareil / provenance) ---------- */
+.bar-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:.8rem}
+.bar-label{width:80px;flex:none;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{flex:1;background:var(--panel-2);border-radius:6px;height:8px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px}
+.bar-val{width:28px;flex:none;text-align:right;color:var(--dim);font-size:.75rem}

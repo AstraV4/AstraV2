@@ -479,6 +479,23 @@
       <label><%= t('d_github') %></label>
       <input type="text" name="github_user" value="<%= u.github_user %>" placeholder="ex: torvalds" />
       <div class="hint"><%= t('d_github_hint') %></div>
+
+      <label><%= t('d_widget_youtube') %></label>
+      <input type="text" name="widget_youtube" value="<%= u.widget_youtube %>" placeholder="ex: @mrbeast" />
+      <div class="hint"><%= t('d_widget_youtube_hint') %></div>
+
+      <label><%= t('d_widget_telegram') %></label>
+      <input type="text" name="widget_telegram" value="<%= u.widget_telegram %>" placeholder="ex: monCanal" />
+      <div class="hint"><%= t('d_widget_telegram_hint') %></div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-top:18px">
+        <input type="checkbox" name="show_views" id="show_views" style="width:auto" <%= (u.show_views===undefined||u.show_views)?'checked':'' %> />
+        <label for="show_views" style="margin:0"><%= t('d_show_views') %></label>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+        <input type="checkbox" name="hide_badges" id="hide_badges" style="width:auto" <%= u.hide_badges?'checked':'' %> />
+        <label for="hide_badges" style="margin:0"><%= t('d_hide_badges') %></label>
+      </div>
     </div>
 
     <div class="section" data-tab="infos">
@@ -531,6 +548,24 @@
         </div>
       <% }) %>
     </div>
+    <% if (deviceStats.length || referrerStats.length) { %>
+      <div class="row2" style="margin-top:20px">
+        <div>
+          <label style="margin-top:0"><%= t('d_stats_device') %></label>
+          <% var dmax = Math.max(1, ...deviceStats.map(function(d){return d.c;})); %>
+          <% deviceStats.forEach(function(d){ %>
+            <div class="bar-row"><span class="bar-label"><%= d.device %></span><div class="bar-track"><div class="bar-fill" style="width:<%= Math.round(d.c/dmax*100) %>%"></div></div><span class="bar-val"><%= d.c %></span></div>
+          <% }) %>
+        </div>
+        <div>
+          <label style="margin-top:0"><%= t('d_stats_referrer') %></label>
+          <% var rmax = Math.max(1, ...referrerStats.map(function(r){return r.c;})); %>
+          <% referrerStats.forEach(function(r){ %>
+            <div class="bar-row"><span class="bar-label"><%= r.referrer %></span><div class="bar-track"><div class="bar-fill" style="width:<%= Math.round(r.c/rmax*100) %>%"></div></div><span class="bar-val"><%= r.c %></span></div>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
   </div>
 
   <div class="panel" style="margin-top:20px">
@@ -561,6 +596,27 @@
       </div>
       <button class="btn btn-primary" type="submit" style="margin-top:12px"><%= t('d_pw_btn') %></button>
     </form>
+  </div>
+
+  <div class="panel" style="margin-top:20px" id="alias">
+    <h3 style="margin-bottom:6px"><%= t('d_alias_title') %></h3>
+    <p class="hint"><%= t('d_alias_hint') %></p>
+    <% if (aliasError) { %><div class="error" style="margin-top:8px"><%= {1:t('d_alias_err_invalid'),2:t('d_alias_err_taken'),3:t('d_alias_err_max')}[aliasError] %></div><% } %>
+    <% aliases.forEach(function(a){ %>
+      <div class="repeat-row">
+        <input type="text" value="<%= siteName %>/<%= a.alias %>" readonly style="opacity:.75" />
+        <form method="POST" action="/account/alias/delete" style="display:inline">
+          <input type="hidden" name="alias" value="<%= a.alias %>" />
+          <button class="btn btn-danger" type="submit">✕</button>
+        </form>
+      </div>
+    <% }) %>
+    <% if (aliases.length < 5) { %>
+      <form method="POST" action="/account/alias/add" style="display:flex;gap:8px;margin-top:10px">
+        <input type="text" name="alias" placeholder="<%= t('d_alias_ph') %>" maxlength="20" required />
+        <button class="btn btn-primary" type="submit"><%= t('d_alias_add') %></button>
+      </form>
+    <% } %>
   </div>
 
   <div class="panel" style="margin-top:20px;border-color:rgba(239,68,68,.3)">

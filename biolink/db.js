@@ -110,6 +110,31 @@ addCol('github_user',   "TEXT DEFAULT ''");
 addCol('card_tilt',     "INTEGER DEFAULT 0");
 addCol('layout',        "TEXT DEFAULT 'standard'");
 addCol('effect_intensity', "TEXT DEFAULT 'medium'");
+// --- Widgets riches (YouTube, Telegram — le widget Discord + la présence en direct existent déjà) ---
+addCol('widget_youtube',  "TEXT DEFAULT ''");
+addCol('widget_telegram', "TEXT DEFAULT ''");
+// --- Masquer vues / badges ---
+addCol('show_views',  "INTEGER DEFAULT 1");
+addCol('hide_badges', "INTEGER DEFAULT 0");
+// --- Statistiques avancées (appareil + provenance) ---
+db.exec(`
+CREATE TABLE IF NOT EXISTS views_meta (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  device TEXT DEFAULT 'unknown',
+  referrer TEXT DEFAULT 'direct',
+  created_at INTEGER NOT NULL
+);
+`);
+// --- Pseudos alias (redirigent vers le même profil) ---
+db.exec(`
+CREATE TABLE IF NOT EXISTS aliases (
+  alias_lower TEXT PRIMARY KEY,
+  alias TEXT NOT NULL,
+  user_id INTEGER NOT NULL,
+  created_at INTEGER NOT NULL
+);
+`);
 
 // Table des vues par jour (pour les statistiques)
 db.exec(`
