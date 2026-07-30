@@ -257,3 +257,8 @@ input[type=color]{height:44px;padding:4px;cursor:pointer}
 .pp-item img{width:100%;height:100%;object-fit:contain}
 .pp-custom{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-top:8px;cursor:pointer;color:var(--text);font-size:.85rem;font-family:inherit}
 .pp-custom:hover{border-color:var(--accent)}
+
+/* ---------- Aperçu animé des particules ---------- */
+.fx-preview-box{position:relative;height:110px;border-radius:12px;overflow:hidden;background:#0a0a0f;border:1px solid var(--border);margin:10px 0 4px}
+.fx-preview-box canvas{position:absolute;inset:0;width:100%;height:100%}
+.fx-preview-label{position:absolute;bottom:6px;left:10px;font-size:.72rem;color:var(--dim);background:rgba(0,0,0,.5);padding:2px 8px;border-radius:10px}

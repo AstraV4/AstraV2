@@ -315,48 +315,70 @@ body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;opac
 .share-btn:hover{background:rgba(255,255,255,.16);transform:translateY(-1px)}
 
 /* ===================================================================
-   Mises en page (layout) : réarrangent les éléments existants,
-   aucune fonctionnalité dupliquée — badges/musique/likes marchent partout.
+   Mises en page (layout) v2 : vraies transformations visuelles,
+   toujours sur les mêmes éléments (badges/musique/likes marchent partout).
    =================================================================== */
 
-/* --- Split : en-tête sur une ligne (avatar à gauche, texte à droite) --- */
-body[data-layout="split"] .card{text-align:left}
-body[data-layout="split"] .avatar-wrap,
-body[data-layout="split"] .username,
-body[data-layout="split"] .badges-row,
-body[data-layout="split"] .title{
-  display:inline-block;vertical-align:top}
-body[data-layout="split"] #card > .avatar-wrap{float:left;margin:4px 14px 10px 0}
-body[data-layout="split"] .bio,
-body[data-layout="split"] .joined,
-body[data-layout="split"] .views,
-body[data-layout="split"] .skills,
-body[data-layout="split"] .links,
-body[data-layout="split"] .btn-links{clear:both}
+/* --- Split : vraie 2 colonnes (avatar/infos à gauche, liens à droite) ---
+   Lignes de grille explicites (et non auto) pour garantir que les 2 colonnes
+   démarrent bien en haut, quel que soit l'ordre d'apparition dans le DOM. */
+body[data-layout="split"] #card{
+  display:grid;grid-template-columns:130px 1fr;column-gap:20px;row-gap:6px;
+  text-align:left;align-items:start;padding:26px 22px}
+body[data-layout="split"] #card > .banner{grid-column:1/3;grid-row:1}
+body[data-layout="split"] #card > .avatar-wrap{grid-column:1;grid-row:2;margin:0 auto 10px}
+body[data-layout="split"] #card > .username{grid-column:1;grid-row:3;text-align:center}
+body[data-layout="split"] #card > .badges-row{grid-column:1;grid-row:4;text-align:center}
+body[data-layout="split"] #card > .title{grid-column:1;grid-row:5;text-align:center}
+body[data-layout="split"] #card > .bio{grid-column:1;grid-row:6;text-align:center}
+body[data-layout="split"] #card > .joined{grid-column:1;grid-row:7;text-align:center}
+body[data-layout="split"] #card > .views{grid-column:1;grid-row:8;text-align:center}
+body[data-layout="split"] #card > .skills{grid-column:1;grid-row:9;text-align:center}
+body[data-layout="split"] #card > .links{grid-column:1;grid-row:10;flex-direction:column;gap:8px}
+body[data-layout="split"] #card > .uid{grid-column:2;grid-row:2}
+body[data-layout="split"] #card > #like-btn{grid-column:2;grid-row:3}
+body[data-layout="split"] #card > .share-btn{grid-column:2;grid-row:4}
+body[data-layout="split"] #card > .btn-links{grid-column:2;grid-row:5}
+body[data-layout="split"] #card > #widgets{grid-column:2;grid-row:6}
 
-/* --- Void : minimaliste, texte pur, pas de bloc décoratif --- */
+/* --- Void : ultra minimaliste, grand texte, pas de carte --- */
 body[data-layout="void"] .avatar-wrap,
 body[data-layout="void"] .badges-row,
 body[data-layout="void"] .skills,
 body[data-layout="void"] .uid,
 body[data-layout="void"] .views,
 body[data-layout="void"] .banner{display:none !important}
-body[data-layout="void"] .card{background:transparent;box-shadow:none;backdrop-filter:none;padding:40px 20px}
-body[data-layout="void"] .card::before,
-body[data-layout="void"] .card::after{display:none}
-body[data-layout="void"] .username{font-size:1.6rem;letter-spacing:-.02em}
-body[data-layout="void"] .btn-link{background:none;border:none;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;padding:12px 0;text-align:center}
+body[data-layout="void"] #card{background:transparent;box-shadow:none;backdrop-filter:none;padding:56px 22px 30px;
+  background:radial-gradient(100% 60% at 50% 0%, color-mix(in srgb,var(--accent) 18%,transparent), transparent 70%)}
+body[data-layout="void"] #card::before,
+body[data-layout="void"] #card::after{display:none}
+body[data-layout="void"] .username{font-size:2.1rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+body[data-layout="void"] .bio{font-size:.85rem;margin:12px 0 34px;letter-spacing:.02em}
+body[data-layout="void"] .btn-link{background:none;border:none;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;
+  padding:15px 0;text-align:center;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:.85rem}
 body[data-layout="void"] .btn-link:hover{background:rgba(255,255,255,.05)}
+body[data-layout="void"] .links{margin-top:30px;justify-content:center}
+body[data-layout="void"] .links a{background:transparent;border:1px solid rgba(255,255,255,.15)}
 
-/* --- Glass : chaque lien devient sa propre carte translucide --- */
+/* --- Glass : chaque lien est sa propre carte en verre dépoli, avec relief --- */
 body[data-layout="glass"] .btn-links{gap:12px}
-body[data-layout="glass"] .btn-link{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-body[data-layout="glass"] .links a{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px)}
+body[data-layout="glass"] .btn-link{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(14px);box-shadow:0 12px 32px rgba(0,0,0,.35);padding:14px 16px;border-radius:16px;transition:transform .2s,box-shadow .2s}
+body[data-layout="glass"] .btn-link:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,.45)}
+body[data-layout="glass"] .links a{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(14px)}
+body[data-layout="glass"] .avatar-wrap img{box-shadow:0 0 0 6px rgba(255,255,255,.08),0 0 50px color-mix(in srgb,var(--accent) 40%,transparent)}
 
-/* --- Portfolio (grille) : les liens en grille 2 colonnes --- */
-body[data-layout="grid"] .btn-links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-body[data-layout="grid"] .btn-link{text-align:center}
+/* --- Portfolio : grille façon icônes d'application --- */
+body[data-layout="grid"] .links{justify-content:center;gap:14px;margin:16px 0}
+body[data-layout="grid"] .btn-links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+body[data-layout="grid"] .btn-link{aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-size:.74rem;font-weight:700;padding:10px;border-radius:20px;line-height:1.25;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);transition:transform .15s}
+body[data-layout="grid"] .btn-link:hover{transform:scale(1.05)}
 
-/* --- Cards : gros boutons espacés, plus de respiration --- */
-body[data-layout="cards"] .btn-links{gap:16px}
-body[data-layout="cards"] .btn-link{padding:18px;font-size:1.02rem;border-radius:18px}
+/* --- Cards : gros boutons colorés, alignés à gauche, très visuels --- */
+body[data-layout="cards"] .btn-links{gap:14px}
+body[data-layout="cards"] .btn-link{padding:18px 20px;font-size:1rem;border-radius:20px;text-align:left;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 20%,transparent),color-mix(in srgb,var(--accent-2) 12%,transparent));
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 12px 32px rgba(0,0,0,.35);transition:transform .2s}
+body[data-layout="cards"] .btn-link:hover{transform:translateX(4px)}

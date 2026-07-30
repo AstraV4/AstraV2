@@ -594,6 +594,12 @@ addEventListener('mouseleave', () => card.style.transform = '');
   const NEW_TYPES = ['particles','fireflies','sakura','matrix','shootingstars','constellation'];
   const rnd = (a,b) => a + Math.random()*(b-a);
 
+  // Position du curseur/doigt, suivie en continu pour l'effet Constellation interactif
+  let mouseX = -9999, mouseY = -9999, mouseActive = false;
+  addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; mouseActive = true; });
+  addEventListener('touchmove', e => { if (e.touches[0]) { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; mouseActive = true; } }, { passive: true });
+  addEventListener('mouseleave', () => mouseActive = false);
+
   if (NEW_TYPES.includes(CONFIG.effect)) {
     // --- Moteur des 6 nouveaux effets (indépendant de l'ancien moteur ci-dessous) ---
     const baseCounts = { particles:34, fireflies:20, sakura:28, matrix:18, shootingstars:6, constellation:26 };
@@ -634,11 +640,31 @@ addEventListener('mouseleave', () => card.style.transform = '');
           ctx.globalAlpha = 1 - p.life/p.maxLife;
           ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-p.vx*4,p.y-p.vy*4); ctx.stroke(); });
       } else if (CONFIG.effect==='constellation'){
-        P.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1; });
+        // Les particules derivent normalement, et sont legerement attirees vers le curseur quand il est proche
+        P.forEach(p=>{
+          if (mouseActive){
+            const dx=mouseX-p.x, dy=mouseY-p.y, d=Math.hypot(dx,dy);
+            if (d<160 && d>0.1){ p.vx += (dx/d)*0.012; p.vy += (dy/d)*0.012; }
+          }
+          p.vx*=0.99; p.vy*=0.99; // frein doux pour eviter l'emballement
+          p.x+=p.vx; p.y+=p.vy;
+          if(p.x<0||p.x>W)p.vx*=-1; if(p.y<0||p.y>H)p.vy*=-1;
+        });
+        // Liens entre particules proches
         ctx.strokeStyle='rgba(167,139,250,.35)'; ctx.lineWidth=1;
         for(let i=0;i<P.length;i++) for(let j=i+1;j<P.length;j++){
           const a=P[i],b=P[j]; const d=Math.hypot(a.x-b.x,a.y-b.y);
           if(d<70){ ctx.globalAlpha=1-d/70; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke(); }
+        }
+        // Liens lumineux vers le curseur : la constellation "se rejoint" autour du doigt/de la souris
+        if (mouseActive){
+          ctx.strokeStyle='rgba(196,181,253,.9)'; ctx.lineWidth=1.3;
+          P.forEach(p=>{
+            const d=Math.hypot(mouseX-p.x, mouseY-p.y);
+            if (d<160){ ctx.globalAlpha=1-d/160; ctx.beginPath(); ctx.moveTo(mouseX,mouseY); ctx.lineTo(p.x,p.y); ctx.stroke(); }
+          });
+          ctx.globalAlpha=.9; ctx.fillStyle='#e9e4ff';
+          ctx.beginPath(); ctx.arc(mouseX,mouseY,2.4,0,7); ctx.fill();
         }
         ctx.fillStyle='#c4b5fd'; ctx.globalAlpha=.9;
         P.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,2,0,7); ctx.fill(); });
